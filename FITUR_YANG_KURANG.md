@@ -15,7 +15,7 @@ Setelah analisis, sistem **BELUM PUNYA** fitur-fitur authentication & user manag
 ### 4. ❌ Profile Management (Edit Profile)
 ### 5. ❌ Change Password (untuk user yang sudah login)
 ### 6. ✅ Logout dari Semua Device
-### 7. ❌ Login Attempt Limiting (Protection dari brute force)
+### 7. ✅ Login Attempt Limiting (Protection dari brute force)
 ### 8. ❌ Two-Factor Authentication (2FA)
 
 ---
