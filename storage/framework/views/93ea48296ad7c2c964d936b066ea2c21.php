@@ -187,5 +187,6 @@
 </div>
 <?php endif; ?>
 <?php $__env->stopSection(); ?>
+</a>
 
 <?php echo $__env->make('layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH E:\laragon\www\rumahsakit\resources\views/dashboard.blade.php ENDPATH**/ ?>

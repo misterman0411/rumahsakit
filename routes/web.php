@@ -20,6 +20,7 @@ use App\Http\Controllers\RoomController;
 use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\VitalSignController;
 use App\Http\Controllers\QueueDisplayController;
+use App\Http\Controllers\ProfileController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -356,6 +357,15 @@ Route::middleware(['auth'])->group(function () {
     // View access - all authenticated
     Route::get('departments', [DepartmentController::class, 'index'])->name('departments.index');
     Route::get('departments/{department}', [DepartmentController::class, 'show'])->name('departments.show');
+});
+
+// ============================================
+// PROFILE MANAGEMENT
+// ============================================
+Route::middleware(['auth'])->group(function () {
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::put('/profile/password', [ProfileController::class, 'updatePassword'])->name('profile.password');
 });
 
 require __DIR__.'/auth.php';

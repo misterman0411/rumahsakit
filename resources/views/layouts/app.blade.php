@@ -40,6 +40,68 @@
         .select2-results__option--highlighted {
             background-color: #6366f1 !important;
         }
+        
+        /* Profile Dropdown Styles */
+        .profile-dropdown {
+            display: none;
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            z-index: 50;
+            min-width: 240px;
+            margin-top: 0.5rem;
+        }
+        
+        .profile-dropdown.active {
+            display: block;
+            animation: slideDown 0.2s ease-out;
+        }
+        
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-8px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .profile-dropdown-item {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            text-decoration: none;
+            color: #374151;
+            font-size: 0.875rem;
+            border-bottom: 1px solid #f3f4f6;
+            transition: background-color 0.2s;
+        }
+        
+        .profile-dropdown-item:last-child {
+            border-bottom: none;
+        }
+        
+        .profile-dropdown-item:hover {
+            background-color: #f9fafb;
+            color: #6366f1;
+        }
+        
+        .profile-dropdown-item.danger:hover {
+            background-color: #fef2f2;
+            color: #dc2626;
+        }
+        
+        .profile-dropdown-item svg {
+            width: 1rem;
+            height: 1rem;
+            margin-right: 0.75rem;
+        }
     </style>
 </head>
 <body class="bg-gray-50">
@@ -54,27 +116,50 @@
                 <div class="flex items-center justify-between px-8 py-5">
                     <h1 class="text-2xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">@yield('title', 'Dashboard')</h1>
                     <div class="flex items-center space-x-6">
-                        <div class="flex items-center space-x-3">
-                            <div class="text-right">
-                                <p class="text-sm font-semibold text-gray-700">{{ Auth::user()->nama }}</p>
-                                <p class="text-xs text-gray-500">{{ Auth::user()->email }}</p>
-                            </div>
-                            <div class="w-11 h-11 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-xl flex items-center justify-center text-white font-bold shadow-lg">
-                                {{ strtoupper(substr(Auth::user()->nama, 0, 1)) }}
+                        <!-- Profile Section with Dropdown -->
+                        <div class="relative">
+                            <!-- Profile Button -->
+                            <button id="profileBtn" class="flex items-center space-x-3 hover:opacity-80 transition-opacity cursor-pointer">
+                                <div class="text-right">
+                                    <p class="text-sm font-semibold text-gray-700">{{ Auth::user()->nama }}</p>
+                                    <p class="text-xs text-gray-500">{{ Auth::user()->email }}</p>
+                                </div>
+                                <div class="w-11 h-11 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-xl flex items-center justify-center text-white font-bold shadow-lg">
+                                    {{ strtoupper(substr(Auth::user()->nama, 0, 1)) }}
+                                </div>
+                            </button>
+
+                            <!-- Dropdown Menu -->
+                            <div id="profileDropdown" class="profile-dropdown">
+                                <!-- Profile Header -->
+                                <div class="px-4 py-3 bg-gradient-to-r from-indigo-50 to-purple-50 border-b border-gray-200">
+                                    <p class="text-xs font-medium text-gray-600 uppercase tracking-wide">Akun</p>
+                                </div>
+
+                                <!-- Menu Items -->
+                                <a href="{{ route('profile.edit') }}" class="profile-dropdown-item">
+                                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                                    </svg>
+                                    <span>Edit Profile</span>
+                                </a>
+                                
+                                <!-- Logout -->
+                                <form method="POST" action="{{ route('logout') }}" class="profile-dropdown-item danger" style="padding: 0;">
+                                    @csrf
+                                    <button type="submit" style="display: flex; align-items: center; width: 100%; padding: 0.75rem 1rem; background: none; border: none; cursor: pointer; font-size: 0.875rem;">
+                                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+                                        </svg>
+                                        <span>Logout</span>
+                                    </button>
+                                </form>
                             </div>
                         </div>
+
                         <span class="px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-xs font-semibold rounded-lg shadow-md">
                             {{ ucfirst(Auth::user()->role->nama ?? 'User') }}
                         </span>
-                        <form method="POST" action="{{ route('logout') }}" class="inline">
-                            @csrf
-                            <button type="submit" class="flex items-center space-x-2 px-4 py-2 bg-red-50 text-red-600 hover:bg-red-100 rounded-lg transition-colors font-medium text-sm">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
-                                </svg>
-                                <span>Logout</span>
-                            </button>
-                        </form>
                     </div>
                 </div>
             </header>
@@ -139,6 +224,29 @@
                         width: '100%'
                     });
                 }
+            });
+        });
+
+        // Profile Dropdown Toggle
+        const profileBtn = document.getElementById('profileBtn');
+        const profileDropdown = document.getElementById('profileDropdown');
+
+        profileBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            profileDropdown.classList.toggle('active');
+        });
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!profileBtn.contains(e.target) && !profileDropdown.contains(e.target)) {
+                profileDropdown.classList.remove('active');
+            }
+        });
+
+        // Close dropdown when clicking on a link
+        document.querySelectorAll('.profile-dropdown-item').forEach(item => {
+            item.addEventListener('click', function() {
+                profileDropdown.classList.remove('active');
             });
         });
     </script>
