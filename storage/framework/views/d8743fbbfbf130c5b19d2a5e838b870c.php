@@ -54,12 +54,12 @@
 
                 <p class="text-gray-500 mb-8 text-sm">
                     Don't have an account?
-                    <a href="{{ route('register') }}" class="text-blue-600 font-medium hover:underline">Create an account</a><br>
+                    <a href="<?php echo e(route('register')); ?>" class="text-blue-600 font-medium hover:underline">Create an account</a><br>
                     It will take less than a minute.
                 </p>
 
                 <!-- Locked Message (Countdown Timer) -->
-                @if(!empty($attemptInfo) && $attemptInfo['is_locked'] && $attemptInfo['locked_until'])
+                <?php if(!empty($attemptInfo) && $attemptInfo['is_locked'] && $attemptInfo['locked_until']): ?>
                     <div id="lockMessageContainer" class="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
                         <div class="flex items-center gap-2 mb-2">
                             <svg class="w-5 h-5 text-red-600" fill="currentColor" viewBox="0 0 20 20">
@@ -72,7 +72,7 @@
                         </p>
                     </div>
                 <!-- Attempt Counter Warning -->
-                @elseif ($errors->any() && !empty($attemptInfo) && $attemptInfo['attempts'] > 0 && !$attemptInfo['is_locked']) 
+                <?php elseif($errors->any() && !empty($attemptInfo) && $attemptInfo['attempts'] > 0 && !$attemptInfo['is_locked']): ?> 
                     <div class="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
                         <div class="flex items-center gap-2 mb-2">
                             <svg class="w-5 h-5 text-yellow-600" fill="currentColor" viewBox="0 0 20 20">
@@ -80,24 +80,24 @@
                             </svg>
                             <p class="text-yellow-800 text-sm font-medium">Login gagal!</p>
                         </div>
-                        @foreach ($errors->all() as $error)
+                        <?php $__currentLoopData = $errors->all(); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $error): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                         <p class="text-yellow-700 text-sm">• salah input email atau password</p>
-                        @endforeach
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                         <p class="text-yellow-700 text-sm">
-                            <strong class="text-red-600">{{ $attemptInfo['remaining'] }}</strong> percobaan tersisa sebelum akun terkunci.
+                            <strong class="text-red-600"><?php echo e($attemptInfo['remaining']); ?></strong> percobaan tersisa sebelum akun terkunci.
                         </p>
                     </div>
-                @elseif ($errors->any())
+                <?php elseif($errors->any()): ?>
                     <div class="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
                         <p class="text-red-700 text-sm font-medium">Login gagal!</p>
-                        @foreach ($errors->all() as $error)
-                            <p class="text-red-600 text-sm">• {{ $error }}</p>
-                        @endforeach
+                        <?php $__currentLoopData = $errors->all(); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $error): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                            <p class="text-red-600 text-sm">• <?php echo e($error); ?></p>
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                     </div>
-                @endif
+                <?php endif; ?>
 
-                <form method="POST" action="{{ route('login') }}" id="loginForm">
-                    @csrf
+                <form method="POST" action="<?php echo e(route('login')); ?>" id="loginForm">
+                    <?php echo csrf_field(); ?>
 
                     <!-- Email -->
                     <div class="mb-6">
@@ -106,8 +106,8 @@
                         </label>
 
                         <div class="relative">
-                            <input id="email" type="email" name="email" value="{{ old('email') }}" required
-                                   class="w-full px-4 py-3 border-b focus:outline-none transition bg-transparent placeholder-gray-400 {{ $errors->has('email') ? 'border-red-500 focus:border-red-600' : 'border-gray-300 focus:border-blue-600' }}"
+                            <input id="email" type="email" name="email" value="<?php echo e(old('email')); ?>" required
+                                   class="w-full px-4 py-3 border-b focus:outline-none transition bg-transparent placeholder-gray-400 <?php echo e($errors->has('email') ? 'border-red-500 focus:border-red-600' : 'border-gray-300 focus:border-blue-600'); ?>"
                                    placeholder="Enter your email">
 
                             <div class="absolute right-0 top-3 text-gray-400">
@@ -117,9 +117,16 @@
                                 </svg>
                             </div>
                         </div>
-                        @error('email')
-                            <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-                        @enderror
+                        <?php $__errorArgs = ['email'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                            <p class="text-red-500 text-sm mt-1"><?php echo e($message); ?></p>
+                        <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                     </div>
 
                     <!-- Password -->
@@ -130,7 +137,7 @@
 
                         <div class="relative">
                             <input id="password" type="password" name="password" required
-                                   class="w-full px-4 py-3 border-b focus:outline-none transition bg-transparent placeholder-gray-400 {{ $errors->has('password') ? 'border-red-500 focus:border-red-600' : 'border-gray-300 focus:border-blue-600' }}"
+                                   class="w-full px-4 py-3 border-b focus:outline-none transition bg-transparent placeholder-gray-400 <?php echo e($errors->has('password') ? 'border-red-500 focus:border-red-600' : 'border-gray-300 focus:border-blue-600'); ?>"
                                    placeholder="Enter your password">
                             <div class="absolute right-0 top-3 text-gray-400">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -139,9 +146,16 @@
                                 </svg>
                             </div>
                         </div>
-                        @error('password')
-                            <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-                        @enderror
+                        <?php $__errorArgs = ['password'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                            <p class="text-red-500 text-sm mt-1"><?php echo e($message); ?></p>
+                        <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                     </div>
 
                     <!-- Remember & Submit -->
@@ -176,8 +190,8 @@
 
 <script>
     // Countdown Timer untuk Lock Message
-    @if(!empty($attemptInfo) && $attemptInfo['is_locked'] && $attemptInfo['locked_until'])
-        const lockedUntil = new Date('{{ $attemptInfo['locked_until'] }}').getTime();
+    <?php if(!empty($attemptInfo) && $attemptInfo['is_locked'] && $attemptInfo['locked_until']): ?>
+        const lockedUntil = new Date('<?php echo e($attemptInfo['locked_until']); ?>').getTime();
         const lockTimerElement = document.getElementById('lockTimer');
         const lockMessageContainer = document.getElementById('lockMessageContainer');
         const submitBtn = document.getElementById('submitBtn');
@@ -204,8 +218,9 @@
         // Update immediately dan setiap 1 detik
         updateCountdown();
         const countdownInterval = setInterval(updateCountdown, 1000);
-    @endif
+    <?php endif; ?>
 </script>
 
 </body>
 </html>
+<?php /**PATH E:\laragon\www\rumahsakit\resources\views/auth/login.blade.php ENDPATH**/ ?>

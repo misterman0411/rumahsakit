@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\LoginAttempt;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -11,9 +13,29 @@ class AuthenticatedSessionController extends Controller
     /**
      * Display the login view.
      */
-    public function create()
+    public function create(Request $request)
     {
-        return view('auth.login');
+        $email = old('email', '');
+        $ipAddress = $request->ip();
+        $attemptInfo = [];
+
+        if ($email) {
+            $attempt = LoginAttempt::where('email', $email)
+                ->where('ip_address', $ipAddress)
+                ->first();
+
+            if ($attempt) {
+                $attemptInfo = [
+                    'attempts' => $attempt->attempts,
+                    'remaining' => max(0, 5 - $attempt->attempts),
+                    'is_locked' => LoginAttempt::isLocked($email, $ipAddress),
+                    'locked_minutes' => LoginAttempt::getLockedMinutesRemaining($email, $ipAddress),
+                    'locked_until' => $attempt->locked_until ? $attempt->locked_until->toIso8601String() : null,
+                ];
+            }
+        }
+
+        return view('auth.login', ['attemptInfo' => $attemptInfo]);
     }
 
     /**
@@ -21,15 +43,41 @@ class AuthenticatedSessionController extends Controller
      */
     public function store(Request $request)
     {
+        $email = $request->input('email');
+        $ipAddress = $request->ip();
+
+        // Cek apakah akun sudah di-lock
+        if (LoginAttempt::isLocked($email, $ipAddress)) {
+            return back()->onlyInput('email');
+        }
+
         $credentials = $request->validate([
             'email' => ['required', 'email'],
             'password' => ['required'],
         ]);
 
+        // Cek apakah email ada di database
+        $userExists = User::where('email', $email)->exists();
+        if (!$userExists) {
+            return back()->withErrors([
+                'email' => 'Email tidak terdaftar. Silakan buat akun baru terlebih dahulu.',
+            ])->onlyInput('email');
+        }
+
         if (Auth::attempt($credentials, $request->boolean('remember'))) {
+            // Reset attempts ketika login berhasil
+            LoginAttempt::resetAttempts($email, $ipAddress);
             $request->session()->regenerate();
 
             return redirect()->intended(route('dashboard'));
+        }
+
+        // Record failed attempt
+        LoginAttempt::recordAttempt($email, $ipAddress);
+        
+        // Cek lagi apakah baru di-lock setelah attempt ini
+        if (LoginAttempt::isLocked($email, $ipAddress)) {
+            return back()->onlyInput('email');
         }
 
         return back()->withErrors([
