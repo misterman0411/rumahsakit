@@ -5,7 +5,7 @@
 @section('content')
 <!-- Queue Display Links (Front Office & Admin) -->
 @if(auth()->user()->hasAnyRole(['front_office', 'admin']))
-<div class="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-xl shadow-lg p-6 mb-8 text-white">
+<div class="bg-linear-to-r from-blue-600 to-indigo-700 rounded-xl shadow-lg p-6 mb-8 text-white">
     <div class="flex items-center justify-between mb-4">
         <div class="flex items-center space-x-3">
             <div class="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center backdrop-blur-sm">
@@ -56,7 +56,7 @@
                 </svg>
             </div>
         </div>
-        <div class="text-4xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+        <div class="text-4xl font-bold bg-linear-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
             {{ strpos($label, 'revenue') !== false ? 'Rp ' . number_format($value, 0, ',', '.') : $value }}
         </div>
     </div>
@@ -94,10 +94,7 @@
                     <td class="px-6 py-4 text-sm text-gray-900">{{ $apt->pasien->nama }}</td>
                     <td class="px-6 py-4 text-sm text-gray-600">{{ ucfirst($apt->type) }}</td>
                     <td class="px-6 py-4">
-                        <span class="px-3 py-1 text-xs font-semibold rounded-full
-                            @if($apt->status === 'completed') bg-green-100 text-green-800
-                            @elseif($apt->status === 'cancelled') bg-red-100 text-red-800
-                            @else bg-yellow-100 text-yellow-800 @endif">
+                        <span class="px-3 py-1 text-xs font-semibold rounded-full {{ $apt->status === 'completed' ? 'bg-green-100 text-green-800' : ($apt->status === 'cancelled' ? 'bg-red-100 text-red-800' : 'bg-yellow-100 text-yellow-800') }}">
                             {{ ucfirst($apt->status) }}
                         </span>
                     </td>
@@ -141,13 +138,11 @@
                     <td class="px-6 py-4">
                         <span class="px-3 py-1 text-xs font-semibold rounded-full
                             @if($patient->status === 'active') bg-green-100 text-green-800
-                            @else bg-gray-100 text-gray-800 @endif">
+                    <td class="px-6 py-4">
+                        <span class="px-3 py-1 text-xs font-semibold rounded-full {{ $patient->status === 'active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800' }}">
                             {{ ucfirst($patient->status) }}
                         </span>
                     </td>
-                </tr>
-                @endforeach
-            </tbody>
         </table>
     </div>
 </div>

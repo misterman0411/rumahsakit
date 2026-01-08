@@ -14,9 +14,18 @@ class ProfileController extends Controller
      */
     public function edit()
     {
-        return view('profile.edit', [
-            'user' => Auth::user()
-        ]);
+        $user = Auth::user();
+        $staffRoles = [
+            'admin', 'doctor', 'nurse', 'front_office', 
+            'pharmacist', 'lab_technician', 'radiologist', 
+            'cashier', 'management'
+        ];
+
+        if ($user->hasAnyRole($staffRoles)) {
+            return view('profile.edit', ['user' => $user]);
+        }
+
+        return view('profile.edit-public', ['user' => $user]);
     }
 
     /**

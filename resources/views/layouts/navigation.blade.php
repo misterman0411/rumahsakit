@@ -56,7 +56,7 @@
             <!-- Settings Dropdown -->
             <div class="hidden sm:flex sm:items-center sm:ml-6">
                 <div class="ml-3 relative">
-                    <span class="text-sm text-gray-700">{{ Auth::user()->nama }}</span>
+                    <span class="text-sm text-gray-700">{{ Auth::user()?->name ?? 'User' }}</span>
                     <a href="{{ route('confirm-logout-other-devices') }}" class="ml-3 text-sm text-red-600 hover:text-red-800">
                         Logout Other Devices
                     </a>

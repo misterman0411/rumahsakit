@@ -69,7 +69,18 @@ class AuthenticatedSessionController extends Controller
             LoginAttempt::resetAttempts($email, $ipAddress);
             $request->session()->regenerate();
 
-            return redirect()->intended(route('dashboard'));
+            $user = Auth::user();
+            $staffRoles = [
+                'admin', 'doctor', 'nurse', 'front_office', 
+                'pharmacist', 'lab_technician', 'radiologist', 
+                'cashier', 'management'
+            ];
+
+            if ($user->hasAnyRole($staffRoles)) {
+                return redirect()->intended(route('dashboard'));
+            }
+
+            return redirect()->intended(route('home'));
         }
 
         // Record failed attempt

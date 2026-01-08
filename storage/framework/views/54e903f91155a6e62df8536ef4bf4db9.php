@@ -144,7 +144,6 @@
                                     </svg>
                                     <span>Edit Profile</span>
                                 </a>
-                                
                                 <!-- Logout -->
                                 <form method="POST" action="<?php echo e(route('logout')); ?>" class="profile-dropdown-item danger" style="padding: 0;">
                                     <?php echo csrf_field(); ?>

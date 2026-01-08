@@ -24,7 +24,11 @@ use App\Http\Controllers\ProfileController;
 
 Route::get('/', function () {
     return view('welcome');
-});
+})->name('home');
+
+Route::get('/shop', [App\Http\Controllers\ShopController::class, 'index'])->name('shop.index');
+Route::get('/shop/{medication}', [App\Http\Controllers\ShopController::class, 'show'])->name('shop.show');
+
 
 // Midtrans Webhook (must be outside auth middleware)
 Route::post('/api/midtrans/notification', [MidtransController::class, 'notification'])->name('midtrans.notification');

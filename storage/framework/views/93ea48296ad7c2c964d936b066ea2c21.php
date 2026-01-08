@@ -3,7 +3,7 @@
 <?php $__env->startSection('content'); ?>
 <!-- Queue Display Links (Front Office & Admin) -->
 <?php if(auth()->user()->hasAnyRole(['front_office', 'admin'])): ?>
-<div class="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-xl shadow-lg p-6 mb-8 text-white">
+<div class="bg-linear-to-r from-blue-600 to-indigo-700 rounded-xl shadow-lg p-6 mb-8 text-white">
     <div class="flex items-center justify-between mb-4">
         <div class="flex items-center space-x-3">
             <div class="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center backdrop-blur-sm">
@@ -54,7 +54,7 @@
                 </svg>
             </div>
         </div>
-        <div class="text-4xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+        <div class="text-4xl font-bold bg-linear-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
             <?php echo e(strpos($label, 'revenue') !== false ? 'Rp ' . number_format($value, 0, ',', '.') : $value); ?>
 
         </div>
@@ -93,10 +93,7 @@
                     <td class="px-6 py-4 text-sm text-gray-900"><?php echo e($apt->pasien->nama); ?></td>
                     <td class="px-6 py-4 text-sm text-gray-600"><?php echo e(ucfirst($apt->type)); ?></td>
                     <td class="px-6 py-4">
-                        <span class="px-3 py-1 text-xs font-semibold rounded-full
-                            <?php if($apt->status === 'completed'): ?> bg-green-100 text-green-800
-                            <?php elseif($apt->status === 'cancelled'): ?> bg-red-100 text-red-800
-                            <?php else: ?> bg-yellow-100 text-yellow-800 <?php endif; ?>">
+                        <span class="px-3 py-1 text-xs font-semibold rounded-full <?php echo e($apt->status === 'completed' ? 'bg-green-100 text-green-800' : ($apt->status === 'cancelled' ? 'bg-red-100 text-red-800' : 'bg-yellow-100 text-yellow-800')); ?>">
                             <?php echo e(ucfirst($apt->status)); ?>
 
                         </span>
@@ -139,9 +136,7 @@
                     <td class="px-6 py-4 text-sm font-semibold text-gray-900"><?php echo e($patient->nama); ?></td>
                     <td class="px-6 py-4 text-sm text-gray-600"><?php echo e($patient->telepon); ?></td>
                     <td class="px-6 py-4">
-                        <span class="px-3 py-1 text-xs font-semibold rounded-full
-                            <?php if($patient->status === 'active'): ?> bg-green-100 text-green-800
-                            <?php else: ?> bg-gray-100 text-gray-800 <?php endif; ?>">
+                        <span class="px-3 py-1 text-xs font-semibold rounded-full <?php echo e($patient->status === 'active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'); ?>">
                             <?php echo e(ucfirst($patient->status)); ?>
 
                         </span>
