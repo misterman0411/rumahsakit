@@ -70,12 +70,12 @@
         </div>
         <div>
             <label class="text-sm font-medium text-gray-500">Doctor</label>
-            <p class="mt-1 text-gray-900">{{ $appointment->dokter->nama_lengkap }}</p>
+            <p class="mt-1 text-gray-900">{{ $appointment->dokter->user->nama }}</p>
             <p class="text-sm text-gray-500">{{ $appointment->dokter->departemen->nama }}</p>
         </div>
         <div>
             <label class="text-sm font-medium text-gray-500">Date & Time</label>
-            <p class="mt-1 text-gray-900">{{ \Carbon\Carbon::parse($appointment->janjiTemu_date)->format('d F Y, H:i') }}</p>
+            <p class="mt-1 text-gray-900">{{ \Carbon\Carbon::parse($appointment->tanggal_janji)->format('d F Y, H:i') }}</p>
         </div>
         <div>
             <label class="text-sm font-medium text-gray-500">Type</label>

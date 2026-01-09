@@ -95,9 +95,9 @@
                 <!-- Admission Type -->
                 <div>
                     <label class="block text-sm font-semibold text-gray-700 mb-2">Tipe Rawat Inap <span class="text-red-500">*</span></label>
-                    <select name="admission_type" required class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 @error('admission_type') border-red-500 @enderror">
-                        <option value="emergency" {{ old('admission_type') == 'emergency' ? 'selected' : '' }}>Emergency</option>
-                        <option value="elective" {{ old('admission_type') == 'elective' ? 'selected' : '' }}>Elective</option>
+                    <select name="jenis_masuk" required class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 @error('jenis_masuk') border-red-500 @enderror">
+                        <option value="darurat" {{ old('jenis_masuk') == 'darurat' ? 'selected' : '' }}>Darurat (Emergency)</option>
+                        <option value="elektif" {{ old('jenis_masuk') == 'elektif' ? 'selected' : '' }}>Elektif (Scheduled)</option>
                     </select>
                     @error('admission_type')
                         <p class="mt-1 text-sm text-red-500">{{ $message }}</p>
@@ -136,7 +136,7 @@ document.getElementById('room_id').addEventListener('change', function() {
     if (selectedOption.value) {
         const beds = JSON.parse(selectedOption.dataset.beds);
         beds.forEach(bed => {
-            if (bed.status === 'available') {
+            if (bed.status === 'tersedia') {
                 const option = document.createElement('option');
                 option.value = bed.id;
                 option.textContent = `Bed ${bed.bed_number}`;

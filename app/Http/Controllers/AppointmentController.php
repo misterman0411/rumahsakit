@@ -9,12 +9,28 @@ use App\Models\Department;
 use App\Models\Invoice;
 use App\Models\ServiceCharge;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class AppointmentController extends Controller
 {
     public function index(Request $request)
     {
         $query = Appointment::with(['pasien', 'dokter.user', 'departemen']);
+
+        // Filter berdasarkan role user
+        $user = Auth::user();
+        $role = $user->peran->nama ?? null;
+
+        if ($role === 'doctor') {
+            // Jika login sebagai dokter, hanya tampilkan appointment dokter tersebut
+            $doctor = Doctor::where('user_id', $user->id)->first();
+            if ($doctor) {
+                $query->where('dokter_id', $doctor->id);
+            }
+        } elseif ($role === 'nurse') {
+            // Jika login sebagai perawat, bisa filter berdasarkan departemen jika perlu
+            // (bisa disesuaikan dengan kebutuhan)
+        }
 
         if ($request->filled('search')) {
             $search = $request->search;
@@ -85,7 +101,7 @@ class AppointmentController extends Controller
             'diskon' => 0,
             'pajak' => 0,
             'total' => $feeAmount,
-            'status' => 'unpaid',
+            'status' => 'belum_dibayar',
             'jatuh_tempo' => now()->addDays(7),
         ]);
 

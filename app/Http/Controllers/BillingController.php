@@ -49,22 +49,19 @@ class BillingController extends Controller
         DB::beginTransaction();
         try {
             $payment = Payment::create([
-                'pasien_id' => $invoice->pasien_id,
+                'tagihan_id' => $invoice->id,
                 'jumlah' => $validated['jumlah'],
                 'metode_pembayaran' => $validated['metode_pembayaran'],
                 'tanggal_pembayaran' => $validated['tanggal_pembayaran'],
                 'catatan' => $validated['catatan'] ?? null,
-                'diproses_oleh' => Auth::id(),
+                'diterima_oleh' => Auth::id(),
             ]);
-
-            // Attach payment to invoice
-            $payment->tagihan()->attach($invoice->id);
 
             // Update invoice status if fully paid
             if ($validated['jumlah'] >= $invoice->total) {
-                $invoice->update(['status' => 'paid']);
+                $invoice->update(['status' => 'lunas']);
             } else {
-                $invoice->update(['status' => 'partially_paid']);
+                $invoice->update(['status' => 'dibayar_sebagian']);
             }
 
             DB::commit();
@@ -92,25 +89,25 @@ class BillingController extends Controller
             $invoices = Invoice::whereIn('id', $validated['tagihan_ids'])->get();
             $totalAmount = $invoices->sum('total');
 
-            $payment = Payment::create([
-                'pasien_id' => $invoices->first()->pasien_id,
-                'jumlah' => $totalAmount,
-                'metode_pembayaran' => $validated['metode_pembayaran'],
-                'tanggal_pembayaran' => $validated['tanggal_pembayaran'],
-                'catatan' => $validated['catatan'] ?? null,
-                'processed_by' => Auth::id(),
-            ]);
-
-            // Attach payment to all invoices
-            $payment->invoices()->attach($validated['invoice_ids']);
+            // Create separate payment for each invoice
+            foreach ($invoices as $invoice) {
+                Payment::create([
+                    'tagihan_id' => $invoice->id,
+                    'jumlah' => $invoice->total,
+                    'metode_pembayaran' => $validated['metode_pembayaran'],
+                    'tanggal_pembayaran' => $validated['tanggal_pembayaran'],
+                    'catatan' => $validated['catatan'] ?? null,
+                    'diterima_oleh' => Auth::id(),
+                ]);
+            }
 
             // Update all invoices to paid
-            Invoice::whereIn('id', $validated['invoice_ids'])->update(['status' => 'paid']);
+            Invoice::whereIn('id', $validated['tagihan_ids'])->update(['status' => 'lunas']);
 
             DB::commit();
 
             return redirect()->route('billing.index')
-                ->with('success', "Pembayaran {$invoices->count()} invoice berhasil diproses dengan nomor: {$payment->payment_number}");
+                ->with('success', "Pembayaran {$invoices->count()} invoice berhasil diproses");
         } catch (\Exception $e) {
             DB::rollBack();
             return back()->with('error', 'Gagal memproses pembayaran: ' . $e->getMessage())->withInput();
@@ -119,13 +116,13 @@ class BillingController extends Controller
 
     public function payments(Request $request)
     {
-        $query = Payment::with(['patient', 'invoices', 'processor']);
+        $query = Payment::with(['tagihan', 'diterimaOleh']);
 
-        if ($request->filled('payment_method')) {
-            $query->where('payment_method', $request->payment_method);
+        if ($request->filled('metode_pembayaran')) {
+            $query->where('metode_pembayaran', $request->metode_pembayaran);
         }
 
-        $payments = $query->latest('payment_date')->paginate(20);
+        $payments = $query->latest('tanggal_pembayaran')->paginate(20);
 
         return view('billing.payments', compact('payments'));
     }

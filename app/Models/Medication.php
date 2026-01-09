@@ -36,4 +36,9 @@ class Medication extends Model
     {
         return $this->hasMany(PrescriptionItem::class, 'obat_id');
     }
+
+    public function mutasiStok()
+    {
+        return $this->hasMany(StockMovement::class, 'obat_id');
+    }
 }

@@ -82,7 +82,7 @@
             </div>
             <div class="text-right">
                 <div class="text-3xl font-bold text-blue-900">
-                    Rp {{ number_format($charges->sum('total_amount'), 0, ',', '.') }}
+                    Rp {{ number_format($charges->sum('total'), 0, ',', '.') }}
                 </div>
             </div>
         </div>
@@ -110,29 +110,29 @@
                     @foreach($charges as $charge)
                     <tr class="hover:bg-gray-50">
                         <td class="px-4 py-3 text-sm text-gray-900">
-                            {{ \Carbon\Carbon::parse($charge->charge_date)->format('d M Y') }}
+                            {{ \Carbon\Carbon::parse($charge->tanggal)->format('d M Y') }}
                         </td>
                         <td class="px-4 py-3">
                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
-                                @if($charge->charge_type == 'room') bg-blue-100 text-blue-800
-                                @elseif($charge->charge_type == 'doctor_visit') bg-green-100 text-green-800
-                                @elseif($charge->charge_type == 'medication') bg-purple-100 text-purple-800
-                                @elseif($charge->charge_type == 'procedure') bg-indigo-100 text-indigo-800
-                                @elseif($charge->charge_type == 'lab') bg-yellow-100 text-yellow-800
-                                @elseif($charge->charge_type == 'radiology') bg-pink-100 text-pink-800
-                                @elseif($charge->charge_type == 'nursing_care') bg-teal-100 text-teal-800
-                                @elseif($charge->charge_type == 'consultation') bg-orange-100 text-orange-800
+                                @if($charge->jenis_biaya == 'room') bg-blue-100 text-blue-800
+                                @elseif($charge->jenis_biaya == 'doctor_visit') bg-green-100 text-green-800
+                                @elseif($charge->jenis_biaya == 'medication') bg-purple-100 text-purple-800
+                                @elseif($charge->jenis_biaya == 'procedure') bg-indigo-100 text-indigo-800
+                                @elseif($charge->jenis_biaya == 'lab') bg-yellow-100 text-yellow-800
+                                @elseif($charge->jenis_biaya == 'radiology') bg-pink-100 text-pink-800
+                                @elseif($charge->jenis_biaya == 'nursing_care') bg-teal-100 text-teal-800
+                                @elseif($charge->jenis_biaya == 'consultation') bg-orange-100 text-orange-800
                                 @else bg-gray-100 text-gray-800 @endif">
-                                {{ ucfirst(str_replace('_', ' ', $charge->charge_type)) }}
+                                {{ ucfirst(str_replace('_', ' ', $charge->jenis_biaya)) }}
                             </span>
                         </td>
-                        <td class="px-4 py-3 text-sm text-gray-900">{{ $charge->description }}</td>
+                        <td class="px-4 py-3 text-sm text-gray-900">{{ $charge->deskripsi }}</td>
                         <td class="px-4 py-3 text-sm text-gray-900 text-right">{{ $charge->jumlah }}</td>
                         <td class="px-4 py-3 text-sm text-gray-900 text-right">
                             Rp {{ number_format($charge->harga_satuan, 0, ',', '.') }}
                         </td>
                         <td class="px-4 py-3 text-sm font-semibold text-gray-900 text-right">
-                            Rp {{ number_format($charge->total_amount, 0, ',', '.') }}
+                            Rp {{ number_format($charge->total, 0, ',', '.') }}
                         </td>
                         @if(auth()->user()->hasAnyRole(['cashier', 'admin']))
                         <td class="px-4 py-3 text-center">
@@ -155,7 +155,7 @@
                     <tr>
                         <td colspan="5" class="px-4 py-3 text-right text-sm font-bold text-gray-900">Grand Total:</td>
                         <td class="px-4 py-3 text-right text-lg font-bold text-blue-900">
-                            Rp {{ number_format($charges->sum('total_amount'), 0, ',', '.') }}
+                            Rp {{ number_format($charges->sum('total'), 0, ',', '.') }}
                         </td>
                         @if(auth()->user()->hasAnyRole(['cashier', 'admin']))
                         <td></td>

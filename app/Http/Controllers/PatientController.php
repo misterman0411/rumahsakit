@@ -72,9 +72,9 @@ class PatientController extends Controller
         $patient->load([
             'janjiTemu.dokter.user',
             'rekamMedis.dokter.user',
-            'resep.itemResep.obat',
-            'permintaanLaboratorium.jenisTes',
-            'permintaanRadiologi.jenisTes',
+            'prescriptions.itemResep.obat',
+            'laboratoryOrders.jenisTes',
+            'radiologyOrders.jenisTes',
         ]);
 
         return view('patients.show', compact('patient'));

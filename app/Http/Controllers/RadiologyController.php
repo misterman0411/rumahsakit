@@ -7,13 +7,29 @@ use App\Models\RadiologyTestType;
 use App\Models\Patient;
 use App\Models\Doctor;
 use App\Models\Invoice;
+use App\Models\MedicalRecord;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class RadiologyController extends Controller
 {
     public function index(Request $request)
     {
         $query = RadiologyOrder::with(['pasien', 'dokter.user', 'jenisTes']);
+
+        // Filter berdasarkan role user
+        $user = Auth::user();
+        $role = $user->peran->nama ?? null;
+
+        if ($role === 'doctor') {
+            // Jika login sebagai dokter, hanya tampilkan order radiologi dokter tersebut
+            $doctor = Doctor::where('user_id', $user->id)->first();
+            if ($doctor) {
+                $query->where('dokter_id', $doctor->id);
+            }
+        } elseif ($role === 'radiologist') {
+            // Radiologist bisa melihat semua order radiologi
+        }
 
         if ($request->filled('status')) {
             $query->where('status', $request->status);
@@ -26,7 +42,25 @@ class RadiologyController extends Controller
 
     public function create()
     {
-        $patients = Patient::orderBy('nama')->get();
+        $user = Auth::user();
+        $role = $user->peran->nama ?? null;
+        
+        // Filter pasien berdasarkan role
+        if ($role === 'doctor') {
+            // Hanya tampilkan pasien yang sudah pernah diperiksa oleh dokter ini
+            $doctor = Doctor::where('user_id', $user->id)->first();
+            if ($doctor) {
+                $patients = Patient::whereHas('rekamMedis', function ($query) use ($doctor) {
+                    $query->where('dokter_id', $doctor->id);
+                })->orderBy('nama')->get();
+            } else {
+                $patients = collect(); // empty collection
+            }
+        } else {
+            // Admin, radiologist, dll bisa lihat semua pasien
+            $patients = Patient::orderBy('nama')->get();
+        }
+        
         $doctors = Doctor::with('user')->get();
         $testTypes = RadiologyTestType::orderBy('nama')->get();
 
@@ -87,7 +121,7 @@ class RadiologyController extends Controller
         ]);
 
         $radiology->update([
-            'status' => 'scheduled',
+            'status' => 'sedang_diproses',
             'scheduled_date' => $validated['scheduled_date'],
         ]);
 

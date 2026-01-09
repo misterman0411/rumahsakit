@@ -10,7 +10,7 @@
                 <p class="text-gray-600 mt-2">{{ $prescription->nomor_resep }}</p>
             </div>
             <div class="flex space-x-2">
-                @if($prescription->status === 'pending')
+                @if($prescription->status === 'menunggu')
                     <form action="{{ route('prescriptions.verify', $prescription) }}" method="POST" class="inline">
                         @csrf
                         <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
@@ -18,7 +18,7 @@
                         </button>
                     </form>
                 @endif
-                @if($prescription->status === 'verified')
+                @if($prescription->status === 'diverifikasi')
                     <form action="{{ route('prescriptions.dispense', $prescription) }}" method="POST" class="inline">
                         @csrf
                         <button type="submit" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
@@ -43,9 +43,9 @@
                         <div>
                             <p class="text-sm text-gray-500">Status</p>
                             <span class="inline-flex px-3 py-1 rounded-full text-sm font-semibold
-                                @if($prescription->status === 'dispensed') bg-green-100 text-green-800
-                                @elseif($prescription->status === 'verified') bg-blue-100 text-blue-800
-                                @elseif($prescription->status === 'cancelled') bg-red-100 text-red-800
+                                @if($prescription->status === 'diserahkan') bg-green-100 text-green-800
+                                @elseif($prescription->status === 'diverifikasi') bg-blue-100 text-blue-800
+                                @elseif($prescription->status === 'dibatalkan') bg-red-100 text-red-800
                                 @else bg-yellow-100 text-yellow-800
                                 @endif">
                                 {{ ucfirst($prescription->status) }}
@@ -55,16 +55,16 @@
                             <p class="text-sm text-gray-500">Tanggal Dibuat</p>
                             <p class="font-semibold">{{ $prescription->created_at->format('d/m/Y H:i') }}</p>
                         </div>
-                        @if($prescription->verified_at)
+                        @if($prescription->waktu_verifikasi)
                         <div>
                             <p class="text-sm text-gray-500">Diverifikasi</p>
-                            <p class="font-semibold">{{ $prescription->verified_at->format('d/m/Y H:i') }}</p>
+                            <p class="font-semibold">{{ $prescription->waktu_verifikasi->format('d/m/Y H:i') }}</p>
                         </div>
                         @endif
-                        @if($prescription->dispensed_at)
+                        @if($prescription->waktu_diserahkan)
                         <div>
                             <p class="text-sm text-gray-500">Diserahkan</p>
-                            <p class="font-semibold">{{ $prescription->dispensed_at->format('d/m/Y H:i') }}</p>
+                            <p class="font-semibold">{{ $prescription->waktu_diserahkan->format('d/m/Y H:i') }}</p>
                         </div>
                         @endif
                     </div>
@@ -80,39 +80,39 @@
                 <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
                     <h2 class="text-xl font-bold text-gray-800 mb-4">Daftar Obat</h2>
                     <div class="space-y-4">
-                        @foreach($prescription->items as $item)
+                        @foreach($prescription->itemResep as $item)
                         <div class="border border-gray-200 rounded-lg p-4">
                             <div class="flex justify-between items-start mb-3">
                                 <div>
                                     <h3 class="font-bold text-gray-800 text-lg">{{ $item->obat->nama }}</h3>
-                                    <p class="text-sm text-gray-600">{{ $item->obat->generic_name }}</p>
+                                    <p class="text-sm text-gray-600">{{ $item->obat->kode }}</p>
                                 </div>
                                 <div class="text-right">
                                     <p class="text-sm text-gray-500">Harga</p>
-                                    <p class="font-bold text-indigo-600">Rp {{ number_format($item->price, 0, ',', '.') }}</p>
+                                    <p class="font-bold text-indigo-600">Rp {{ number_format($item->obat->harga * $item->jumlah, 0, ',', '.') }}</p>
                                 </div>
                             </div>
                             <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mt-3">
                                 <div>
                                     <p class="text-xs text-gray-500">Jumlah</p>
-                                    <p class="font-semibold">{{ $item->jumlah }} {{ $item->obat->unit }}</p>
+                                    <p class="font-semibold">{{ $item->jumlah }} {{ $item->obat->satuan }}</p>
                                 </div>
                                 <div>
                                     <p class="text-xs text-gray-500">Dosis</p>
-                                    <p class="font-semibold">{{ $item->dosage }}</p>
+                                    <p class="font-semibold">{{ $item->dosis }}</p>
                                 </div>
                                 <div>
                                     <p class="text-xs text-gray-500">Frekuensi</p>
-                                    <p class="font-semibold">{{ $item->frequency }}</p>
+                                    <p class="font-semibold">{{ $item->frekuensi }}</p>
                                 </div>
                                 <div>
                                     <p class="text-xs text-gray-500">Durasi</p>
-                                    <p class="font-semibold">{{ $item->duration }}</p>
+                                    <p class="font-semibold">{{ $item->durasi }}</p>
                                 </div>
                             </div>
-                            @if($item->instructions)
+                            @if($item->instruksi)
                             <div class="mt-3 bg-blue-50 p-3 rounded-lg">
-                                <p class="text-sm text-blue-800"><span class="font-semibold">Instruksi:</span> {{ $item->instructions }}</p>
+                                <p class="text-sm text-blue-800"><span class="font-semibold">Instruksi:</span> {{ $item->instruksi }}</p>
                             </div>
                             @endif
                         </div>
@@ -124,7 +124,7 @@
                         <div class="flex justify-between items-center">
                             <p class="text-lg font-bold text-gray-800">Total</p>
                             <p class="text-2xl font-bold text-indigo-600">
-                                Rp {{ number_format($prescription->items->sum('price'), 0, ',', '.') }}
+                                Rp {{ number_format($prescription->itemResep->sum(function($item) { return $item->obat->harga * $item->jumlah; }), 0, ',', '.') }}
                             </p>
                         </div>
                     </div>
@@ -192,12 +192,12 @@
                         </div>
                         <div>
                             <p class="text-sm text-gray-500">Total</p>
-                            <p class="text-2xl font-bold text-indigo-600">Rp {{ number_format($prescription->tagihan->total_amount, 0, ',', '.') }}</p>
+                            <p class="text-2xl font-bold text-indigo-600">Rp {{ number_format($prescription->tagihan->total, 0, ',', '.') }}</p>
                         </div>
                         <div>
                             <p class="text-sm text-gray-500">Status</p>
                             <span class="inline-flex px-3 py-1 rounded-full text-sm font-semibold
-                                @if($prescription->tagihan->status === 'paid') bg-green-100 text-green-800
+                                @if($prescription->tagihan->status === 'lunas') bg-green-100 text-green-800
                                 @else bg-yellow-100 text-yellow-800
                                 @endif">
                                 {{ ucfirst($prescription->tagihan->status) }}

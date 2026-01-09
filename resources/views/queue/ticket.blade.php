@@ -184,11 +184,11 @@
         </div>
         <div class="info-row">
             <span class="info-label">Tanggal:</span>
-            <span class="info-value">{{ $appointment->janjiTemu_date->format('d/m/Y') }}</span>
+            <span class="info-value">{{ $appointment->tanggal_janji->format('d/m/Y') }}</span>
         </div>
         <div class="info-row">
             <span class="info-label">Waktu:</span>
-            <span class="info-value">{{ $appointment->janjiTemu_time }}</span>
+            <span class="info-value">{{ $appointment->tanggal_janji->format('H:i') }}</span>
         </div>
         <div class="info-row">
             <span class="info-label">Check-in:</span>

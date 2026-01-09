@@ -50,16 +50,6 @@ class VitalSign extends Model
         return $this->belongsTo(InpatientAdmission::class, 'rawat_inap_id');
     }
 
-    public function rekamMedis()
-    {
-        return $this->belongsTo(MedicalRecord::class, 'rekam_medis_id');
-    }
-
-    public function dicatatOleh()
-    {
-        return $this->belongsTo(User::class, 'dicatat_oleh');
-    }
-
     // Auto calculate BMI
     protected static function boot()
     {

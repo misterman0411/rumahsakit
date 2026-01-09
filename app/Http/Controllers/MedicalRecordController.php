@@ -7,12 +7,25 @@ use App\Models\Appointment;
 use App\Models\Patient;
 use App\Models\Doctor;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class MedicalRecordController extends Controller
 {
     public function index(Request $request)
     {
         $query = MedicalRecord::with(['pasien', 'dokter.user', 'janjiTemu']);
+
+        // Filter berdasarkan role user
+        $user = Auth::user();
+        $role = $user->peran->nama ?? null;
+
+        if ($role === 'doctor') {
+            // Jika login sebagai dokter, hanya tampilkan rekam medis dokter tersebut
+            $doctor = Doctor::where('user_id', $user->id)->first();
+            if ($doctor) {
+                $query->where('dokter_id', $doctor->id);
+            }
+        }
 
         if ($request->filled('search')) {
             $search = $request->search;

@@ -149,12 +149,12 @@
                         </div>
                         <div>
                             <p class="text-sm text-gray-500">Total</p>
-                            <p class="text-2xl font-bold text-indigo-600">Rp {{ number_format($radiology->tagihan->total_amount, 0, ',', '.') }}</p>
+                            <p class="text-2xl font-bold text-indigo-600">Rp {{ number_format($radiology->tagihan->total, 0, ',', '.') }}</p>
                         </div>
                         <div>
                             <p class="text-sm text-gray-500">Status</p>
                             <span class="inline-flex px-3 py-1 rounded-full text-sm font-semibold
-                                @if($radiology->tagihan->status === 'paid') bg-green-100 text-green-800
+                                @if($radiology->tagihan->status === 'lunas') bg-green-100 text-green-800
                                 @else bg-yellow-100 text-yellow-800
                                 @endif">
                                 {{ ucfirst($radiology->tagihan->status) }}

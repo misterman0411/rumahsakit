@@ -78,7 +78,7 @@
                 <!-- Statistics -->
                 <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
                     <h2 class="text-xl font-bold text-gray-800 mb-4">Statistik</h2>
-                    <div class="grid grid-cols-3 gap-4">
+                    <div class="grid grid-cols-2 gap-4">
                         <div class="bg-blue-50 p-4 rounded-lg text-center">
                             <p class="text-3xl font-bold text-blue-600">{{ $doctor->janjiTemu->count() }}</p>
                             <p class="text-sm text-gray-600 mt-1">Total Appointments</p>
@@ -86,10 +86,6 @@
                         <div class="bg-green-50 p-4 rounded-lg text-center">
                             <p class="text-3xl font-bold text-green-600">{{ $doctor->rekamMedis->count() }}</p>
                             <p class="text-sm text-gray-600 mt-1">Rekam Medis</p>
-                        </div>
-                        <div class="bg-purple-50 p-4 rounded-lg text-center">
-                            <p class="text-3xl font-bold text-purple-600">{{ $doctor->reseps->count() }}</p>
-                            <p class="text-sm text-gray-600 mt-1">Resep</p>
                         </div>
                     </div>
                 </div>
@@ -103,7 +99,7 @@
                             <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
                                 <div>
                                     <p class="font-semibold">{{ $appointment->pasien->nama }}</p>
-                                    <p class="text-sm text-gray-600">{{ $appointment->janjiTemu_date->format('d M Y, H:i') }}</p>
+                                    <p class="text-sm text-gray-600">{{ $appointment->tanggal_janji->format('d M Y, H:i') }}</p>
                                 </div>
                                 <span class="px-3 py-1 rounded-full text-sm font-semibold
                                     @if($appointment->status === 'completed') bg-green-100 text-green-800
@@ -165,7 +161,7 @@
                             <p class="text-sm text-gray-800">{{ $doctor->departemen->description }}</p>
                         </div>
                         @endif
-                        <a href="{{ route('departments.show', $doctor->department) }}"
+                        <a href="{{ route('departments.show', $doctor->departemen) }}"
                             class="block w-full text-center px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors">
                             Lihat Detail Departemen
                         </a>

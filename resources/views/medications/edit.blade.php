@@ -5,8 +5,8 @@
     <div class="max-w-3xl mx-auto">
         <!-- Header -->
         <div class="mb-6">
-            <h1 class="text-3xl font-bold text-gray-800">Edit Medication</h1>
-            <p class="text-gray-600 mt-2">Update medication information</p>
+            <h1 class="text-3xl font-bold text-gray-800">Edit Obat</h1>
+            <p class="text-gray-600 mt-2">Update informasi obat</p>
         </div>
 
         <!-- Form Card -->
@@ -16,149 +16,146 @@
                 @method('PUT')
 
                 <div class="p-6 space-y-6">
-                    <!-- Medication Name -->
-                    <div>
-                        <label for="name" class="block text-sm font-semibold text-gray-700 mb-2">
-                            Medication Name <span class="text-red-500">*</span>
-                        </label>
-                        <input type="text" name="nama" id="name" required value="{{ old('nama', $medication->nama) }}"
-                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
-                        @error('nama')
-                            <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-                        @enderror
-                    </div>
-
-                    <!-- Generic Name -->
-                    <div>
-                        <label for="generic_name" class="block text-sm font-semibold text-gray-700 mb-2">
-                            Generic Name
-                        </label>
-                        <input type="text" name="generic_name" id="generic_name" value="{{ old('generic_name', $medication->generic_name) }}"
-                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
-                        @error('generic_name')
-                            <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-                        @enderror
-                    </div>
-
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <!-- Type -->
+                        <!-- Nama Obat -->
                         <div>
-                            <label for="type" class="block text-sm font-semibold text-gray-700 mb-2">
-                                Type <span class="text-red-500">*</span>
+                            <label for="nama" class="block text-sm font-semibold text-gray-700 mb-2">
+                                Nama Obat <span class="text-red-500">*</span>
                             </label>
-                            <select name="type" id="type" required
+                            <input type="text" name="nama" id="nama" required value="{{ old('nama', $medication->nama) }}"
                                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
-                                <option value="tablet" {{ old('type', $medication->type) == 'tablet' ? 'selected' : '' }}>Tablet</option>
-                                <option value="capsule" {{ old('type', $medication->type) == 'capsule' ? 'selected' : '' }}>Capsule</option>
-                                <option value="syrup" {{ old('type', $medication->type) == 'syrup' ? 'selected' : '' }}>Syrup</option>
-                                <option value="injection" {{ old('type', $medication->type) == 'injection' ? 'selected' : '' }}>Injection</option>
-                                <option value="cream" {{ old('type', $medication->type) == 'cream' ? 'selected' : '' }}>Cream/Ointment</option>
-                                <option value="drops" {{ old('type', $medication->type) == 'drops' ? 'selected' : '' }}>Drops</option>
-                                <option value="inhaler" {{ old('type', $medication->type) == 'inhaler' ? 'selected' : '' }}>Inhaler</option>
-                                <option value="other" {{ old('type', $medication->type) == 'other' ? 'selected' : '' }}>Other</option>
+                            @error('nama')
+                                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <!-- Kode Obat (Readonly) -->
+                        <div>
+                            <label for="kode" class="block text-sm font-semibold text-gray-700 mb-2">
+                                Kode Obat
+                            </label>
+                            <input type="text" id="kode" readonly value="{{ $medication->kode }}"
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50">
+                        </div>
+
+                        <!-- Bentuk Sediaan -->
+                        <div>
+                            <label for="bentuk_sediaan" class="block text-sm font-semibold text-gray-700 mb-2">
+                                Bentuk Sediaan <span class="text-red-500">*</span>
+                            </label>
+                            <select name="bentuk_sediaan" id="bentuk_sediaan" required
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
+                                <option value="">-- Pilih Bentuk Sediaan --</option>
+                                <option value="Tablet" {{ old('bentuk_sediaan', $medication->bentuk_sediaan) == 'Tablet' ? 'selected' : '' }}>Tablet</option>
+                                <option value="Kapsul" {{ old('bentuk_sediaan', $medication->bentuk_sediaan) == 'Kapsul' ? 'selected' : '' }}>Kapsul</option>
+                                <option value="Sirup" {{ old('bentuk_sediaan', $medication->bentuk_sediaan) == 'Sirup' ? 'selected' : '' }}>Sirup</option>
+                                <option value="Injeksi" {{ old('bentuk_sediaan', $medication->bentuk_sediaan) == 'Injeksi' ? 'selected' : '' }}>Injeksi</option>
+                                <option value="Salep" {{ old('bentuk_sediaan', $medication->bentuk_sediaan) == 'Salep' ? 'selected' : '' }}>Salep</option>
+                                <option value="Tetes" {{ old('bentuk_sediaan', $medication->bentuk_sediaan) == 'Tetes' ? 'selected' : '' }}>Tetes</option>
                             </select>
-                            @error('type')
+                            @error('bentuk_sediaan')
                                 <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                             @enderror
                         </div>
 
-                        <!-- Dosage -->
+                        <!-- Kekuatan -->
                         <div>
-                            <label for="dosage" class="block text-sm font-semibold text-gray-700 mb-2">
-                                Dosage <span class="text-red-500">*</span>
+                            <label for="kekuatan" class="block text-sm font-semibold text-gray-700 mb-2">
+                                Kekuatan/Dosis <span class="text-red-500">*</span>
                             </label>
-                            <input type="text" name="dosage" id="dosage" required value="{{ old('dosage', $medication->dosage) }}"
+                            <input type="text" name="kekuatan" id="kekuatan" required value="{{ old('kekuatan', $medication->kekuatan) }}"
                                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
-                            @error('dosage')
+                            @error('kekuatan')
                                 <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                             @enderror
                         </div>
 
-                        <!-- Unit Price -->
+                        <!-- Satuan -->
                         <div>
-                            <label for="unit_price" class="block text-sm font-semibold text-gray-700 mb-2">
-                                Unit Price (Rp) <span class="text-red-500">*</span>
+                            <label for="satuan" class="block text-sm font-semibold text-gray-700 mb-2">
+                                Satuan <span class="text-red-500">*</span>
                             </label>
-                            <input type="number" step="0.01" name="harga_satuan" id="unit_price" required value="{{ old('unit_price', $medication->harga_satuan) }}"
+                            <input type="text" name="satuan" id="satuan" required value="{{ old('satuan', $medication->satuan) }}"
                                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
-                            @error('unit_price')
+                            @error('satuan')
                                 <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                             @enderror
                         </div>
 
-                        <!-- Stock Quantity -->
+                        <!-- Harga -->
                         <div>
-                            <label for="stock_quantity" class="block text-sm font-semibold text-gray-700 mb-2">
-                                Stock Quantity <span class="text-red-500">*</span>
+                            <label for="harga" class="block text-sm font-semibold text-gray-700 mb-2">
+                                Harga (Rp) <span class="text-red-500">*</span>
                             </label>
-                            <input type="number" name="stock_quantity" id="stock_quantity" required value="{{ old('stock_quantity', $medication->stock_quantity) }}"
+                            <input type="number" step="0.01" name="harga" id="harga" required value="{{ old('harga', $medication->harga) }}"
+                                min="0" max="99999999"
                                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
-                            @error('stock_quantity')
+                            <p class="text-xs text-gray-500 mt-1">Maksimal: Rp 99,999,999.99</p>
+                            @error('harga')
                                 <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                             @enderror
                         </div>
 
-                        <!-- Minimum Stock -->
+                        <!-- Stok -->
                         <div>
-                            <label for="minimum_stock" class="block text-sm font-semibold text-gray-700 mb-2">
-                                Minimum Stock Level
+                            <label for="stok" class="block text-sm font-semibold text-gray-700 mb-2">
+                                Stok <span class="text-red-500">*</span>
                             </label>
-                            <input type="number" name="minimum_stock" id="minimum_stock" value="{{ old('minimum_stock', $medication->minimum_stock) }}"
+                            <input type="number" name="stok" id="stok" required value="{{ old('stok', $medication->stok) }}"
+                                min="0" max="2147483647"
                                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
-                            @error('minimum_stock')
+                            @error('stok')
                                 <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                             @enderror
                         </div>
 
-                        <!-- Expiry Date -->
+                        <!-- Stok Minimum -->
                         <div>
-                            <label for="expiry_date" class="block text-sm font-semibold text-gray-700 mb-2">
-                                Expiry Date
+                            <label for="stok_minimum" class="block text-sm font-semibold text-gray-700 mb-2">
+                                Stok Minimum <span class="text-red-500">*</span>
                             </label>
-                            <input type="date" name="expiry_date" id="expiry_date" value="{{ old('expiry_date', $medication->expiry_date?->format('Y-m-d')) }}"
+                            <input type="number" name="stok_minimum" id="stok_minimum" required value="{{ old('stok_minimum', $medication->stok_minimum) }}"
+                                min="0" max="2147483647"
                                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
-                            @error('expiry_date')
+                            @error('stok_minimum')
+                                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <!-- Kategori -->
+                        <div>
+                            <label for="kategori" class="block text-sm font-semibold text-gray-700 mb-2">
+                                Kategori
+                            </label>
+                            <input type="text" name="kategori" id="kategori" value="{{ old('kategori', $medication->kategori) }}"
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
+                            @error('kategori')
+                                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <!-- Tanggal Kadaluarsa -->
+                        <div>
+                            <label for="tanggal_kadaluarsa" class="block text-sm font-semibold text-gray-700 mb-2">
+                                Tanggal Kadaluarsa
+                            </label>
+                            <input type="date" name="tanggal_kadaluarsa" id="tanggal_kadaluarsa" 
+                                value="{{ old('tanggal_kadaluarsa', $medication->tanggal_kadaluarsa?->format('Y-m-d')) }}"
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
+                            @error('tanggal_kadaluarsa')
                                 <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                             @enderror
                         </div>
                     </div>
 
-                    <!-- Manufacturer -->
+                    <!-- Deskripsi -->
                     <div>
-                        <label for="manufacturer" class="block text-sm font-semibold text-gray-700 mb-2">
-                            Manufacturer
+                        <label for="deskripsi" class="block text-sm font-semibold text-gray-700 mb-2">
+                            Deskripsi
                         </label>
-                        <input type="text" name="manufacturer" id="manufacturer" value="{{ old('manufacturer', $medication->manufacturer) }}"
-                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
-                        @error('manufacturer')
-                            <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-                        @enderror
-                    </div>
-
-                    <!-- Description -->
-                    <div>
-                        <label for="description" class="block text-sm font-semibold text-gray-700 mb-2">
-                            Description
-                        </label>
-                        <textarea name="description" id="description" rows="3"
-                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500">{{ old('description', $medication->description) }}</textarea>
-                        @error('description')
-                            <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-                        @enderror
-                    </div>
-
-                    <!-- Status -->
-                    <div>
-                        <label for="status" class="block text-sm font-semibold text-gray-700 mb-2">
-                            Status
-                        </label>
-                        <select name="status" id="status"
-                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
-                            <option value="available" {{ old('status', $medication->status) == 'available' ? 'selected' : '' }}>Available</option>
-                            <option value="out_of_stock" {{ old('status', $medication->status) == 'out_of_stock' ? 'selected' : '' }}>Out of Stock</option>
-                            <option value="discontinued" {{ old('status', $medication->status) == 'discontinued' ? 'selected' : '' }}>Discontinued</option>
-                        </select>
-                        @error('status')
+                        <textarea name="deskripsi" id="deskripsi" rows="3"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500">{{ old('deskripsi', $medication->deskripsi) }}</textarea>
+                        @error('deskripsi')
                             <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                         @enderror
                     </div>
@@ -168,11 +165,11 @@
                 <div class="bg-gray-50 px-6 py-4 border-t border-gray-200 flex justify-end space-x-3">
                     <a href="{{ route('medications.show', $medication) }}"
                         class="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">
-                        Cancel
+                        Batal
                     </a>
                     <button type="submit"
                         class="px-6 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg hover:from-indigo-700 hover:to-purple-700 transition-all">
-                        Update Medication
+                        Update Obat
                     </button>
                 </div>
             </form>

@@ -7,13 +7,15 @@
         <div class="flex justify-between items-center mb-6">
             <div>
                 <h1 class="text-3xl font-bold text-gray-800">{{ $medication->nama }}</h1>
-                <p class="text-gray-600 mt-2">{{ $medication->generic_name ?? 'Medication Details' }}</p>
+                <p class="text-gray-600 mt-2">{{ $medication->kode }}</p>
             </div>
             <div class="flex space-x-3">
+                @can('manage-medications')
                 <a href="{{ route('medications.edit', $medication) }}" 
                     class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
                     Edit
                 </a>
+                @endcan
                 <a href="{{ route('medications.index') }}" 
                     class="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">
                     Back to List
@@ -39,30 +41,24 @@
                             <p class="font-semibold text-gray-900">{{ $medication->nama }}</p>
                         </div>
                         <div>
-                            <p class="text-sm text-gray-600">Generic Name</p>
-                            <p class="font-semibold text-gray-900">{{ $medication->generic_name ?? '-' }}</p>
+                            <p class="text-sm text-gray-600">Kode Obat</p>
+                            <p class="font-semibold text-gray-900">{{ $medication->kode }}</p>
                         </div>
                         <div>
-                            <p class="text-sm text-gray-600">Type</p>
-                            <p class="font-semibold text-gray-900">{{ ucfirst($medication->type) }}</p>
+                            <p class="text-sm text-gray-600">Bentuk Sediaan</p>
+                            <p class="font-semibold text-gray-900">{{ $medication->bentuk_sediaan }}</p>
                         </div>
                         <div>
-                            <p class="text-sm text-gray-600">Dosage</p>
-                            <p class="font-semibold text-gray-900">{{ $medication->dosage }}</p>
+                            <p class="text-sm text-gray-600">Kekuatan</p>
+                            <p class="font-semibold text-gray-900">{{ $medication->kekuatan }}</p>
                         </div>
                         <div>
-                            <p class="text-sm text-gray-600">Manufacturer</p>
-                            <p class="font-semibold text-gray-900">{{ $medication->manufacturer ?? '-' }}</p>
+                            <p class="text-sm text-gray-600">Satuan</p>
+                            <p class="font-semibold text-gray-900">{{ $medication->satuan }}</p>
                         </div>
                         <div>
-                            <p class="text-sm text-gray-600">Status</p>
-                            <span class="inline-flex px-3 py-1 rounded-full text-xs font-semibold
-                                @if($medication->status == 'available') bg-green-100 text-green-800
-                                @elseif($medication->status == 'out_of_stock') bg-red-100 text-red-800
-                                @else bg-gray-100 text-gray-800
-                                @endif">
-                                {{ ucwords(str_replace('_', ' ', $medication->status)) }}
-                            </span>
+                            <p class="text-sm text-gray-600">Kategori</p>
+                            <p class="font-semibold text-gray-900">{{ $medication->kategori ?? '-' }}</p>
                         </div>
                     </div>
                 </div>
@@ -71,21 +67,21 @@
                 <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
                     <h2 class="text-xl font-bold text-gray-800 mb-4">Stock & Pricing</h2>
                     <div class="grid grid-cols-3 gap-4">
-                        <div class="bg-gradient-to-br from-blue-50 to-blue-100 p-4 rounded-lg">
-                            <p class="text-sm text-blue-900 mb-1">Unit Price</p>
-                            <p class="text-2xl font-bold text-blue-900">Rp {{ number_format($medication->harga_satuan, 0, ',', '.') }}</p>
+                        <div class="bg-blue-50 p-4 rounded-lg">
+                            <p class="text-sm text-blue-900 mb-1">Harga Satuan</p>
+                            <p class="text-2xl font-bold text-blue-900">Rp {{ number_format($medication->harga, 0, ',', '.') }}</p>
                         </div>
-                        <div class="bg-gradient-to-br from-green-50 to-green-100 p-4 rounded-lg">
-                            <p class="text-sm text-green-900 mb-1">Stock Quantity</p>
-                            <p class="text-2xl font-bold text-green-900">{{ $medication->stock_quantity }}</p>
+                        <div class="bg-green-50 p-4 rounded-lg">
+                            <p class="text-sm text-green-900 mb-1">Stok Tersedia</p>
+                            <p class="text-2xl font-bold text-green-900">{{ $medication->stok }} {{ $medication->satuan }}</p>
                         </div>
-                        <div class="bg-gradient-to-br from-orange-50 to-orange-100 p-4 rounded-lg">
-                            <p class="text-sm text-orange-900 mb-1">Minimum Stock</p>
-                            <p class="text-2xl font-bold text-orange-900">{{ $medication->minimum_stock ?? 0 }}</p>
+                        <div class="bg-orange-50 p-4 rounded-lg">
+                            <p class="text-sm text-orange-900 mb-1">Stok Minimum</p>
+                            <p class="text-2xl font-bold text-orange-900">{{ $medication->stok_minimum ?? 0 }} {{ $medication->satuan }}</p>
                         </div>
                     </div>
                     
-                    @if($medication->stock_quantity <= $medication->minimum_stock)
+                    @if($medication->stok <= $medication->stok_minimum)
                         <div class="mt-4 bg-red-50 border border-red-200 rounded-lg p-4">
                             <div class="flex items-center">
                                 <svg class="w-5 h-5 text-red-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -99,10 +95,10 @@
                 </div>
 
                 <!-- Description -->
-                @if($medication->description)
+                @if($medication->deskripsi)
                 <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-                    <h2 class="text-xl font-bold text-gray-800 mb-4">Description</h2>
-                    <p class="text-gray-700 whitespace-pre-wrap">{{ $medication->description }}</p>
+                    <h2 class="text-xl font-bold text-gray-800 mb-4">Deskripsi</h2>
+                    <p class="text-gray-700 whitespace-pre-wrap">{{ $medication->deskripsi }}</p>
                 </div>
                 @endif
             </div>
@@ -110,14 +106,14 @@
             <!-- Sidebar -->
             <div class="space-y-6">
                 <!-- Expiry Info -->
-                @if($medication->expiry_date)
+                @if($medication->tanggal_kadaluarsa)
                 <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-                    <h2 class="text-lg font-bold text-gray-800 mb-4">Expiry Information</h2>
+                    <h2 class="text-lg font-bold text-gray-800 mb-4">Informasi Kadaluarsa</h2>
                     <div class="text-center">
-                        <p class="text-sm text-gray-600">Expiry Date</p>
-                        <p class="text-2xl font-bold text-gray-900 mt-2">{{ $medication->expiry_date->format('d M Y') }}</p>
+                        <p class="text-sm text-gray-600">Tanggal Kadaluarsa</p>
+                        <p class="text-2xl font-bold text-gray-900 mt-2">{{ \Carbon\Carbon::parse($medication->tanggal_kadaluarsa)->format('d M Y') }}</p>
                         @php
-                            $daysUntilExpiry = now()->diffInDays($medication->expiry_date, false);
+                            $daysUntilExpiry = now()->diffInDays($medication->tanggal_kadaluarsa, false);
                         @endphp
                         @if($daysUntilExpiry < 0)
                             <span class="inline-block mt-2 px-3 py-1 bg-red-100 text-red-800 text-xs font-semibold rounded-full">
@@ -137,6 +133,7 @@
                 @endif
 
                 <!-- Quick Actions -->
+                @can('manage-medications')
                 <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
                     <h2 class="text-lg font-bold text-gray-800 mb-4">Quick Actions</h2>
                     <div class="space-y-3">
@@ -155,6 +152,7 @@
                         </form>
                     </div>
                 </div>
+                @endcan
 
                 <!-- Record Info -->
                 <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">

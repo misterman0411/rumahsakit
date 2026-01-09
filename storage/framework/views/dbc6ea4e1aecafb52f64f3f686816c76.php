@@ -1,26 +1,24 @@
-@extends('layouts.app')
+<?php $__env->startSection('title', 'Invoice Details'); ?>
 
-@section('title', 'Invoice Details')
-
-@section('content')
-@php
+<?php $__env->startSection('content'); ?>
+<?php
     // Calculate outstanding balance at the top
     $paidAmount = $invoice->pembayaran->sum('jumlah');
     $outstanding = $invoice->total - $paidAmount;
-@endphp
+?>
 
 <div class="max-w-4xl mx-auto">
     <div class="bg-white shadow rounded-lg">
         <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
             <h2 class="text-2xl font-semibold text-gray-800">Invoice Details</h2>
             <div class="flex flex-wrap gap-2">
-                <a href="{{ route('billing.index') }}" class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-md">
+                <a href="<?php echo e(route('billing.index')); ?>" class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-md">
                     Back
                 </a>
                 <button onclick="window.print()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md no-print">
                     Print Invoice
                 </button>
-                @if($outstanding > 0)
+                <?php if($outstanding > 0): ?>
                 <button onclick="payWithMidtrans()" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-md no-print whitespace-nowrap" style="background-color: #9333ea !important;">
                     <svg class="inline w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
@@ -37,7 +35,7 @@
                     class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md no-print">
                     Add Manual Payment
                 </button>
-                @endif
+                <?php endif; ?>
             </div>
         </div>
 
@@ -49,25 +47,26 @@
                     <div class="space-y-3">
                         <div>
                             <label class="text-sm font-medium text-gray-500">Invoice Number</label>
-                            <p class="mt-1 text-lg text-gray-900 font-semibold">{{ $invoice->nomor_tagihan }}</p>
+                            <p class="mt-1 text-lg text-gray-900 font-semibold"><?php echo e($invoice->nomor_tagihan); ?></p>
                         </div>
                         <div>
                             <label class="text-sm font-medium text-gray-500">Invoice Date</label>
-                            <p class="mt-1 text-gray-900">{{ $invoice->created_at->format('d F Y H:i') }}</p>
+                            <p class="mt-1 text-gray-900"><?php echo e($invoice->created_at->format('d F Y H:i')); ?></p>
                         </div>
                         <div>
                             <label class="text-sm font-medium text-gray-500">Due Date</label>
-                            <p class="mt-1 text-gray-900">{{ $invoice->jatuh_tempo ? $invoice->jatuh_tempo->format('d F Y') : '-' }}</p>
+                            <p class="mt-1 text-gray-900"><?php echo e($invoice->jatuh_tempo ? $invoice->jatuh_tempo->format('d F Y') : '-'); ?></p>
                         </div>
                         <div>
                             <label class="text-sm font-medium text-gray-500">Status</label>
                             <p class="mt-1">
                                 <span class="px-3 py-1 text-sm rounded-full 
-                                    @if($invoice->status == 'lunas') bg-green-100 text-green-800
-                                    @elseif($invoice->status == 'dibayar_sebagian') bg-yellow-100 text-yellow-800
-                                    @elseif($invoice->status == 'dibatalkan') bg-gray-100 text-gray-800
-                                    @else bg-red-100 text-red-800 @endif">
-                                    {{ ucfirst(str_replace('_', ' ', $invoice->status)) }}
+                                    <?php if($invoice->status == 'lunas'): ?> bg-green-100 text-green-800
+                                    <?php elseif($invoice->status == 'dibayar_sebagian'): ?> bg-yellow-100 text-yellow-800
+                                    <?php elseif($invoice->status == 'dibatalkan'): ?> bg-gray-100 text-gray-800
+                                    <?php else: ?> bg-red-100 text-red-800 <?php endif; ?>">
+                                    <?php echo e(ucfirst(str_replace('_', ' ', $invoice->status))); ?>
+
                                 </span>
                             </p>
                         </div>
@@ -78,15 +77,15 @@
                     <div class="space-y-3">
                         <div>
                             <label class="text-sm font-medium text-gray-500">Name</label>
-                            <p class="mt-1 text-gray-900 font-semibold">{{ $invoice->pasien->nama }}</p>
+                            <p class="mt-1 text-gray-900 font-semibold"><?php echo e($invoice->pasien->nama); ?></p>
                         </div>
                         <div>
                             <label class="text-sm font-medium text-gray-500">MRN</label>
-                            <p class="mt-1 text-gray-900">{{ $invoice->pasien->no_rekam_medis }}</p>
+                            <p class="mt-1 text-gray-900"><?php echo e($invoice->pasien->no_rekam_medis); ?></p>
                         </div>
                         <div>
                             <label class="text-sm font-medium text-gray-500">Phone</label>
-                            <p class="mt-1 text-gray-900">{{ $invoice->pasien->no_telepon ?? '-' }}</p>
+                            <p class="mt-1 text-gray-900"><?php echo e($invoice->pasien->no_telepon ?? '-'); ?></p>
                         </div>
                     </div>
                 </div>
@@ -99,67 +98,67 @@
                     <div class="flex justify-between items-start mb-3">
                         <div>
                             <span class="text-sm font-medium text-gray-500">Service Type:</span>
-                            <span class="ml-2 text-gray-900 font-semibold">{{ class_basename($invoice->tagihan_untuk_tipe) }}</span>
+                            <span class="ml-2 text-gray-900 font-semibold"><?php echo e(class_basename($invoice->tagihan_untuk_tipe)); ?></span>
                         </div>
-                        @if($invoice->tagihanUntuk)
-                            @if($invoice->tagihan_untuk_tipe == 'App\Models\Prescription')
-                                <a href="{{ route('prescriptions.show', $invoice->tagihanUntuk->id) }}" class="text-blue-600 hover:text-blue-900 text-sm">View Details →</a>
-                            @elseif($invoice->tagihan_untuk_tipe == 'App\Models\LaboratoryOrder')
-                                <a href="{{ route('laboratory.show', $invoice->tagihanUntuk->id) }}" class="text-blue-600 hover:text-blue-900 text-sm">View Details →</a>
-                            @elseif($invoice->tagihan_untuk_tipe == 'App\Models\RadiologyOrder')
-                                <a href="{{ route('radiology.show', $invoice->tagihanUntuk->id) }}" class="text-blue-600 hover:text-blue-900 text-sm">View Details →</a>
-                            @elseif($invoice->tagihan_untuk_tipe == 'App\Models\InpatientAdmission')
-                                <a href="{{ route('inpatient.show', $invoice->tagihanUntuk->id) }}" class="text-blue-600 hover:text-blue-900 text-sm">View Details →</a>
-                            @endif
-                        @endif
+                        <?php if($invoice->tagihanUntuk): ?>
+                            <?php if($invoice->tagihan_untuk_tipe == 'App\Models\Prescription'): ?>
+                                <a href="<?php echo e(route('prescriptions.show', $invoice->tagihanUntuk->id)); ?>" class="text-blue-600 hover:text-blue-900 text-sm">View Details →</a>
+                            <?php elseif($invoice->tagihan_untuk_tipe == 'App\Models\LaboratoryOrder'): ?>
+                                <a href="<?php echo e(route('laboratory.show', $invoice->tagihanUntuk->id)); ?>" class="text-blue-600 hover:text-blue-900 text-sm">View Details →</a>
+                            <?php elseif($invoice->tagihan_untuk_tipe == 'App\Models\RadiologyOrder'): ?>
+                                <a href="<?php echo e(route('radiology.show', $invoice->tagihanUntuk->id)); ?>" class="text-blue-600 hover:text-blue-900 text-sm">View Details →</a>
+                            <?php elseif($invoice->tagihan_untuk_tipe == 'App\Models\InpatientAdmission'): ?>
+                                <a href="<?php echo e(route('inpatient.show', $invoice->tagihanUntuk->id)); ?>" class="text-blue-600 hover:text-blue-900 text-sm">View Details →</a>
+                            <?php endif; ?>
+                        <?php endif; ?>
                     </div>
                     
-                    @if($invoice->tagihan_untuk_tipe == 'App\Models\Prescription' && $invoice->tagihanUntuk)
+                    <?php if($invoice->tagihan_untuk_tipe == 'App\Models\Prescription' && $invoice->tagihanUntuk): ?>
                         <div class="space-y-2">
                             <div class="text-sm">
                                 <span class="text-gray-500">Prescription Number:</span>
-                                <span class="ml-2 text-gray-900">{{ $invoice->tagihanUntuk->nomor_resep }}</span>
+                                <span class="ml-2 text-gray-900"><?php echo e($invoice->tagihanUntuk->nomor_resep); ?></span>
                             </div>
                             <div class="text-sm">
                                 <span class="text-gray-500">Doctor:</span>
-                                <span class="ml-2 text-gray-900">{{ $invoice->tagihanUntuk->dokter->user->nama ?? '-' }}</span>
+                                <span class="ml-2 text-gray-900"><?php echo e($invoice->tagihanUntuk->dokter->user->nama ?? '-'); ?></span>
                             </div>
                             <div class="text-sm">
                                 <span class="text-gray-500">Total Items:</span>
-                                <span class="ml-2 text-gray-900">{{ $invoice->tagihanUntuk->itemResep->count() }} items</span>
+                                <span class="ml-2 text-gray-900"><?php echo e($invoice->tagihanUntuk->itemResep->count()); ?> items</span>
                             </div>
                         </div>
-                    @elseif($invoice->tagihan_untuk_tipe == 'App\Models\LaboratoryOrder' && $invoice->tagihanUntuk)
+                    <?php elseif($invoice->tagihan_untuk_tipe == 'App\Models\LaboratoryOrder' && $invoice->tagihanUntuk): ?>
                         <div class="space-y-2">
                             <div class="text-sm">
                                 <span class="text-gray-500">Order Number:</span>
-                                <span class="ml-2 text-gray-900">{{ $invoice->tagihanUntuk->nomor_permintaan }}</span>
+                                <span class="ml-2 text-gray-900"><?php echo e($invoice->tagihanUntuk->nomor_permintaan); ?></span>
                             </div>
                             <div class="text-sm">
                                 <span class="text-gray-500">Test Type:</span>
-                                <span class="ml-2 text-gray-900">{{ $invoice->tagihanUntuk->jenisTes->nama ?? '-' }}</span>
+                                <span class="ml-2 text-gray-900"><?php echo e($invoice->tagihanUntuk->jenisTes->nama ?? '-'); ?></span>
                             </div>
                             <div class="text-sm">
                                 <span class="text-gray-500">Doctor:</span>
-                                <span class="ml-2 text-gray-900">{{ $invoice->tagihanUntuk->dokter->user->nama ?? '-' }}</span>
+                                <span class="ml-2 text-gray-900"><?php echo e($invoice->tagihanUntuk->dokter->user->nama ?? '-'); ?></span>
                             </div>
                         </div>
-                    @elseif($invoice->tagihan_untuk_tipe == 'App\Models\RadiologyOrder' && $invoice->tagihanUntuk)
+                    <?php elseif($invoice->tagihan_untuk_tipe == 'App\Models\RadiologyOrder' && $invoice->tagihanUntuk): ?>
                         <div class="space-y-2">
                             <div class="text-sm">
                                 <span class="text-gray-500">Order Number:</span>
-                                <span class="ml-2 text-gray-900">{{ $invoice->tagihanUntuk->nomor_permintaan }}</span>
+                                <span class="ml-2 text-gray-900"><?php echo e($invoice->tagihanUntuk->nomor_permintaan); ?></span>
                             </div>
                             <div class="text-sm">
                                 <span class="text-gray-500">Test Type:</span>
-                                <span class="ml-2 text-gray-900">{{ $invoice->tagihanUntuk->jenisTes->nama ?? '-' }}</span>
+                                <span class="ml-2 text-gray-900"><?php echo e($invoice->tagihanUntuk->jenisTes->nama ?? '-'); ?></span>
                             </div>
                             <div class="text-sm">
                                 <span class="text-gray-500">Doctor:</span>
-                                <span class="ml-2 text-gray-900">{{ $invoice->tagihanUntuk->dokter->user->nama ?? '-' }}</span>
+                                <span class="ml-2 text-gray-900"><?php echo e($invoice->tagihanUntuk->dokter->user->nama ?? '-'); ?></span>
                             </div>
                         </div>
-                    @endif
+                    <?php endif; ?>
                 </div>
             </div>
 
@@ -170,42 +169,42 @@
                     <div class="space-y-3">
                         <div class="flex justify-between text-gray-700">
                             <span>Subtotal</span>
-                            <span class="font-medium">Rp {{ number_format($invoice->subtotal, 0, ',', '.') }}</span>
+                            <span class="font-medium">Rp <?php echo e(number_format($invoice->subtotal, 0, ',', '.')); ?></span>
                         </div>
-                        @if($invoice->diskon > 0)
+                        <?php if($invoice->diskon > 0): ?>
                         <div class="flex justify-between text-gray-700">
                             <span>Discount</span>
-                            <span class="font-medium text-red-600">- Rp {{ number_format($invoice->diskon, 0, ',', '.') }}</span>
+                            <span class="font-medium text-red-600">- Rp <?php echo e(number_format($invoice->diskon, 0, ',', '.')); ?></span>
                         </div>
-                        @endif
-                        @if($invoice->pajak > 0)
+                        <?php endif; ?>
+                        <?php if($invoice->pajak > 0): ?>
                         <div class="flex justify-between text-gray-700">
                             <span>Tax (10%)</span>
-                            <span class="font-medium">Rp {{ number_format($invoice->pajak, 0, ',', '.') }}</span>
+                            <span class="font-medium">Rp <?php echo e(number_format($invoice->pajak, 0, ',', '.')); ?></span>
                         </div>
-                        @endif
+                        <?php endif; ?>
                         <div class="flex justify-between text-xl font-bold text-gray-900 border-t pt-3">
                             <span>Total Amount</span>
-                            <span>Rp {{ number_format($invoice->total, 0, ',', '.') }}</span>
+                            <span>Rp <?php echo e(number_format($invoice->total, 0, ',', '.')); ?></span>
                         </div>
-                        @if($paidAmount > 0)
+                        <?php if($paidAmount > 0): ?>
                         <div class="flex justify-between text-lg text-green-600 font-semibold">
                             <span>Paid Amount</span>
-                            <span>Rp {{ number_format($paidAmount, 0, ',', '.') }}</span>
+                            <span>Rp <?php echo e(number_format($paidAmount, 0, ',', '.')); ?></span>
                         </div>
-                        @endif
-                        @if($outstanding > 0)
+                        <?php endif; ?>
+                        <?php if($outstanding > 0): ?>
                         <div class="flex justify-between text-lg text-red-600 font-bold">
                             <span>Outstanding Balance</span>
-                            <span>Rp {{ number_format($outstanding, 0, ',', '.') }}</span>
+                            <span>Rp <?php echo e(number_format($outstanding, 0, ',', '.')); ?></span>
                         </div>
-                        @endif
+                        <?php endif; ?>
                     </div>
                 </div>
             </div>
 
             <!-- Payment History -->
-            @if($invoice->pembayaran && $invoice->pembayaran->count() > 0)
+            <?php if($invoice->pembayaran && $invoice->pembayaran->count() > 0): ?>
             <div>
                 <h3 class="text-lg font-semibold text-gray-900 mb-4">Payment History</h3>
                 <div class="overflow-x-auto">
@@ -220,63 +219,68 @@
                             </tr>
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200">
-                            @foreach($invoice->pembayaran as $payment)
+                            <?php $__currentLoopData = $invoice->pembayaran; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $payment): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                             <tr>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                    {{ $payment->nomor_pembayaran }}
+                                    <?php echo e($payment->nomor_pembayaran); ?>
+
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                    {{ $payment->tanggal_pembayaran ? \Carbon\Carbon::parse($payment->tanggal_pembayaran)->format('d M Y H:i') : '-' }}
+                                    <?php echo e($payment->tanggal_pembayaran ? \Carbon\Carbon::parse($payment->tanggal_pembayaran)->format('d M Y H:i') : '-'); ?>
+
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-semibold">
-                                    Rp {{ number_format($payment->jumlah, 0, ',', '.') }}
+                                    Rp <?php echo e(number_format($payment->jumlah, 0, ',', '.')); ?>
+
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                     <span class="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs">
-                                        {{ ucfirst($payment->metode_pembayaran) }}
+                                        <?php echo e(ucfirst($payment->metode_pembayaran)); ?>
+
                                     </span>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                    {{ $payment->diterimaOleh->name ?? '-' }}
+                                    <?php echo e($payment->diterimaOleh->name ?? '-'); ?>
+
                                 </td>
                             </tr>
-                            @endforeach
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                         </tbody>
                     </table>
                 </div>
             </div>
-            @endif
+            <?php endif; ?>
         </div>
     </div>
 </div>
 
 <!-- Payment Modal -->
-@php
+<?php
     // Recalculate for modal (in case it's not calculated yet)
     if (!isset($outstanding)) {
         $paidAmount = $invoice->pembayaran->sum('jumlah');
         $outstanding = $invoice->total - $paidAmount;
     }
-@endphp
+?>
 <div id="paymentModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
     <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
         <div class="mt-3">
             <h3 class="text-lg font-medium text-gray-900 mb-4">Add Payment</h3>
-            <form action="{{ route('billing.payment', $invoice) }}" method="POST">
-                @csrf
+            <form action="<?php echo e(route('billing.payment', $invoice)); ?>" method="POST">
+                <?php echo csrf_field(); ?>
                 <div class="space-y-4">
                     <div>
                         <label class="block text-sm font-medium text-gray-700">Amount *</label>
                         <input type="number" name="jumlah" step="0.01" required
-                            value="{{ $outstanding }}"
-                            max="{{ $outstanding }}"
+                            value="<?php echo e($outstanding); ?>"
+                            max="<?php echo e($outstanding); ?>"
                             class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
-                        <p class="text-xs text-gray-500 mt-1">Outstanding: Rp {{ number_format($outstanding, 0, ',', '.') }}</p>
+                        <p class="text-xs text-gray-500 mt-1">Outstanding: Rp <?php echo e(number_format($outstanding, 0, ',', '.')); ?></p>
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700">Payment Date *</label>
                         <input type="datetime-local" name="tanggal_pembayaran" required
-                            value="{{ now()->format('Y-m-d\TH:i') }}"
+                            value="<?php echo e(now()->format('Y-m-d\TH:i')); ?>"
                             class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
                     </div>
                     <div>
@@ -375,11 +379,11 @@ function payWithMidtrans() {
     btn.innerHTML = '<svg class="animate-spin inline w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>Processing...';
 
     // Request snap token from server
-    fetch('{{ route("billing.midtrans.create", $invoice) }}', {
+    fetch('<?php echo e(route("billing.midtrans.create", $invoice)); ?>', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            'X-CSRF-TOKEN': '<?php echo e(csrf_token()); ?>'
         }
     })
     .then(response => response.json())
@@ -434,11 +438,11 @@ function checkPaymentStatus() {
 }
 
 function checkSpecificOrder(orderId, btn, originalText) {
-    fetch('{{ route("billing.midtrans.check", ":orderId") }}'.replace(':orderId', orderId), {
+    fetch('<?php echo e(route("billing.midtrans.check", ":orderId")); ?>'.replace(':orderId', orderId), {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            'X-CSRF-TOKEN': '<?php echo e(csrf_token()); ?>'
         }
     })
     .then(response => response.json())
@@ -474,11 +478,11 @@ function updateInvoiceStatus(orderId, btn, originalText) {
 
 function generalVerification(btn, originalText) {
     // Call API to verify payment with Midtrans
-    fetch('{{ route("billing.midtrans.verify", $invoice) }}', {
+    fetch('<?php echo e(route("billing.midtrans.verify", $invoice)); ?>', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            'X-CSRF-TOKEN': '<?php echo e(csrf_token()); ?>'
         }
     })
     .then(response => response.json())
@@ -486,7 +490,7 @@ function generalVerification(btn, originalText) {
         if (data.success) {
             alert(data.message);
             // Remove URL parameters and reload
-            window.location.href = '{{ route("billing.show", $invoice) }}';
+            window.location.href = '<?php echo e(route("billing.show", $invoice)); ?>';
         } else {
             alert(data.message || 'No payment found');
             btn.disabled = false;
@@ -514,7 +518,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (transactionStatus === 'settlement' || transactionStatus === 'capture') {
             // Pembayaran berhasil - reload halaman untuk update status
             setTimeout(() => {
-                window.location.href = '{{ route("billing.show", $invoice) }}';
+                window.location.href = '<?php echo e(route("billing.show", $invoice)); ?>';
             }, 1000);
             
             // Tampilkan pesan sukses
@@ -542,4 +546,6 @@ document.addEventListener('DOMContentLoaded', function() {
     <p style="font-size: 14px; color: #666;">Jl. Kesehatan No. 123, Jakarta | Tel: (021) 1234-5678</p>
     <h2 style="font-size: 18px; font-weight: bold; margin-top: 15px;">INVOICE / TAGIHAN</h2>
 </div>
-@endsection
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\Users\User\Desktop\rumahsakit\resources\views/billing/show.blade.php ENDPATH**/ ?>

@@ -17,8 +17,8 @@
                 <thead class="bg-gray-50">
                     <tr>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Name</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Generic Name</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Type</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Bentuk Sediaan</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Kekuatan</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Stock</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Unit Price</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
@@ -31,18 +31,18 @@
                             {{ $medication->nama }}
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                            {{ $medication->generic_name }}
+                            {{ $medication->bentuk_sediaan }}
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                            {{ ucfirst($medication->type) }}
+                            {{ $medication->kekuatan }}
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                            <span class="{{ $medication->stock < $medication->minimum_stock ? 'text-red-600 font-semibold' : '' }}">
-                                {{ $medication->stock }} {{ $medication->unit }}
+                            <span class="{{ $medication->stok < $medication->stok_minimum ? 'text-red-600 font-semibold' : '' }}">
+                                {{ $medication->stok }} {{ $medication->satuan }}
                             </span>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                            Rp {{ number_format($medication->price, 0, ',', '.') }}
+                            Rp {{ number_format($medication->harga, 0, ',', '.') }}
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
                             <a href="{{ route('medications.show', $medication) }}" class="text-blue-600 hover:text-blue-900">View</a>

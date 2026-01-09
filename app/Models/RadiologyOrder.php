@@ -59,7 +59,7 @@ class RadiologyOrder extends Model
         return $this->belongsTo(RadiologyTestType::class, 'jenis_tes_id');
     }
 
-    public function dipriksaOleh()
+    public function diperiksaOleh()
     {
         return $this->belongsTo(User::class, 'diperiksa_oleh');
     }

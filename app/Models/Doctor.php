@@ -43,4 +43,25 @@ class Doctor extends Model
     {
         return $this->hasMany(MedicalRecord::class, 'dokter_id');
     }
+
+    public function resep()
+    {
+        return $this->hasMany(Prescription::class, 'dokter_id');
+    }
+
+    public function permintaanLaboratorium()
+    {
+        return $this->hasMany(LaboratoryOrder::class, 'dokter_id');
+    }
+
+    public function permintaanRadiologi()
+    {
+        return $this->hasMany(RadiologyOrder::class, 'dokter_id');
+    }
+
+    // Accessor for nama from user
+    public function getNamaAttribute()
+    {
+        return $this->user?->name;
+    }
 }

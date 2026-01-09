@@ -22,6 +22,16 @@ class Department extends Model
         return $this->hasMany(Doctor::class, 'departemen_id');
     }
 
+    public function perawat()
+    {
+        return $this->hasMany(Nurse::class, 'departemen_id');
+    }
+
+    public function ruangan()
+    {
+        return $this->hasMany(Room::class, 'departemen_id');
+    }
+
     public function janjiTemu()
     {
         return $this->hasMany(Appointment::class, 'departemen_id');

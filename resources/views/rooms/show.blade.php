@@ -53,8 +53,8 @@
                         <div>
                             <p class="text-sm text-gray-600">Status</p>
                             <span class="inline-flex px-3 py-1 rounded-full text-xs font-semibold
-                                @if($room->status == 'available') bg-green-100 text-green-800
-                                @elseif($room->status == 'occupied') bg-red-100 text-red-800
+                                @if($room->status == 'tersedia') bg-green-100 text-green-800
+                                @elseif($room->status == 'terisi') bg-red-100 text-red-800
                                 @else bg-orange-100 text-orange-800
                                 @endif">
                                 {{ ucfirst($room->status) }}
@@ -62,7 +62,7 @@
                         </div>
                         <div>
                             <p class="text-sm text-gray-600">Available Beds</p>
-                            <p class="font-semibold text-gray-900">{{ $room->tempatTidurs->where('status', 'available')->count() }} / {{ $room->tempatTidurs->count() }}</p>
+                            <p class="font-semibold text-gray-900">{{ $room->tempatTidurs->where('status', 'tersedia')->count() }} / {{ $room->tempatTidurs->count() }}</p>
                         </div>
                     </div>
                 </div>
@@ -83,8 +83,8 @@
                     <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
                         @foreach($room->tempatTidurs as $bed)
                             <div class="border rounded-lg p-3 text-center
-                                @if($bed->status == 'available') border-green-300 bg-green-50
-                                @elseif($bed->status == 'occupied') border-red-300 bg-red-50
+                                @if($bed->status == 'tersedia') border-green-300 bg-green-50
+                                @elseif($bed->status == 'terisi') border-red-300 bg-red-50
                                 @else border-gray-300 bg-gray-50
                                 @endif">
                                 <p class="font-semibold text-gray-900">{{ $bed->nomor_tempat_tidur }}</p>
@@ -101,30 +101,30 @@
                 <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
                     <h2 class="text-lg font-bold text-gray-800 mb-4">Room Status</h2>
                     <div class="text-center">
-                        @if($room->status == 'available')
+                        @if($room->status == 'tersedia')
                             <div class="w-20 h-20 mx-auto bg-green-100 rounded-full flex items-center justify-center mb-3">
                                 <svg class="w-10 h-10 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                                 </svg>
                             </div>
-                            <p class="text-lg font-bold text-green-900">Available</p>
-                            <p class="text-sm text-gray-600 mt-1">Ready for admission</p>
-                        @elseif($room->status == 'occupied')
+                            <p class="text-lg font-bold text-green-900">Tersedia</p>
+                            <p class="text-sm text-gray-600 mt-1">Siap untuk rawat inap</p>
+                        @elseif($room->status == 'terisi')
                             <div class="w-20 h-20 mx-auto bg-red-100 rounded-full flex items-center justify-center mb-3">
                                 <svg class="w-10 h-10 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                                 </svg>
                             </div>
-                            <p class="text-lg font-bold text-red-900">Occupied</p>
-                            <p class="text-sm text-gray-600 mt-1">Currently in use</p>
+                            <p class="text-lg font-bold text-red-900">Terisi</p>
+                            <p class="text-sm text-gray-600 mt-1">Sedang digunakan</p>
                         @else
                             <div class="w-20 h-20 mx-auto bg-orange-100 rounded-full flex items-center justify-center mb-3">
                                 <svg class="w-10 h-10 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                                 </svg>
                             </div>
-                            <p class="text-lg font-bold text-orange-900">Maintenance</p>
-                            <p class="text-sm text-gray-600 mt-1">Under repair</p>
+                            <p class="text-lg font-bold text-orange-900">Perawatan</p>
+                            <p class="text-sm text-gray-600 mt-1">Sedang diperbaiki</p>
                         @endif
                     </div>
                 </div>

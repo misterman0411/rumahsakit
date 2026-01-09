@@ -50,7 +50,7 @@ class Invoice extends Model
 
     public function pasien()
     {
-        return $this->belongsTo(Patient::class, 'pasien_id');
+        return $this->belongsTo(\App\Models\Patient::class, 'pasien_id');
     }
 
     public function tagihanUntuk()

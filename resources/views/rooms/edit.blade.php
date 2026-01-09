@@ -31,14 +31,14 @@
                             <label for="room_type" class="block text-sm font-semibold text-gray-700 mb-2">
                                 Room Type <span class="text-red-500">*</span>
                             </label>
-                            <select name="room_type" id="room_type" required
+                            <select name="tipe_ruangan" id="tipe_ruangan" required
                                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
-                                <option value="vip" {{ old('room_type', $room->ruangan_type) == 'vip' ? 'selected' : '' }}>VIP</option>
-                                <option value="class_1" {{ old('room_type', $room->ruangan_type) == 'class_1' ? 'selected' : '' }}>Class 1</option>
-                                <option value="class_2" {{ old('room_type', $room->ruangan_type) == 'class_2' ? 'selected' : '' }}>Class 2</option>
-                                <option value="class_3" {{ old('room_type', $room->ruangan_type) == 'class_3' ? 'selected' : '' }}>Class 3</option>
-                                <option value="icu" {{ old('room_type', $room->ruangan_type) == 'icu' ? 'selected' : '' }}>ICU</option>
-                                <option value="emergency" {{ old('room_type', $room->ruangan_type) == 'emergency' ? 'selected' : '' }}>Emergency</option>
+                                <option value="vip" {{ old('tipe_ruangan', $room->tipe_ruangan) == 'vip' ? 'selected' : '' }}>VIP</option>
+                                <option value="kelas_1" {{ old('tipe_ruangan', $room->tipe_ruangan) == 'kelas_1' ? 'selected' : '' }}>Kelas 1</option>
+                                <option value="kelas_2" {{ old('tipe_ruangan', $room->tipe_ruangan) == 'kelas_2' ? 'selected' : '' }}>Kelas 2</option>
+                                <option value="kelas_3" {{ old('tipe_ruangan', $room->tipe_ruangan) == 'kelas_3' ? 'selected' : '' }}>Kelas 3</option>
+                                <option value="icu" {{ old('tipe_ruangan', $room->tipe_ruangan) == 'icu' ? 'selected' : '' }}>ICU</option>
+                                <option value="darurat" {{ old('tipe_ruangan', $room->tipe_ruangan) == 'darurat' ? 'selected' : '' }}>Darurat</option>
                             </select>
                             @error('room_type')
                                 <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
@@ -76,9 +76,9 @@
                             </label>
                             <select name="status" id="status"
                                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
-                                <option value="available" {{ old('status', $room->status) == 'available' ? 'selected' : '' }}>Available</option>
-                                <option value="occupied" {{ old('status', $room->status) == 'occupied' ? 'selected' : '' }}>Occupied</option>
-                                <option value="maintenance" {{ old('status', $room->status) == 'maintenance' ? 'selected' : '' }}>Under Maintenance</option>
+                                <option value="tersedia" {{ old('status', $room->status) == 'tersedia' ? 'selected' : '' }}>Tersedia</option>
+                                <option value="terisi" {{ old('status', $room->status) == 'terisi' ? 'selected' : '' }}>Terisi</option>
+                                <option value="perawatan" {{ old('status', $room->status) == 'perawatan' ? 'selected' : '' }}>Dalam Perawatan</option>
                             </select>
                             @error('status')
                                 <p class="text-red-500 text-sm mt-1">{{ $message }}</p>

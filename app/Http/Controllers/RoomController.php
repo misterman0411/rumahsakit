@@ -36,11 +36,11 @@ class RoomController extends Controller
     {
         $validated = $request->validate([
             'nomor_ruangan' => 'required|string|unique:ruangan,nomor_ruangan',
-            'tipe_ruangan' => 'required|in:vip,class_1,class_2,class_3,icu,emergency',
+            'tipe_ruangan' => 'required|in:vip,kelas_1,kelas_2,kelas_3,icu,darurat',
             'lantai' => 'required|integer',
             'kapasitas' => 'required|integer|min:1',
             'tarif_per_hari' => 'required|numeric|min:0',
-            'status' => 'required|in:available,occupied,maintenance',
+            'status' => 'required|in:tersedia,terisi,perawatan',
         ]);
 
         $room = Room::create($validated);
@@ -50,7 +50,7 @@ class RoomController extends Controller
             Bed::create([
                 'ruangan_id' => $room->id,
                 'nomor_tempat_tidur' => $validated['nomor_ruangan'] . '-' . $i,
-                'status' => 'available',
+                'status' => 'tersedia',
             ]);
         }
 
@@ -73,10 +73,10 @@ class RoomController extends Controller
     public function update(Request $request, Room $room)
     {
         $validated = $request->validate([
-            'tipe_ruangan' => 'required|in:vip,class_1,class_2,class_3,icu,emergency',
+            'tipe_ruangan' => 'required|in:vip,kelas_1,kelas_2,kelas_3,icu,darurat',
             'lantai' => 'required|integer',
             'tarif_per_hari' => 'required|numeric|min:0',
-            'status' => 'required|in:available,occupied,maintenance',
+            'status' => 'required|in:tersedia,terisi,perawatan',
         ]);
 
         $room->update($validated);
