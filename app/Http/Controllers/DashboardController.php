@@ -21,6 +21,11 @@ class DashboardController extends Controller
         $user = Auth::user();
         $role = $user->peran->nama ?? 'guest';
 
+        // Redirect management role to Management Dashboard
+        if ($role === 'management') {
+            return redirect()->route('management.index');
+        }
+
         $stats = [];
         $appointments = [];
         $recent_patients = [];
@@ -90,24 +95,26 @@ class DashboardController extends Controller
 
             case 'cashier':
                 $stats = [
-                    'unpaid_invoices' => Invoice::where('status', 'unpaid')->count(),
+                    'unpaid_invoices' => Invoice::where('status', 'belum_dibayar')->count(),
                     'today_revenue' => Payment::whereDate('tanggal_pembayaran', today())->sum('jumlah'),
                 ];
                 break;
 
             case 'lab_technician':
                 $stats = [
-                    'pending_tests' => LaboratoryOrder::where('status', 'ordered')->count(),
-                    'in_progress' => LaboratoryOrder::where('status', 'in_progress')->count(),
+                    'pending_tests' => LaboratoryOrder::where('status', 'menunggu')->count(),
+                    'in_progress' => LaboratoryOrder::whereIn('status', ['sampel_diambil', 'sedang_diproses'])->count(),
                 ];
                 break;
 
             case 'radiologist':
                 $stats = [
-                    'pending_exams' => RadiologyOrder::where('status', 'ordered')->count(),
-                    'scheduled' => RadiologyOrder::where('status', 'scheduled')->count(),
+                    'pending_exams' => RadiologyOrder::where('status', 'menunggu')->count(),
+                    'in_progress' => RadiologyOrder::where('status', 'sedang_diproses')->count(),
                 ];
                 break;
+
+            // Management role redirected to Management Dashboard
         }
 
         return view('dashboard', compact('role', 'stats', 'appointments', 'recent_patients'));

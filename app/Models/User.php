@@ -90,4 +90,20 @@ class User extends Authenticatable
     {
         return $this->hasOne(Nurse::class);
     }
+
+    /**
+     * Get lab results entered by this user (lab technician).
+     */
+    public function laboratoryResultsEntered()
+    {
+        return $this->hasMany(LaboratoryOrder::class, 'hasil_diinput_oleh');
+    }
+
+    /**
+     * Get radiology reports signed by this user (radiologist).
+     */
+    public function radiologySignedReports()
+    {
+        return $this->hasMany(RadiologyOrder::class, 'signed_by');
+    }
 }

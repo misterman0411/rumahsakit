@@ -10,6 +10,15 @@
                 <p class="text-gray-600 mt-2">{{ $laboratory->nomor_permintaan }}</p>
             </div>
             <div class="flex space-x-2">
+                @if($laboratory->status === 'selesai')
+                    <a href="{{ route('laboratory.print', $laboratory) }}" target="_blank"
+                        class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 flex items-center gap-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path>
+                        </svg>
+                        Cetak Hasil
+                    </a>
+                @endif
                 @if($laboratory->status === 'menunggu')
                     <form action="{{ route('laboratory.collect-sample', $laboratory) }}" method="POST" class="inline">
                         @csrf
@@ -24,13 +33,22 @@
                         Input Hasil
                     </button>
                 @endif
-                @if($laboratory->status === 'sedang_diproses')
+                @if($laboratory->status === 'sedang_diproses' && ((auth()->user()->peran->nama ?? null) === 'doctor' || (auth()->user()->peran->nama ?? null) === 'admin'))
                     <form action="{{ route('laboratory.verify', $laboratory) }}" method="POST" class="inline">
                         @csrf
                         <button type="submit" class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700">
                             Verifikasi Hasil
                         </button>
                     </form>
+                @endif
+                @if($laboratory->status === 'selesai' && $laboratory->hasilLaboratorium->count() > 0)
+                    <a href="{{ route('laboratory.print', $laboratory) }}" target="_blank"
+                        class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 inline-flex items-center gap-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path>
+                        </svg>
+                        Cetak / Export
+                    </a>
                 @endif
                 <a href="{{ route('laboratory.index') }}"
                     class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300">
@@ -131,6 +149,80 @@
                     </div>
                 </div>
                 @endif
+
+                <!-- Audit Trail / Riwayat Pemeriksaan -->
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                    <h2 class="text-xl font-bold text-gray-800 mb-4">Riwayat Pemeriksaan</h2>
+                    <div class="space-y-4">
+                        <!-- Order Created -->
+                        <div class="flex items-start space-x-3">
+                            <div class="flex-shrink-0 w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center">
+                                <svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                                </svg>
+                            </div>
+                            <div class="flex-1">
+                                <p class="text-sm font-semibold text-gray-800">Order Dibuat</p>
+                                <p class="text-xs text-gray-500">{{ $laboratory->created_at->format('d/m/Y H:i') }}</p>
+                                <p class="text-xs text-gray-600 mt-1">oleh Dr. {{ $laboratory->dokter->user->nama }}</p>
+                            </div>
+                        </div>
+
+                        <!-- Sample Collected -->
+                        @if($laboratory->sample_collected_at)
+                        <div class="flex items-start space-x-3">
+                            <div class="flex-shrink-0 w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                                <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                </svg>
+                            </div>
+                            <div class="flex-1">
+                                <p class="text-sm font-semibold text-gray-800">Sampel Diambil</p>
+                                <p class="text-xs text-gray-500">{{ \Carbon\Carbon::parse($laboratory->sample_collected_at)->format('d/m/Y H:i') }}</p>
+                                @if($laboratory->sampelDiambilOleh)
+                                <p class="text-xs text-gray-600 mt-1">oleh {{ $laboratory->sampelDiambilOleh->nama }}</p>
+                                @endif
+                            </div>
+                        </div>
+                        @endif
+
+                        <!-- Results Entered -->
+                        @if($laboratory->waktu_input_hasil)
+                        <div class="flex items-start space-x-3">
+                            <div class="flex-shrink-0 w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+                                <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                </svg>
+                            </div>
+                            <div class="flex-1">
+                                <p class="text-sm font-semibold text-gray-800">Hasil Diinput</p>
+                                <p class="text-xs text-gray-500">{{ \Carbon\Carbon::parse($laboratory->waktu_input_hasil)->format('d/m/Y H:i') }}</p>
+                                @if($laboratory->hasilDiinputOleh)
+                                <p class="text-xs text-gray-600 mt-1">oleh {{ $laboratory->hasilDiinputOleh->nama }}</p>
+                                @endif
+                            </div>
+                        </div>
+                        @endif
+
+                        <!-- Verified -->
+                        @if($laboratory->waktu_verifikasi)
+                        <div class="flex items-start space-x-3">
+                            <div class="flex-shrink-0 w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
+                                <svg class="w-4 h-4 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                            </div>
+                            <div class="flex-1">
+                                <p class="text-sm font-semibold text-gray-800">Hasil Diverifikasi</p>
+                                <p class="text-xs text-gray-500">{{ \Carbon\Carbon::parse($laboratory->waktu_verifikasi)->format('d/m/Y H:i') }}</p>
+                                @if($laboratory->diverifikasiOleh)
+                                <p class="text-xs text-gray-600 mt-1">oleh Dr. {{ $laboratory->diverifikasiOleh->nama }}</p>
+                                @endif
+                            </div>
+                        </div>
+                        @endif
+                    </div>
+                </div>
             </div>
 
             <!-- Sidebar -->
@@ -220,36 +312,44 @@
                     <div class="result-item border border-gray-200 rounded-lg p-4">
                         <div class="grid grid-cols-2 gap-4">
                             <div class="col-span-2">
-                                <label class="block text-sm font-semibold text-gray-700 mb-2">Nama Test</label>
-                                <input type="text" name="results[0][test_name]" required
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">Hasil *</label>
+                                <input type="text" name="results[0][hasil]" required
+                                    placeholder="Contoh: Glukosa Puasa"
                                     class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
                             </div>
                             <div>
-                                <label class="block text-sm font-semibold text-gray-700 mb-2">Hasil</label>
-                                <input type="text" name="results[0][result_value]" required
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">Nilai</label>
+                                <input type="text" name="results[0][nilai]"
+                                    placeholder="Contoh: 145"
                                     class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
                             </div>
                             <div>
                                 <label class="block text-sm font-semibold text-gray-700 mb-2">Satuan</label>
-                                <input type="text" name="results[0][unit]"
+                                <input type="text" name="results[0][satuan]"
+                                    placeholder="Contoh: mg/dL"
                                     class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
                             </div>
                             <div>
-                                <label class="block text-sm font-semibold text-gray-700 mb-2">Nilai Normal</label>
-                                <input type="text" name="results[0][normal_range]"
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">Nilai Rujukan</label>
+                                <input type="text" name="results[0][nilai_rujukan]"
+                                    placeholder="Contoh: 70-100"
                                     class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
                             </div>
                             <div>
                                 <label class="block text-sm font-semibold text-gray-700 mb-2">Status</label>
-                                <select name="results[0][is_abnormal]"
+                                <select name="results[0][status]"
                                     class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
-                                    <option value="0">Normal</option>
-                                    <option value="1">Abnormal</option>
+                                    <option value="">Pilih Status</option>
+                                    <option value="normal">Normal</option>
+                                    <option value="tinggi">Tinggi</option>
+                                    <option value="rendah">Rendah</option>
+                                    <option value="kritis">Kritis</option>
                                 </select>
                             </div>
                             <div class="col-span-2">
                                 <label class="block text-sm font-semibold text-gray-700 mb-2">Catatan</label>
-                                <textarea name="results[0][notes]" rows="2"
+                                <textarea name="results[0][catatan]" rows="2"
+                                    placeholder="Catatan tambahan (opsional)"
                                     class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"></textarea>
                             </div>
                         </div>
@@ -281,36 +381,44 @@ function addResult() {
         <div class="result-item border border-gray-200 rounded-lg p-4">
             <div class="grid grid-cols-2 gap-4">
                 <div class="col-span-2">
-                    <label class="block text-sm font-semibold text-gray-700 mb-2">Nama Test</label>
-                    <input type="text" name="results[${resultIndex}][test_name]" required
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Hasil *</label>
+                    <input type="text" name="results[${resultIndex}][hasil]" required
+                        placeholder="Contoh: Glukosa Puasa"
                         class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
                 </div>
                 <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-2">Hasil</label>
-                    <input type="text" name="results[${resultIndex}][result_value]" required
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Nilai</label>
+                    <input type="text" name="results[${resultIndex}][nilai]"
+                        placeholder="Contoh: 145"
                         class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
                 </div>
                 <div>
                     <label class="block text-sm font-semibold text-gray-700 mb-2">Satuan</label>
-                    <input type="text" name="results[${resultIndex}][unit]"
+                    <input type="text" name="results[${resultIndex}][satuan]"
+                        placeholder="Contoh: mg/dL"
                         class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
                 </div>
                 <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-2">Nilai Normal</label>
-                    <input type="text" name="results[${resultIndex}][normal_range]"
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Nilai Rujukan</label>
+                    <input type="text" name="results[${resultIndex}][nilai_rujukan]"
+                        placeholder="Contoh: 70-100"
                         class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
                 </div>
                 <div>
                     <label class="block text-sm font-semibold text-gray-700 mb-2">Status</label>
-                    <select name="results[${resultIndex}][is_abnormal]"
+                    <select name="results[${resultIndex}][status]"
                         class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
-                        <option value="0">Normal</option>
-                        <option value="1">Abnormal</option>
+                        <option value="">Pilih Status</option>
+                        <option value="normal">Normal</option>
+                        <option value="tinggi">Tinggi</option>
+                        <option value="rendah">Rendah</option>
+                        <option value="kritis">Kritis</option>
                     </select>
                 </div>
                 <div class="col-span-2">
                     <label class="block text-sm font-semibold text-gray-700 mb-2">Catatan</label>
-                    <textarea name="results[${resultIndex}][notes]" rows="2"
+                    <textarea name="results[${resultIndex}][catatan]" rows="2"
+                        placeholder="Catatan tambahan (opsional)"
                         class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"></textarea>
                 </div>
             </div>

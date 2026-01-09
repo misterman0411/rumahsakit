@@ -68,7 +68,7 @@
                 @forelse($admissions as $admission)
                 <tr class="hover:bg-indigo-50/50 transition-colors">
                     <td class="px-6 py-4 whitespace-nowrap">
-                        <span class="text-sm font-bold text-indigo-600">{{ $admission->admission_number }}</span>
+                        <span class="text-sm font-bold text-indigo-600">{{ $admission->nomor_rawat_inap }}</span>
                     </td>
                     <td class="px-6 py-4">
                         <div class="text-sm font-semibold text-gray-900">{{ $admission->pasien->nama }}</div>

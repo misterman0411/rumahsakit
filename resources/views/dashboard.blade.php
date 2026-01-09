@@ -224,4 +224,215 @@
     </div>
 </div>
 @endif
+
+<!-- Management Comprehensive Dashboard -->
+@if($role === 'management')
+<div class="space-y-6">
+    <!-- Financial Overview -->
+    <div class="bg-gradient-to-r from-green-600 to-emerald-700 rounded-xl shadow-lg p-6 text-white">
+        <h2 class="text-2xl font-bold mb-4 flex items-center gap-2">
+            <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            Financial Overview
+        </h2>
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            <div class="bg-white/10 backdrop-blur-sm rounded-lg p-4 border border-white/20">
+                <div class="text-sm text-green-100">Today Revenue</div>
+                <div class="text-2xl font-bold">Rp {{ number_format($stats['today_revenue'] ?? 0, 0, ',', '.') }}</div>
+            </div>
+            <div class="bg-white/10 backdrop-blur-sm rounded-lg p-4 border border-white/20">
+                <div class="text-sm text-green-100">This Month Revenue</div>
+                <div class="text-2xl font-bold">Rp {{ number_format($stats['this_month_revenue'] ?? 0, 0, ',', '.') }}</div>
+            </div>
+            <div class="bg-white/10 backdrop-blur-sm rounded-lg p-4 border border-white/20">
+                <div class="text-sm text-green-100">Unpaid Invoices</div>
+                <div class="text-2xl font-bold">Rp {{ number_format($stats['unpaid_invoices'] ?? 0, 0, ',', '.') }}</div>
+                <div class="text-xs text-green-200">{{ $stats['unpaid_count'] ?? 0 }} invoices</div>
+            </div>
+            <div class="bg-white/10 backdrop-blur-sm rounded-lg p-4 border border-white/20">
+                <div class="text-sm text-green-100">Collection Rate</div>
+                <div class="text-2xl font-bold">
+                    @php
+                        $total_billed = ($stats['this_month_revenue'] ?? 0) + ($stats['unpaid_invoices'] ?? 0);
+                        $rate = $total_billed > 0 ? round(($stats['this_month_revenue'] ?? 0) / $total_billed * 100) : 0;
+                    @endphp
+                    {{ $rate }}%
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Operational Metrics -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Patient Statistics -->
+        <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-200">
+            <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+                <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                </svg>
+                Patient Statistics
+            </h3>
+            <div class="space-y-3">
+                <div class="flex justify-between items-center">
+                    <span class="text-gray-600">Total Patients</span>
+                    <span class="text-2xl font-bold text-blue-600">{{ $stats['total_patients'] ?? 0 }}</span>
+                </div>
+                <div class="flex justify-between items-center">
+                    <span class="text-gray-600">New This Month</span>
+                    <span class="text-xl font-bold text-green-600">+{{ $stats['new_patients_this_month'] ?? 0 }}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Staff Statistics -->
+        <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-200">
+            <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+                <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                </svg>
+                Staff Overview
+            </h3>
+            <div class="space-y-3">
+                <div class="flex justify-between items-center">
+                    <span class="text-gray-600">Doctors</span>
+                    <span class="text-2xl font-bold text-purple-600">{{ $stats['total_doctors'] ?? 0 }}</span>
+                </div>
+                <div class="flex justify-between items-center">
+                    <span class="text-gray-600">Nurses</span>
+                    <span class="text-2xl font-bold text-pink-600">{{ $stats['total_nurses'] ?? 0 }}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Appointments -->
+        <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-200">
+            <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+                <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                </svg>
+                Appointments
+            </h3>
+            <div class="space-y-3">
+                <div class="flex justify-between items-center">
+                    <span class="text-gray-600">Today</span>
+                    <span class="text-2xl font-bold text-indigo-600">{{ $stats['today_appointments'] ?? 0 }}</span>
+                </div>
+                <div class="flex justify-between items-center">
+                    <span class="text-gray-600">This Month</span>
+                    <span class="text-xl font-bold text-blue-600">{{ $stats['this_month_appointments'] ?? 0 }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Departmental Performance -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Laboratory -->
+        <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-200 hover:shadow-lg transition-shadow">
+            <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+                <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path>
+                </svg>
+                Laboratory
+            </h3>
+            <div class="space-y-3">
+                <div class="flex justify-between">
+                    <span class="text-gray-600">Pending</span>
+                    <span class="text-lg font-bold text-yellow-600">{{ $stats['lab_pending'] ?? 0 }}</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-gray-600">Completed (Month)</span>
+                    <span class="text-lg font-bold text-green-600">{{ $stats['lab_completed'] ?? 0 }}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Radiology -->
+        <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-200 hover:shadow-lg transition-shadow">
+            <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+                <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"></path>
+                </svg>
+                Radiology
+            </h3>
+            <div class="space-y-3">
+                <div class="flex justify-between">
+                    <span class="text-gray-600">Pending</span>
+                    <span class="text-lg font-bold text-yellow-600">{{ $stats['rad_pending'] ?? 0 }}</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-gray-600">Completed (Month)</span>
+                    <span class="text-lg font-bold text-green-600">{{ $stats['rad_completed'] ?? 0 }}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pharmacy -->
+        <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-200 hover:shadow-lg transition-shadow">
+            <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+                <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+                </svg>
+                Pharmacy
+            </h3>
+            <div class="space-y-3">
+                <div class="flex justify-between">
+                    <span class="text-gray-600">Pending</span>
+                    <span class="text-lg font-bold text-yellow-600">{{ $stats['prescriptions_pending'] ?? 0 }}</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-gray-600">Completed (Month)</span>
+                    <span class="text-lg font-bold text-green-600">{{ $stats['prescriptions_completed'] ?? 0 }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Activity (Audit Trail) -->
+    @if(isset($appointments) && count($appointments) > 0)
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+            <svg class="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+            </svg>
+            Recent Appointments (Audit Trail)
+        </h3>
+        <div class="overflow-x-auto">
+            <table class="min-w-full">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-4 py-2 text-left text-xs font-semibold text-gray-600">Date</th>
+                        <th class="px-4 py-2 text-left text-xs font-semibold text-gray-600">Patient</th>
+                        <th class="px-4 py-2 text-left text-xs font-semibold text-gray-600">Doctor</th>
+                        <th class="px-4 py-2 text-left text-xs font-semibold text-gray-600">Status</th>
+                        <th class="px-4 py-2 text-left text-xs font-semibold text-gray-600">Queue</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200">
+                    @foreach($appointments as $apt)
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-4 py-3 text-sm">{{ $apt->tanggal_janji->format('d/m/Y H:i') }}</td>
+                        <td class="px-4 py-3 text-sm font-medium">{{ $apt->pasien->nama }}</td>
+                        <td class="px-4 py-3 text-sm">{{ $apt->dokter->user->nama }}</td>
+                        <td class="px-4 py-3 text-sm">
+                            <span class="px-2 py-1 rounded-full text-xs font-semibold
+                                @if($apt->status === 'selesai') bg-green-100 text-green-800
+                                @elseif($apt->status === 'in_progress') bg-blue-100 text-blue-800
+                                @elseif($apt->status === 'check_in') bg-yellow-100 text-yellow-800
+                                @else bg-gray-100 text-gray-800
+                                @endif">
+                                {{ ucfirst($apt->status) }}
+                            </span>
+                        </td>
+                        <td class="px-4 py-3 text-sm">{{ $apt->nomor_antrian }}</td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+    </div>
+    @endif
+</div>
+@endif
 @endsection

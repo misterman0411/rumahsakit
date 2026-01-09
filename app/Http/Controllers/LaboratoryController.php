@@ -20,7 +20,9 @@ class LaboratoryController extends Controller
         $query = LaboratoryOrder::with(['pasien', 'dokter.user', 'jenisTes', 'hasilLaboratorium']);
 
         // Filter berdasarkan role user
+        /** @var \App\Models\User $user */
         $user = Auth::user();
+        $user->load('peran');
         $role = $user->peran->nama ?? null;
 
         if ($role === 'doctor') {
@@ -44,7 +46,9 @@ class LaboratoryController extends Controller
 
     public function create()
     {
+        /** @var \App\Models\User $user */
         $user = Auth::user();
+        $user->load('peran');
         $role = $user->peran->nama ?? null;
         
         // Filter pasien berdasarkan role
@@ -142,7 +146,20 @@ class LaboratoryController extends Controller
 
     public function show(LaboratoryOrder $laboratory)
     {
-        $laboratory->load(['pasien', 'dokter.user', 'jenisTes', 'hasilLaboratorium', 'tagihan']);
+        $laboratory->load([
+            'pasien',
+            'dokter.user',
+            'jenisTes',
+            'hasilLaboratorium',
+            'tagihan',
+            'sampelDiambilOleh',
+            'hasilDiinputOleh',
+            'diverifikasiOleh'
+        ]);
+
+        /** @var \App\Models\User $currentUser */
+        $currentUser = Auth::user();
+        $currentUser->load('peran');
 
         return view('laboratory.show', compact('laboratory'));
     }
@@ -152,6 +169,7 @@ class LaboratoryController extends Controller
         $laboratory->update([
             'status' => 'sampel_diambil',
             'sample_collected_at' => now(),
+            'sampel_diambil_oleh' => Auth::id(),
         ]);
 
         return redirect()->route('laboratory.show', $laboratory)
@@ -179,12 +197,16 @@ class LaboratoryController extends Controller
                 'nilai_rujukan' => $result['nilai_rujukan'] ?? null,
                 'status' => $result['status'] ?? null,
                 'catatan' => $result['catatan'] ?? null,
-                'diperiksa_oleh' => auth()->id,
+                'diperiksa_oleh' => Auth::id(),
                 'waktu_pemeriksaan' => now(),
             ]);
         }
 
-        $laboratory->update(['status' => 'sedang_diproses']);
+        $laboratory->update([
+            'status' => 'sedang_diproses',
+            'hasil_diinput_oleh' => Auth::id(),
+            'waktu_input_hasil' => now(),
+        ]);
 
         return redirect()->route('laboratory.show', $laboratory)
             ->with('success', 'Hasil laboratorium berhasil diinput');
@@ -194,9 +216,26 @@ class LaboratoryController extends Controller
     {
         $laboratory->update([
             'status' => 'selesai',
+            'diverifikasi_oleh' => Auth::id(),
+            'waktu_verifikasi' => now(),
         ]);
 
         return redirect()->route('laboratory.show', $laboratory)
             ->with('success', 'Hasil laboratorium berhasil diverifikasi');
+    }
+
+    public function print(LaboratoryOrder $laboratory)
+    {
+        $laboratory->load([
+            'pasien',
+            'dokter.user',
+            'jenisTes',
+            'hasilLaboratorium',
+            'sampelDiambilOleh',
+            'hasilDiinputOleh',
+            'diverifikasiOleh',
+        ]);
+
+        return view('laboratory.print', compact('laboratory'));
     }
 }

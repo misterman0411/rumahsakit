@@ -149,6 +149,7 @@ Route::middleware(['auth'])->group(function () {
     Route::middleware(['role:doctor,lab_technician,nurse,admin'])->group(function () {
         Route::get('laboratory', [LaboratoryController::class, 'index'])->name('laboratory.index');
         Route::get('laboratory/{laboratory}', [LaboratoryController::class, 'show'])->name('laboratory.show');
+        Route::get('laboratory/{laboratory}/print', [LaboratoryController::class, 'print'])->name('laboratory.print');
     });
     
     // Edit/Update/Delete - Lab Tech + Doctor
@@ -167,17 +168,19 @@ Route::middleware(['auth'])->group(function () {
         Route::post('radiology', [RadiologyController::class, 'store'])->name('radiology.store');
     });
     
-    // Radiologist - schedule, upload, interpret
+    // Radiologist - schedule, upload, interpret, finalize, revise
     Route::middleware(['role:radiologist,admin'])->group(function () {
         Route::post('radiology/{radiology}/schedule', [RadiologyController::class, 'schedule'])->name('radiology.schedule');
-        Route::post('radiology/{radiology}/upload-image', [RadiologyController::class, 'uploadImage'])->name('radiology.upload-image');
         Route::post('radiology/{radiology}/enter-interpretation', [RadiologyController::class, 'enterInterpretation'])->name('radiology.enter-interpretation');
+        Route::post('radiology/{radiology}/finalize', [RadiologyController::class, 'finalizeReport'])->name('radiology.finalize');
+        Route::post('radiology/{radiology}/revise', [RadiologyController::class, 'createRevision'])->name('radiology.revise');
     });
     
     // View access
     Route::middleware(['role:doctor,radiologist,nurse,admin'])->group(function () {
         Route::get('radiology', [RadiologyController::class, 'index'])->name('radiology.index');
         Route::get('radiology/{radiology}', [RadiologyController::class, 'show'])->name('radiology.show');
+        Route::get('radiology/{radiology}/print', [RadiologyController::class, 'print'])->name('radiology.print');
     });
     
     // Edit/Update/Delete - Radiologist + Doctor
@@ -366,6 +369,17 @@ Route::middleware(['auth'])->group(function () {
     // View access - all authenticated
     Route::get('departments', [DepartmentController::class, 'index'])->name('departments.index');
     Route::get('departments/{department}', [DepartmentController::class, 'show'])->name('departments.show');
+
+    // ============================================
+    // MANAGEMENT REPORTS
+    // ============================================
+    Route::middleware(['role:management,admin'])->prefix('management')->name('management.')->group(function () {
+        Route::get('/', [App\Http\Controllers\ManagementReportController::class, 'index'])->name('index');
+        Route::get('/financial', [App\Http\Controllers\ManagementReportController::class, 'financial'])->name('financial');
+        Route::get('/operational', [App\Http\Controllers\ManagementReportController::class, 'operational'])->name('operational');
+        Route::get('/patient-flow', [App\Http\Controllers\ManagementReportController::class, 'patientFlow'])->name('patient-flow');
+        Route::get('/staff-performance', [App\Http\Controllers\ManagementReportController::class, 'staffPerformance'])->name('staff-performance');
+    });
 });
 
 // ============================================

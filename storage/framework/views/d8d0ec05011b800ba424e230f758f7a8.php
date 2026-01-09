@@ -17,12 +17,16 @@
     <!-- Navigation Menu -->
     <nav class="flex-1 overflow-y-auto py-6 px-3 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent hover:scrollbar-thumb-gray-400">
         <ul class="space-y-1.5">
-            <!-- Dashboard -->
+            <!-- Dashboard - Management role goes to Management Dashboard -->
             <li>
-                <a href="<?php echo e(route('dashboard')); ?>" 
-                   class="group flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-200 <?php echo e(request()->routeIs('dashboard') ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg shadow-indigo-200' : 'text-gray-700 hover:bg-gray-50'); ?>">
-                    <div class="<?php echo e(request()->routeIs('dashboard') ? 'bg-white/20' : 'bg-gray-100 group-hover:bg-indigo-50'); ?> p-2 rounded-lg transition-colors">
-                        <svg class="w-5 h-5 <?php echo e(request()->routeIs('dashboard') ? 'text-white' : 'text-gray-600 group-hover:text-indigo-600'); ?>" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <?php
+                    $dashboardRoute = auth()->user()->hasRole('management') ? route('management.index') : route('dashboard');
+                    $isDashboardActive = request()->routeIs('dashboard') || (auth()->user()->hasRole('management') && request()->routeIs('management.*'));
+                ?>
+                <a href="<?php echo e($dashboardRoute); ?>" 
+                   class="group flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-200 <?php echo e($isDashboardActive ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg shadow-indigo-200' : 'text-gray-700 hover:bg-gray-50'); ?>">
+                    <div class="<?php echo e($isDashboardActive ? 'bg-white/20' : 'bg-gray-100 group-hover:bg-indigo-50'); ?> p-2 rounded-lg transition-colors">
+                        <svg class="w-5 h-5 <?php echo e($isDashboardActive ? 'text-white' : 'text-gray-600 group-hover:text-indigo-600'); ?>" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
                         </svg>
                     </div>
@@ -127,7 +131,7 @@
             <?php endif; ?>
 
             <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('view-pharmacy')): ?>
-            <!-- Pharmacy -->
+            <!-- Prescriptions -->
             <li>
                 <a href="<?php echo e(route('prescriptions.index')); ?>" 
                    class="group flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-200 <?php echo e(request()->routeIs('prescriptions.*') ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg shadow-indigo-200' : 'text-gray-700 hover:bg-gray-50'); ?>">
@@ -136,10 +140,12 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path>
                         </svg>
                     </div>
-                    <span class="font-semibold">Pharmacy</span>
+                    <span class="font-semibold">Prescriptions</span>
                 </a>
             </li>
+            <?php endif; ?>
 
+            <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('manage-pharmacy')): ?>
             <!-- Medications -->
             <li>
                 <a href="<?php echo e(route('medications.index')); ?>" 
@@ -200,6 +206,84 @@
                         </svg>
                     </div>
                     <span class="font-semibold">Inpatient</span>
+                </a>
+            </li>
+            <?php endif; ?>
+
+            <?php if(auth()->user()->hasAnyRole(['management', 'admin'])): ?>
+            <!-- Divider -->
+            <li class="py-3">
+                <div class="flex items-center space-x-3 px-4">
+                    <div class="flex-1 h-px bg-gradient-to-r from-transparent via-gray-300 to-transparent"></div>
+                </div>
+            </li>
+
+            <!-- Management Reports Section -->
+            <li class="px-4 py-2">
+                <p class="text-xs font-bold text-gray-400 uppercase tracking-wider">Reports</p>
+            </li>
+
+            <!-- Financial Report -->
+            <li>
+                <a href="<?php echo e(route('management.financial')); ?>" 
+                   class="group flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-200 <?php echo e(request()->routeIs('management.financial') ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg shadow-indigo-200' : 'text-gray-700 hover:bg-gray-50'); ?>">
+                    <div class="<?php echo e(request()->routeIs('management.financial') ? 'bg-white/20' : 'bg-gray-100 group-hover:bg-indigo-50'); ?> p-2 rounded-lg transition-colors">
+                        <svg class="w-5 h-5 <?php echo e(request()->routeIs('management.financial') ? 'text-white' : 'text-gray-600 group-hover:text-indigo-600'); ?>" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                    </div>
+                    <div>
+                        <div class="font-semibold">Financial Report</div>
+                        <div class="text-xs <?php echo e(request()->routeIs('management.financial') ? 'text-white/80' : 'text-gray-500'); ?>">Revenue & Outstanding</div>
+                    </div>
+                </a>
+            </li>
+
+            <!-- Operational Performance -->
+            <li>
+                <a href="<?php echo e(route('management.operational')); ?>" 
+                   class="group flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-200 <?php echo e(request()->routeIs('management.operational') ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg shadow-indigo-200' : 'text-gray-700 hover:bg-gray-50'); ?>">
+                    <div class="<?php echo e(request()->routeIs('management.operational') ? 'bg-white/20' : 'bg-gray-100 group-hover:bg-indigo-50'); ?> p-2 rounded-lg transition-colors">
+                        <svg class="w-5 h-5 <?php echo e(request()->routeIs('management.operational') ? 'text-white' : 'text-gray-600 group-hover:text-indigo-600'); ?>" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path>
+                        </svg>
+                    </div>
+                    <div>
+                        <div class="font-semibold">Operational</div>
+                        <div class="text-xs <?php echo e(request()->routeIs('management.operational') ? 'text-white/80' : 'text-gray-500'); ?>">Lab, Rad, Pharmacy, Clinic</div>
+                    </div>
+                </a>
+            </li>
+
+            <!-- Patient Flow -->
+            <li>
+                <a href="<?php echo e(route('management.patient-flow')); ?>" 
+                   class="group flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-200 <?php echo e(request()->routeIs('management.patient-flow') ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg shadow-indigo-200' : 'text-gray-700 hover:bg-gray-50'); ?>">
+                    <div class="<?php echo e(request()->routeIs('management.patient-flow') ? 'bg-white/20' : 'bg-gray-100 group-hover:bg-indigo-50'); ?> p-2 rounded-lg transition-colors">
+                        <svg class="w-5 h-5 <?php echo e(request()->routeIs('management.patient-flow') ? 'text-white' : 'text-gray-600 group-hover:text-indigo-600'); ?>" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                        </svg>
+                    </div>
+                    <div>
+                        <div class="font-semibold">Patient Flow</div>
+                        <div class="text-xs <?php echo e(request()->routeIs('management.patient-flow') ? 'text-white/80' : 'text-gray-500'); ?>">Visits & Admissions</div>
+                    </div>
+                </a>
+            </li>
+
+            <!-- Staff Performance -->
+            <li>
+                <a href="<?php echo e(route('management.staff-performance')); ?>" 
+                   class="group flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-200 <?php echo e(request()->routeIs('management.staff-performance') ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg shadow-indigo-200' : 'text-gray-700 hover:bg-gray-50'); ?>">
+                    <div class="<?php echo e(request()->routeIs('management.staff-performance') ? 'bg-white/20' : 'bg-gray-100 group-hover:bg-indigo-50'); ?> p-2 rounded-lg transition-colors">
+                        <svg class="w-5 h-5 <?php echo e(request()->routeIs('management.staff-performance') ? 'text-white' : 'text-gray-600 group-hover:text-indigo-600'); ?>" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                        </svg>
+                    </div>
+                    <div>
+                        <div class="font-semibold">Staff Performance</div>
+                        <div class="text-xs <?php echo e(request()->routeIs('management.staff-performance') ? 'text-white/80' : 'text-gray-500'); ?>">Doctors & Technicians</div>
+                    </div>
                 </a>
             </li>
             <?php endif; ?>

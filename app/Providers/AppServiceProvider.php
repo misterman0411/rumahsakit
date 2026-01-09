@@ -22,7 +22,7 @@ class AppServiceProvider extends ServiceProvider
     {
         // Define Gates for role-based permissions
         Gate::define('manage-patients', function ($user) {
-            return $user->hasAnyRole(['admin', 'front_office', 'nurse', 'doctor', 'pharmacist', 'lab_technician', 'radiologist', 'management']);
+            return $user->hasAnyRole(['admin', 'front_office', 'nurse', 'doctor', 'pharmacist', 'lab_technician', 'radiologist']);
         });
 
         Gate::define('manage-appointments', function ($user) {
@@ -49,8 +49,12 @@ class AppServiceProvider extends ServiceProvider
             return $user->hasAnyRole(['admin', 'doctor', 'pharmacist', 'nurse']);
         });
 
+        Gate::define('manage-pharmacy', function ($user) {
+            return $user->hasAnyRole(['admin', 'pharmacist']);
+        });
+
         Gate::define('view-billing', function ($user) {
-            return $user->hasAnyRole(['admin', 'front_office', 'cashier', 'doctor', 'management']);
+            return $user->hasAnyRole(['admin', 'front_office', 'cashier', 'doctor']);
         });
 
         Gate::define('manage-inpatient', function ($user) {
