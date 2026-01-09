@@ -203,6 +203,7 @@ Route::middleware(['auth'])->group(function () {
     Route::middleware(['role:pharmacist,admin'])->group(function () {
         Route::post('prescriptions/{prescription}/verify', [PrescriptionController::class, 'verify'])->name('prescriptions.verify');
         Route::post('prescriptions/{prescription}/dispense', [PrescriptionController::class, 'dispense'])->name('prescriptions.dispense');
+        Route::post('prescriptions/{prescription}/reject', [PrescriptionController::class, 'reject'])->name('prescriptions.reject');
     });
     
     // View access
@@ -274,8 +275,8 @@ Route::middleware(['auth'])->group(function () {
         Route::post('billing/payment-multiple-midtrans', [BillingController::class, 'paymentMultipleMidtrans'])->name('billing.payment-multiple-midtrans');
     });
     
-    // Cashier + Management + Doctor - view billing
-    Route::middleware(['role:cashier,management,admin,doctor'])->group(function () {
+    // Cashier + Management + Doctor + Front Office - view billing
+    Route::middleware(['role:cashier,management,admin,doctor,front_office'])->group(function () {
         Route::get('billing', [BillingController::class, 'index'])->name('billing.index');
         Route::get('billing/{invoice}', [BillingController::class, 'show'])->name('billing.show');
         Route::get('billing/payments/history', [BillingController::class, 'payments'])->name('billing.payments');

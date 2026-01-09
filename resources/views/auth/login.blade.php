@@ -167,10 +167,13 @@
     </div>
 </div>
 
+@if(!empty($attemptInfo) && $attemptInfo['is_locked'] && $attemptInfo['locked_until'])
+@php
+    $lockedUntilTime = $attemptInfo['locked_until'];
+@endphp
 <script>
-    // Countdown Timer untuk Lock Message
-    @if(!empty($attemptInfo) && $attemptInfo['is_locked'] && $attemptInfo['locked_until'])
-        const lockedUntil = new Date('{{ $attemptInfo['locked_until'] }}').getTime();
+    (function() {
+        const lockedUntil = new Date('{{ $lockedUntilTime }}').getTime();
         const lockTimerElement = document.getElementById('lockTimer');
         const lockMessageContainer = document.getElementById('lockMessageContainer');
         const submitBtn = document.getElementById('submitBtn');
@@ -181,7 +184,6 @@
             const timeLeft = lockedUntil - now;
 
             if (timeLeft <= 0) {
-                // Waktu sudah habis
                 if(lockMessageContainer) lockMessageContainer.style.display = 'none';
                 if(submitBtn) submitBtn.disabled = false;
                 if(submitBtn) submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
@@ -202,8 +204,9 @@
 
         updateCountdown();
         const countdownInterval = setInterval(updateCountdown, 1000);
-    @endif
+    })();
 </script>
+@endif
 
 </body>
 </html>

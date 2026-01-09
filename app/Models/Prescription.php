@@ -22,11 +22,15 @@ class Prescription extends Model
         'diverifikasi_oleh',
         'waktu_penyerahan',
         'diserahkan_oleh',
+        'alasan_penolakan',
+        'ditolak_oleh',
+        'waktu_penolakan',
     ];
 
     protected $casts = [
         'waktu_verifikasi' => 'datetime',
         'waktu_penyerahan' => 'datetime',
+        'waktu_penolakan' => 'datetime',
     ];
 
     protected static function boot()

@@ -10,14 +10,14 @@
                 <h2 class="text-2xl font-bold text-gray-900">Patients</h2>
                 <p class="text-sm text-gray-500 mt-1">Manage patient records and information</p>
             </div>
-            @can('manage-patients')
+            @if(auth()->user()->hasAnyRole(['front_office', 'admin']))
             <a href="{{ route('patients.create') }}" class="flex items-center space-x-2 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-6 py-3 rounded-lg shadow-md hover:shadow-lg transition-all duration-200 font-semibold">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
                 </svg>
                 <span>Add New Patient</span>
             </a>
-            @endcan
+            @endif
         </div>
     </div>
 

@@ -83,8 +83,8 @@ class DashboardController extends Controller
 
             case 'pharmacist':
                 $stats = [
-                    'pending_prescriptions' => Prescription::where('status', 'pending')->count(),
-                    'verified_prescriptions' => Prescription::where('status', 'verified')->count(),
+                    'pending_prescriptions' => Prescription::where('status', 'menunggu')->count(),
+                    'verified_prescriptions' => Prescription::where('status', 'diverifikasi')->count(),
                 ];
                 break;
 

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Login - MedCare</title>
+    <title>Sign Up - MedCare</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
@@ -17,7 +17,7 @@
     <div class="bg-white rounded-3xl shadow-2xl overflow-hidden max-w-5xl w-full flex flex-col md:flex-row min-h-[600px] border border-gray-100">
 
         <!-- Left Side - Branding -->
-        <div class="w-full md:w-1/2 bg-gradient-to-br from-indigo-600 to-purple-700 p-12 text-white flex flex-col justify-between relative overflow-hidden">
+        <div class="w-full md:w-1/2 bg-gradient-to-br from-indigo-600 to-purple-700 p-12 text-white flex flex-col justify-between relative overflow-hidden order-1 md:order-1">
             
             <div class="relative z-10">
                 <div class="flex items-center gap-2 mb-8">
@@ -35,15 +35,14 @@
                     
                     <div class="w-64 h-64 bg-white/10 backdrop-blur-md rounded-full flex items-center justify-center border border-white/20 shadow-2xl relative z-10">
                         <svg class="w-32 h-32 text-indigo-100" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
                         </svg>
                     </div>
                 </div>
 
                 <div>
-                    <h2 class="text-3xl font-bold mb-3">Welcome Back!</h2>
-                    <p class="text-indigo-100 text-lg">Akses layanan kesehatan digital terbaik untuk Anda dan keluarga.</p>
+                    <h2 class="text-3xl font-bold mb-3">Join Us Today!</h2>
+                    <p class="text-indigo-100 text-lg">Buat akun untuk mengelola kesehatan Anda dengan lebih mudah.</p>
                     <div class="flex gap-2 mt-6">
                         <div class="w-2 h-2 rounded-full bg-white animate-bounce"></div>
                         <div class="w-2 h-2 rounded-full bg-indigo-300 animate-bounce delay-100"></div>
@@ -61,41 +60,28 @@
 
         </div>
 
-        <!-- Right Side - Login Form -->
-        <div class="w-full md:w-1/2 p-12 flex flex-col justify-center bg-white relative">
+        <!-- Right Side - Register Form -->
+        <div class="w-full md:w-1/2 p-12 flex flex-col justify-center bg-white relative order-2 md:order-2">
             <div class="max-w-md mx-auto w-full">
                 <div class="mb-8">
-                    <h2 class="text-3xl font-bold text-gray-900 mb-2">Sign In</h2>
-                    <p class="text-gray-500 text-sm">Masuk untuk mengakses dashboard MedCare.</p>
+                    <h2 class="text-3xl font-bold text-gray-900 mb-2">Create Account</h2>
+                    <p class="text-gray-500 text-sm">Lengkapi data diri Anda untuk mendaftar.</p>
                 </div>
 
-                <!-- Registration Prompt -->
+                <!-- Login Prompt -->
                 <p class="text-gray-500 mb-8 text-sm bg-gray-50 p-4 rounded-xl border border-gray-100">
-                    Belum punya akun?
-                    <a href="<?php echo e(route('register')); ?>" class="text-indigo-600 font-bold hover:text-indigo-700 transition-colors">Daftar sekarang</a>
-                    <span class="block text-xs mt-1">Hanya butuh waktu kurang dari 1 menit.</span>
+                    Sudah punya akun?
+                    <a href="<?php echo e(route('login')); ?>" class="text-indigo-600 font-bold hover:text-indigo-700 transition-colors">Login disini</a>
                 </p>
 
-                <!-- Alerts Logic -->
-                <?php if(!empty($attemptInfo) && $attemptInfo['is_locked'] && $attemptInfo['locked_until']): ?>
-                    <div id="lockMessageContainer" class="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl flex items-start gap-3">
-                        <svg class="w-5 h-5 text-red-600 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd" />
-                        </svg>
-                        <div>
-                            <h3 class="text-red-800 font-semibold text-sm">Akun Terkunci</h3>
-                            <p class="text-red-600 text-sm mt-1">
-                                Silakan coba lagi dalam <span id="lockTimer" class="font-bold font-mono bg-red-100 px-2 py-0.5 rounded">0:00</span>
-                            </p>
-                        </div>
-                    </div>
-                <?php elseif($errors->any()): ?>
+                <!-- Alerts -->
+                <?php if($errors->any()): ?>
                     <div class="mb-6 p-4 bg-red-50 border-l-4 border-red-500 rounded-r-xl">
                         <div class="flex items-center gap-2 mb-1">
                             <svg class="w-5 h-5 text-red-600" fill="currentColor" viewBox="0 0 20 20">
                                 <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
                             </svg>
-                            <h3 class="text-red-800 font-semibold text-sm">Login Gagal</h3>
+                            <h3 class="text-red-800 font-semibold text-sm">Terjadi Kesalahan</h3>
                         </div>
                         <ul class="list-disc list-inside text-red-600 text-sm ml-1">
                             <?php $__currentLoopData = $errors->all(); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $error): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
@@ -105,11 +91,26 @@
                     </div>
                 <?php endif; ?>
 
-                <form method="POST" action="<?php echo e(route('login')); ?>" id="loginForm">
+                <form method="POST" action="<?php echo e(route('register')); ?>">
                     <?php echo csrf_field(); ?>
 
+                    <!-- Name -->
+                    <div class="mb-5 group">
+                        <label for="nama" class="block text-sm font-semibold text-gray-700 mb-2">Nama Lengkap</label>
+                        <div class="relative transition-all duration-300">
+                            <input id="nama" type="text" name="nama" value="<?php echo e(old('nama')); ?>" required
+                                   class="w-full pl-11 pr-4 py-3.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 transition-all bg-gray-50 focus:bg-white placeholder-gray-400 text-gray-800"
+                                   placeholder="John Doe">
+                            <div class="absolute left-0 top-0 h-full w-11 flex items-center justify-center text-gray-400 group-focus-within:text-indigo-500 transition-colors">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- Email -->
-                    <div class="mb-6 group">
+                    <div class="mb-5 group">
                         <label for="email" class="block text-sm font-semibold text-gray-700 mb-2">Email Address</label>
                         <div class="relative transition-all duration-300">
                             <input id="email" type="email" name="email" value="<?php echo e(old('email')); ?>" required
@@ -124,15 +125,8 @@
                     </div>
 
                     <!-- Password -->
-                    <div class="mb-6 group">
-                        <div class="flex justify-between items-center mb-2">
-                             <label for="password" class="block text-sm font-semibold text-gray-700">Password</label>
-                             <?php if(Route::has('password.request')): ?>
-                                <a href="<?php echo e(route('password.request')); ?>" class="text-xs font-semibold text-indigo-600 hover:text-indigo-500">
-                                    Lupa Password?
-                                </a>
-                            <?php endif; ?>
-                        </div>
+                    <div class="mb-5 group">
+                        <label for="password" class="block text-sm font-semibold text-gray-700 mb-2">Password</label>
                         <div class="relative transition-all duration-300">
                             <input id="password" type="password" name="password" required
                                    class="w-full pl-11 pr-4 py-3.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 transition-all bg-gray-50 focus:bg-white placeholder-gray-400 text-gray-800"
@@ -145,21 +139,30 @@
                         </div>
                     </div>
 
-                    <!-- Remember & Submit -->
-                    <div class="space-y-6">
-                        <div class="flex items-center">
-                            <input type="checkbox" id="remember" name="remember"
-                                   class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded cursor-pointer">
-                            <label for="remember" class="ml-2 block text-sm text-gray-600 cursor-pointer select-none">
-                                Ingat saya
-                            </label>
+                    <!-- Confirm Password -->
+                    <div class="mb-8 group">
+                        <label for="password_confirmation" class="block text-sm font-semibold text-gray-700 mb-2">Confirm Password</label>
+                        <div class="relative transition-all duration-300">
+                            <input id="password_confirmation" type="password" name="password_confirmation" required
+                                   class="w-full pl-11 pr-4 py-3.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 transition-all bg-gray-50 focus:bg-white placeholder-gray-400 text-gray-800"
+                                   placeholder="••••••••">
+                            <div class="absolute left-0 top-0 h-full w-11 flex items-center justify-center text-gray-400 group-focus-within:text-indigo-500 transition-colors">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                                </svg>
+                            </div>
                         </div>
-
-                        <button type="submit" id="submitBtn"
-                                class="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold py-4 px-8 rounded-xl hover:from-indigo-700 hover:to-purple-700 focus:outline-none focus:ring-4 focus:ring-indigo-200 shadow-lg shadow-indigo-200 transform transition-all hover:scale-[1.02] active:scale-[0.98]">
-                            Sign In
-                        </button>
                     </div>
+
+                    <!-- Submit -->
+                    <button type="submit"
+                            class="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold py-4 px-8 rounded-xl hover:from-indigo-700 hover:to-purple-700 focus:outline-none focus:ring-4 focus:ring-indigo-200 shadow-lg shadow-indigo-200 transform transition-all hover:scale-[1.02] active:scale-[0.98]">
+                        Register Account
+                    </button>
+                    
+                    <p class="text-xs text-gray-400 mt-4 text-center">
+                        By registering, you agree to our Terms of Service and Privacy Policy.
+                    </p>
                 </form>
             </div>
         </div>
@@ -167,47 +170,6 @@
     </div>
 </div>
 
-<?php if(!empty($attemptInfo) && $attemptInfo['is_locked'] && $attemptInfo['locked_until']): ?>
-<?php
-    $lockedUntilTime = $attemptInfo['locked_until'];
-?>
-<script>
-    (function() {
-        const lockedUntil = new Date('<?php echo e($lockedUntilTime); ?>').getTime();
-        const lockTimerElement = document.getElementById('lockTimer');
-        const lockMessageContainer = document.getElementById('lockMessageContainer');
-        const submitBtn = document.getElementById('submitBtn');
-        const loginForm = document.getElementById('loginForm');
-
-        function updateCountdown() {
-            const now = new Date().getTime();
-            const timeLeft = lockedUntil - now;
-
-            if (timeLeft <= 0) {
-                if(lockMessageContainer) lockMessageContainer.style.display = 'none';
-                if(submitBtn) submitBtn.disabled = false;
-                if(submitBtn) submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
-                clearInterval(countdownInterval);
-                return;
-            } else {
-                 if(submitBtn) {
-                     submitBtn.disabled = true;
-                     submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
-                 }
-            }
-
-            const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
-            const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
-
-            if(lockTimerElement) lockTimerElement.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
-        }
-
-        updateCountdown();
-        const countdownInterval = setInterval(updateCountdown, 1000);
-    })();
-</script>
-<?php endif; ?>
-
 </body>
 </html>
-<?php /**PATH C:\Users\User\Desktop\rumahsakit\resources\views/auth/login.blade.php ENDPATH**/ ?>
+<?php /**PATH C:\Users\User\Desktop\rumahsakit\resources\views/auth/register.blade.php ENDPATH**/ ?>

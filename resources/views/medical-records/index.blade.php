@@ -9,12 +9,14 @@
         <h2 class="text-3xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">Rekam Medis</h2>
         <p class="text-gray-500 mt-1">Kelola rekam medis pasien</p>
     </div>
+    @if(auth()->user()->hasAnyRole(['doctor', 'admin']))
     <a href="{{ route('medical-records.create') }}" class="flex items-center space-x-2 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white px-6 py-3 rounded-xl shadow-lg shadow-indigo-200 hover:shadow-xl hover:scale-105 transition-all duration-200 font-semibold">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
         </svg>
         <span>Rekam Medis Baru</span>
     </a>
+    @endif
 </div>
 
 <!-- Medical Records List -->

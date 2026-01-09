@@ -42,11 +42,9 @@ class StockMovementController extends Controller
             ->paginate(50);
 
         $summary = [
-            'in' => StockMovement::where('obat_id', $medication->id)->where('jenis_mutasi', 'in')->sum('jumlah'),
-            'out' => StockMovement::where('obat_id', $medication->id)->where('jenis_mutasi', 'out')->sum('jumlah'),
-            'adjustment' => StockMovement::where('obat_id', $medication->id)->where('jenis_mutasi', 'adjustment')->sum('jumlah'),
-            'expired' => StockMovement::where('obat_id', $medication->id)->where('jenis_mutasi', 'expired')->sum('jumlah'),
-            'damaged' => StockMovement::where('obat_id', $medication->id)->where('jenis_mutasi', 'damaged')->sum('jumlah'),
+            'masuk' => StockMovement::where('obat_id', $medication->id)->where('jenis_mutasi', 'masuk')->sum('jumlah'),
+            'keluar' => StockMovement::where('obat_id', $medication->id)->where('jenis_mutasi', 'keluar')->sum('jumlah'),
+            'penyesuaian' => StockMovement::where('obat_id', $medication->id)->where('jenis_mutasi', 'penyesuaian')->sum('jumlah'),
         ];
 
         return view('stock-movements.show', compact('medication', 'movements', 'summary'));
@@ -63,7 +61,7 @@ class StockMovementController extends Controller
     {
         $validated = $request->validate([
             'obat_id' => 'required|exists:obat,id',
-            'jenis_mutasi' => 'required|in:in,adjustment,expired,damaged',
+            'jenis_mutasi' => 'required|in:masuk,penyesuaian',
             'jumlah' => 'required|numeric|min:0.01',
             'keterangan' => 'nullable|string',
         ]);

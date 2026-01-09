@@ -213,6 +213,11 @@ class PrescriptionController extends Controller
             abort(403, 'Unauthorized. Only pharmacist can verify prescriptions.');
         }
 
+        // WAJIB: Verify hanya bisa saat status Menunggu
+        if ($prescription->status !== 'menunggu') {
+            return redirect()->back()->with('error', 'Resep hanya dapat diverifikasi saat status Menunggu. Status saat ini: ' . $prescription->status);
+        }
+
         $prescription->update([
             'status' => 'diverifikasi',
             'waktu_verifikasi' => now(),
@@ -228,6 +233,13 @@ class PrescriptionController extends Controller
         // Only pharmacist can dispense prescriptions
         /** @var User $user */
         $user = Auth::user();
+        
+        // WAJIB: Dispense hanya bisa saat Diverifikasi
+        if ($prescription->status !== 'diverifikasi') {
+            return redirect()->back()->with('error', 'Resep hanya dapat diserahkan saat status Diverifikasi. Status saat ini: ' . $prescription->status);
+        }
+        
+        /** @var User $user */
         if (!$user->hasAnyRole(['pharmacist', 'admin'])) {
             abort(403, 'Unauthorized. Only pharmacist can dispense prescriptions.');
         }
@@ -245,7 +257,7 @@ class PrescriptionController extends Controller
             foreach ($prescription->itemResep as $item) {
                 StockMovement::recordMovement(
                     $item->obat,
-                    'out',
+                    'keluar',
                     $item->jumlah,
                     Prescription::class,
                     $prescription->id,
@@ -267,5 +279,35 @@ class PrescriptionController extends Controller
             DB::rollBack();
             return back()->with('error', 'Gagal menyerahkan obat: ' . $e->getMessage());
         }
+    }
+
+    // WAJIB: Reject prescription dengan alasan
+    public function reject(Request $request, Prescription $prescription)
+    {
+        // Only pharmacist can reject prescriptions
+        /** @var User $user */
+        $user = Auth::user();
+        if (!$user->hasAnyRole(['pharmacist', 'admin'])) {
+            abort(403, 'Unauthorized. Only pharmacist can reject prescriptions.');
+        }
+
+        // Reject hanya bisa saat status Menunggu
+        if ($prescription->status !== 'menunggu') {
+            return redirect()->back()->with('error', 'Resep hanya dapat ditolak saat status Menunggu. Status saat ini: ' . $prescription->status);
+        }
+
+        $validated = $request->validate([
+            'alasan_penolakan' => 'required|string|min:10',
+        ]);
+
+        $prescription->update([
+            'status' => 'ditolak',
+            'alasan_penolakan' => $validated['alasan_penolakan'],
+            'ditolak_oleh' => Auth::id(),
+            'waktu_penolakan' => now(),
+        ]);
+
+        return redirect()->route('prescriptions.show', $prescription)
+            ->with('success', 'Resep berhasil ditolak');
     }
 }

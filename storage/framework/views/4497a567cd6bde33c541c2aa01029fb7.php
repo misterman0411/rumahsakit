@@ -1,12 +1,10 @@
-@extends('layouts.app')
+<?php $__env->startSection('title', 'Detail Rawat Inap'); ?>
 
-@section('title', 'Detail Rawat Inap')
-
-@section('content')
+<?php $__env->startSection('content'); ?>
 <div class="max-w-6xl mx-auto">
     <!-- Header -->
     <div class="mb-8">
-        <a href="{{ route('inpatient.index') }}" class="inline-flex items-center text-indigo-600 hover:text-indigo-800 mb-4 font-semibold">
+        <a href="<?php echo e(route('inpatient.index')); ?>" class="inline-flex items-center text-indigo-600 hover:text-indigo-800 mb-4 font-semibold">
             <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
             </svg>
@@ -15,13 +13,13 @@
         <div class="flex justify-between items-start">
             <div>
                 <h2 class="text-3xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">Detail Rawat Inap</h2>
-                <p class="text-gray-500 mt-1">{{ $inpatient->admission_number }}</p>
+                <p class="text-gray-500 mt-1"><?php echo e($inpatient->admission_number); ?></p>
             </div>
-            @if($inpatient->status === 'dirawat')
+            <?php if($inpatient->status === 'dirawat'): ?>
             <button type="button" onclick="document.getElementById('dischargeModal').classList.remove('hidden')" class="px-6 py-3 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white rounded-xl shadow-lg hover:shadow-xl transition-all font-semibold">
                 Pulangkan Pasien
             </button>
-            @endif
+            <?php endif; ?>
         </div>
     </div>
 
@@ -37,19 +35,19 @@
                     <dl class="grid grid-cols-2 gap-4">
                         <div>
                             <dt class="text-sm font-semibold text-gray-500 mb-1">Nama Pasien</dt>
-                            <dd class="text-base font-bold text-gray-900">{{ $inpatient->pasien->nama }}</dd>
+                            <dd class="text-base font-bold text-gray-900"><?php echo e($inpatient->pasien->nama); ?></dd>
                         </div>
                         <div>
                             <dt class="text-sm font-semibold text-gray-500 mb-1">No. Rekam Medis</dt>
-                            <dd class="text-base font-bold text-gray-900">{{ $inpatient->pasien->no_rekam_medis }}</dd>
+                            <dd class="text-base font-bold text-gray-900"><?php echo e($inpatient->pasien->no_rekam_medis); ?></dd>
                         </div>
                         <div>
                             <dt class="text-sm font-semibold text-gray-500 mb-1">Tanggal Lahir</dt>
-                            <dd class="text-base text-gray-900">{{ \Carbon\Carbon::parse($inpatient->pasien->tanggal_lahir)->format('d M Y') }}</dd>
+                            <dd class="text-base text-gray-900"><?php echo e(\Carbon\Carbon::parse($inpatient->pasien->tanggal_lahir)->format('d M Y')); ?></dd>
                         </div>
                         <div>
                             <dt class="text-sm font-semibold text-gray-500 mb-1">Jenis Kelamin</dt>
-                            <dd class="text-base text-gray-900">{{ $inpatient->pasien->gender === 'male' ? 'Laki-laki' : 'Perempuan' }}</dd>
+                            <dd class="text-base text-gray-900"><?php echo e($inpatient->pasien->gender === 'male' ? 'Laki-laki' : 'Perempuan'); ?></dd>
                         </div>
                     </dl>
                 </div>
@@ -64,32 +62,32 @@
                     <dl class="grid grid-cols-2 gap-4">
                         <div>
                             <dt class="text-sm font-semibold text-gray-500 mb-1">Dokter Penanggung Jawab</dt>
-                            <dd class="text-base font-bold text-gray-900">{{ $inpatient->dokter->user->nama }}</dd>
-                            <dd class="text-sm text-gray-600">{{ $inpatient->dokter->spesialisasi }}</dd>
+                            <dd class="text-base font-bold text-gray-900"><?php echo e($inpatient->dokter->user->nama); ?></dd>
+                            <dd class="text-sm text-gray-600"><?php echo e($inpatient->dokter->spesialisasi); ?></dd>
                         </div>
                         <div>
                             <dt class="text-sm font-semibold text-gray-500 mb-1">Kamar / Tempat Tidur</dt>
-                            <dd class="text-base font-bold text-gray-900">{{ $inpatient->ruangan->nomor_ruangan }} / Bed {{ $inpatient->tempatTidur->nomor_tempat_tidur }}</dd>
-                            <dd class="text-sm text-gray-600">{{ ucfirst($inpatient->ruangan->ruangan_type) }}</dd>
+                            <dd class="text-base font-bold text-gray-900"><?php echo e($inpatient->ruangan->nomor_ruangan); ?> / Bed <?php echo e($inpatient->tempatTidur->nomor_tempat_tidur); ?></dd>
+                            <dd class="text-sm text-gray-600"><?php echo e(ucfirst($inpatient->ruangan->ruangan_type)); ?></dd>
                         </div>
                         <div>
                             <dt class="text-sm font-semibold text-gray-500 mb-1">Tanggal Masuk</dt>
-                            <dd class="text-base text-gray-900">{{ \Carbon\Carbon::parse($inpatient->tanggal_masuk)->format('d M Y H:i') }}</dd>
+                            <dd class="text-base text-gray-900"><?php echo e(\Carbon\Carbon::parse($inpatient->tanggal_masuk)->format('d M Y H:i')); ?></dd>
                         </div>
                         <div>
                             <dt class="text-sm font-semibold text-gray-500 mb-1">Tipe Rawat Inap</dt>
-                            <dd class="text-base text-gray-900">{{ ucfirst($inpatient->admission_type) }}</dd>
+                            <dd class="text-base text-gray-900"><?php echo e(ucfirst($inpatient->admission_type)); ?></dd>
                         </div>
                         <div class="col-span-2">
                             <dt class="text-sm font-semibold text-gray-500 mb-1">Alasan Rawat Inap</dt>
-                            <dd class="text-base text-gray-900">{{ $inpatient->reason }}</dd>
+                            <dd class="text-base text-gray-900"><?php echo e($inpatient->reason); ?></dd>
                         </div>
                     </dl>
                 </div>
             </div>
 
             <!-- Discharge Info (if discharged) -->
-            @if($inpatient->status === 'pulang')
+            <?php if($inpatient->status === 'pulang'): ?>
             <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
                 <div class="px-6 py-4 bg-gradient-to-r from-green-50 to-white border-b border-gray-200">
                     <h3 class="text-lg font-bold text-gray-900">Informasi Kepulangan</h3>
@@ -98,32 +96,32 @@
                     <dl class="grid grid-cols-2 gap-4">
                         <div>
                             <dt class="text-sm font-semibold text-gray-500 mb-1">Tanggal Pulang</dt>
-                            <dd class="text-base text-gray-900">{{ \Carbon\Carbon::parse($inpatient->tanggal_keluar)->format('d M Y H:i') }}</dd>
+                            <dd class="text-base text-gray-900"><?php echo e(\Carbon\Carbon::parse($inpatient->tanggal_keluar)->format('d M Y H:i')); ?></dd>
                         </div>
                         <div>
                             <dt class="text-sm font-semibold text-gray-500 mb-1">Status Pulang</dt>
-                            <dd class="text-base text-gray-900">{{ ucfirst(str_replace('_', ' ', $inpatient->discharge_status)) }}</dd>
+                            <dd class="text-base text-gray-900"><?php echo e(ucfirst(str_replace('_', ' ', $inpatient->discharge_status))); ?></dd>
                         </div>
-                        @if($inpatient->follow_up_date)
+                        <?php if($inpatient->follow_up_date): ?>
                         <div>
                             <dt class="text-sm font-semibold text-gray-500 mb-1">Tanggal Follow Up</dt>
-                            <dd class="text-base text-gray-900">{{ \Carbon\Carbon::parse($inpatient->follow_up_date)->format('d M Y') }}</dd>
+                            <dd class="text-base text-gray-900"><?php echo e(\Carbon\Carbon::parse($inpatient->follow_up_date)->format('d M Y')); ?></dd>
                         </div>
-                        @endif
+                        <?php endif; ?>
                         <div class="col-span-2">
                             <dt class="text-sm font-semibold text-gray-500 mb-1">Ringkasan Kepulangan</dt>
-                            <dd class="text-base text-gray-900">{{ $inpatient->ringkasan_keluar }}</dd>
+                            <dd class="text-base text-gray-900"><?php echo e($inpatient->ringkasan_keluar); ?></dd>
                         </div>
-                        @if($inpatient->discharge_instructions)
+                        <?php if($inpatient->discharge_instructions): ?>
                         <div class="col-span-2">
                             <dt class="text-sm font-semibold text-gray-500 mb-1">Instruksi Kepulangan</dt>
-                            <dd class="text-base text-gray-900">{{ $inpatient->discharge_instructions }}</dd>
+                            <dd class="text-base text-gray-900"><?php echo e($inpatient->discharge_instructions); ?></dd>
                         </div>
-                        @endif
+                        <?php endif; ?>
                     </dl>
                 </div>
             </div>
-            @endif
+            <?php endif; ?>
         </div>
 
         <!-- Sidebar -->
@@ -131,47 +129,50 @@
             <!-- Status Card -->
             <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
                 <h3 class="text-sm font-bold text-gray-500 uppercase mb-3">Status</h3>
-                @if($inpatient->status === 'admitted')
+                <?php if($inpatient->status === 'admitted'): ?>
                     <span class="inline-block px-4 py-2 text-sm font-bold rounded-full bg-blue-100 text-blue-800">Dirawat</span>
-                @else
+                <?php else: ?>
                     <span class="inline-block px-4 py-2 text-sm font-bold rounded-full bg-green-100 text-green-800">Pulang</span>
-                @endif
+                <?php endif; ?>
             </div>
 
             <!-- Duration Card -->
             <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
                 <h3 class="text-sm font-bold text-gray-500 uppercase mb-3">Lama Rawat Inap</h3>
                 <p class="text-3xl font-bold text-indigo-600">
-                    @if($inpatient->tanggal_keluar)
-                        {{ \Carbon\Carbon::parse($inpatient->tanggal_masuk)->diffInDays(\Carbon\Carbon::parse($inpatient->tanggal_keluar)) }}
-                    @else
-                        {{ \Carbon\Carbon::parse($inpatient->tanggal_masuk)->diffInDays(now()) }}
-                    @endif
+                    <?php if($inpatient->tanggal_keluar): ?>
+                        <?php echo e(\Carbon\Carbon::parse($inpatient->tanggal_masuk)->diffInDays(\Carbon\Carbon::parse($inpatient->tanggal_keluar))); ?>
+
+                    <?php else: ?>
+                        <?php echo e(\Carbon\Carbon::parse($inpatient->tanggal_masuk)->diffInDays(now())); ?>
+
+                    <?php endif; ?>
                     <span class="text-lg text-gray-600">hari</span>
                 </p>
             </div>
 
             <!-- Invoice Card -->
-            @if($inpatient->tagihan)
+            <?php if($inpatient->tagihan): ?>
             <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
                 <h3 class="text-sm font-bold text-gray-500 uppercase mb-3">Invoice</h3>
                 <div class="space-y-2">
                     <div class="flex justify-between">
                         <span class="text-sm text-gray-600">Total Tagihan</span>
-                        <span class="text-sm font-bold text-gray-900">Rp {{ number_format($inpatient->tagihan->total, 0, ',', '.') }}</span>
+                        <span class="text-sm font-bold text-gray-900">Rp <?php echo e(number_format($inpatient->tagihan->total, 0, ',', '.')); ?></span>
                     </div>
                     <div class="flex justify-between">
                         <span class="text-sm text-gray-600">Status</span>
-                        <span class="text-sm font-semibold {{ $inpatient->tagihan->status === 'lunas' ? 'text-green-600' : 'text-yellow-600' }}">
-                            {{ ucfirst($inpatient->tagihan->status) }}
+                        <span class="text-sm font-semibold <?php echo e($inpatient->tagihan->status === 'lunas' ? 'text-green-600' : 'text-yellow-600'); ?>">
+                            <?php echo e(ucfirst($inpatient->tagihan->status)); ?>
+
                         </span>
                     </div>
                 </div>
-                <a href="{{ route('billing.show', $inpatient->tagihan) }}" class="mt-4 block text-center px-4 py-2 bg-indigo-50 text-indigo-600 hover:bg-indigo-100 rounded-lg transition-colors font-semibold text-sm">
+                <a href="<?php echo e(route('billing.show', $inpatient->tagihan)); ?>" class="mt-4 block text-center px-4 py-2 bg-indigo-50 text-indigo-600 hover:bg-indigo-100 rounded-lg transition-colors font-semibold text-sm">
                     Lihat Invoice
                 </a>
             </div>
-            @endif
+            <?php endif; ?>
         </div>
     </div>
 </div>
@@ -189,51 +190,79 @@
                 </button>
             </div>
         </div>
-        <form method="POST" action="{{ route('inpatient.discharge', $inpatient) }}" class="p-6">
-            @csrf
+        <form method="POST" action="<?php echo e(route('inpatient.discharge', $inpatient)); ?>" class="p-6">
+            <?php echo csrf_field(); ?>
             
             <div class="space-y-4">
                 <div class="grid grid-cols-2 gap-4">
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 mb-2">Tanggal Pulang <span class="text-red-500">*</span></label>
-                        <input type="datetime-local" name="tanggal_keluar" value="{{ old('tanggal_keluar', now()->format('Y-m-d\TH:i')) }}" required class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
-                        @error('tanggal_keluar')
-                            <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-                        @enderror
+                        <input type="datetime-local" name="tanggal_keluar" value="<?php echo e(old('tanggal_keluar', now()->format('Y-m-d\TH:i'))); ?>" required class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                        <?php $__errorArgs = ['tanggal_keluar'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                            <p class="text-red-500 text-sm mt-1"><?php echo e($message); ?></p>
+                        <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                     </div>
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 mb-2">Status Pulang <span class="text-red-500">*</span></label>
                         <select name="status_pulang" required class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
-                            <option value="sembuh" {{ old('status_pulang') == 'sembuh' ? 'selected' : '' }}>Sembuh</option>
-                            <option value="dirujuk" {{ old('status_pulang') == 'dirujuk' ? 'selected' : '' }}>Dirujuk</option>
-                            <option value="meninggal" {{ old('status_pulang') == 'meninggal' ? 'selected' : '' }}>Meninggal</option>
-                            <option value="aps" {{ old('status_pulang') == 'aps' ? 'selected' : '' }}>Pulang Paksa (APS)</option>
+                            <option value="sembuh" <?php echo e(old('status_pulang') == 'sembuh' ? 'selected' : ''); ?>>Sembuh</option>
+                            <option value="dirujuk" <?php echo e(old('status_pulang') == 'dirujuk' ? 'selected' : ''); ?>>Dirujuk</option>
+                            <option value="meninggal" <?php echo e(old('status_pulang') == 'meninggal' ? 'selected' : ''); ?>>Meninggal</option>
+                            <option value="aps" <?php echo e(old('status_pulang') == 'aps' ? 'selected' : ''); ?>>Pulang Paksa (APS)</option>
                         </select>
-                        @error('status_pulang')
-                            <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-                        @enderror
+                        <?php $__errorArgs = ['status_pulang'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                            <p class="text-red-500 text-sm mt-1"><?php echo e($message); ?></p>
+                        <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                     </div>
                 </div>
 
                 <div>
                     <label class="block text-sm font-semibold text-gray-700 mb-2">Ringkasan Kepulangan (Resume Keluar) <span class="text-red-500">*</span></label>
-                    <textarea name="resume_keluar" rows="4" required class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" placeholder="Diagnosis akhir, tindakan yang dilakukan, kondisi pasien saat pulang...">{{ old('resume_keluar') }}</textarea>
-                    @error('resume_keluar')
-                        <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-                    @enderror
+                    <textarea name="resume_keluar" rows="4" required class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" placeholder="Diagnosis akhir, tindakan yang dilakukan, kondisi pasien saat pulang..."><?php echo e(old('resume_keluar')); ?></textarea>
+                    <?php $__errorArgs = ['resume_keluar'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                        <p class="text-red-500 text-sm mt-1"><?php echo e($message); ?></p>
+                    <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                 </div>
 
                 <div>
                     <label class="block text-sm font-semibold text-gray-700 mb-2">Instruksi Kepulangan</label>
-                    <textarea name="instruksi_pulang" rows="3" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" placeholder="Obat yang harus diminum, pantangan, jadwal kontrol...">{{ old('instruksi_pulang') }}</textarea>
-                    @error('instruksi_pulang')
-                        <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-                    @enderror
+                    <textarea name="instruksi_pulang" rows="3" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" placeholder="Obat yang harus diminum, pantangan, jadwal kontrol..."><?php echo e(old('instruksi_pulang')); ?></textarea>
+                    <?php $__errorArgs = ['instruksi_pulang'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                        <p class="text-red-500 text-sm mt-1"><?php echo e($message); ?></p>
+                    <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                 </div>
 
                 <div>
                     <label class="block text-sm font-semibold text-gray-700 mb-2">Tanggal Kontrol</label>
-                    <input type="date" name="tanggal_kontrol" value="{{ old('tanggal_kontrol') }}" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                    <input type="date" name="tanggal_kontrol" value="<?php echo e(old('tanggal_kontrol')); ?>" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
                 </div>
 
                 <div class="grid grid-cols-2 gap-4">
@@ -259,4 +288,6 @@
         </form>
     </div>
 </div>
-@endsection
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\Users\User\Desktop\rumahsakit\resources\views/inpatient/show.blade.php ENDPATH**/ ?>

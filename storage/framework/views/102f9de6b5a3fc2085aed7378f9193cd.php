@@ -167,6 +167,7 @@
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
                                         </svg>
                                     </a>
+                                    <?php if(auth()->user()->hasAnyRole(['front_office', 'doctor', 'admin'])): ?>
                                     <?php if($appointment->status !== 'completed' && $appointment->status !== 'cancelled'): ?>
                                     <a href="<?php echo e(route('appointments.edit', $appointment)); ?>" class="text-indigo-600 hover:text-indigo-900" title="Edit">
                                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -193,6 +194,7 @@
                                             </svg>
                                         </button>
                                     </form>
+                                    <?php endif; ?>
                                     <?php endif; ?>
                                 </div>
                             </td>

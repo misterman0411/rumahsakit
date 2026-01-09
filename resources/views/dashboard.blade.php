@@ -24,17 +24,61 @@
             $departments = \App\Models\Department::orderBy('nama')->get();
         @endphp
         @foreach($departments as $dept)
-        <a href="{{ route('queue.display', $dept->id) }}" target="_blank" 
-           class="bg-white/10 hover:bg-white/20 backdrop-blur-sm rounded-lg p-4 transition-all hover:scale-105 border border-white/20">
-            <div class="text-sm font-medium text-blue-100">Poliklinik</div>
-            <div class="text-lg font-bold mt-1">{{ $dept->nama }}</div>
-            <div class="flex items-center text-xs text-blue-100 mt-2">
-                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
-                </svg>
-                Buka Display
+        @php
+            // Get queue data untuk department ini
+            $today_appointments = \App\Models\Appointment::where('departemen_id', $dept->id)
+                ->whereDate('tanggal_janji', today())
+                ->whereIn('status', ['confirmed', 'in_progress', 'check_in'])
+                ->orderBy('nomor_antrian')
+                ->get();
+            
+            $current_queue = $today_appointments->where('status', 'in_progress')->first();
+            $waiting_count = $today_appointments->whereIn('status', ['confirmed', 'check_in'])->count();
+            $next_queues = $today_appointments->where('status', 'check_in')->take(2);
+        @endphp
+        <div class="bg-white/10 backdrop-blur-sm rounded-lg p-4 border border-white/20 hover:bg-white/15 transition-all">
+            <div class="flex justify-between items-start mb-3">
+                <div>
+                    <div class="text-sm font-medium text-blue-100">Poliklinik</div>
+                    <div class="text-lg font-bold mt-1">{{ $dept->nama }}</div>
+                </div>
+                <a href="{{ route('queue.display', $dept->id) }}" target="_blank" 
+                   class="text-white/80 hover:text-white transition-colors" title="Buka Display">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+                    </svg>
+                </a>
             </div>
-        </a>
+            
+            @if($current_queue)
+            <div class="bg-green-500/20 rounded-md px-3 py-2 mb-2 border border-green-300/30">
+                <div class="text-xs text-green-100 font-medium">Sedang Dilayani</div>
+                <div class="text-2xl font-bold text-white">{{ $current_queue->nomor_antrian }}</div>
+                <div class="text-xs text-green-100 truncate">{{ $current_queue->pasien->nama }}</div>
+            </div>
+            @else
+            <div class="bg-white/5 rounded-md px-3 py-2 mb-2 border border-white/10">
+                <div class="text-xs text-blue-200">Belum Ada Antrian</div>
+            </div>
+            @endif
+            
+            <div class="flex items-center justify-between text-xs text-blue-100 pt-2 border-t border-white/10">
+                <span>Menunggu: <strong>{{ $waiting_count }}</strong></span>
+                <span>Total: <strong>{{ $today_appointments->count() }}</strong></span>
+            </div>
+            
+            @if($next_queues->count() > 0)
+            <div class="mt-2 pt-2 border-t border-white/10">
+                <div class="text-xs text-blue-200 mb-1">Antrian Berikutnya:</div>
+                @foreach($next_queues as $next)
+                <div class="text-xs text-white/80 flex items-center gap-2">
+                    <span class="font-bold">{{ $next->nomor_antrian }}</span>
+                    <span class="truncate">{{ $next->pasien->nama }}</span>
+                </div>
+                @endforeach
+            </div>
+            @endif
+        </div>
         @endforeach
     </div>
     <div class="mt-4 pt-4 border-t border-white/20 text-sm text-blue-100">

@@ -75,6 +75,21 @@
             </li>
             <?php endif; ?>
 
+            <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('manage-vital-signs')): ?>
+            <!-- Vital Signs -->
+            <li>
+                <a href="<?php echo e(route('vital-signs.index')); ?>" 
+                   class="group flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-200 <?php echo e(request()->routeIs('vital-signs.*') ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg shadow-indigo-200' : 'text-gray-700 hover:bg-gray-50'); ?>">
+                    <div class="<?php echo e(request()->routeIs('vital-signs.*') ? 'bg-white/20' : 'bg-gray-100 group-hover:bg-indigo-50'); ?> p-2 rounded-lg transition-colors">
+                        <svg class="w-5 h-5 <?php echo e(request()->routeIs('vital-signs.*') ? 'text-white' : 'text-gray-600 group-hover:text-indigo-600'); ?>" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+                        </svg>
+                    </div>
+                    <span class="font-semibold">Vital Signs</span>
+                </a>
+            </li>
+            <?php endif; ?>
+
             <!-- Divider -->
             <li class="py-3">
                 <div class="flex items-center space-x-3 px-4">
@@ -124,6 +139,32 @@
                     <span class="font-semibold">Pharmacy</span>
                 </a>
             </li>
+
+            <!-- Medications -->
+            <li>
+                <a href="<?php echo e(route('medications.index')); ?>" 
+                   class="group flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-200 <?php echo e(request()->routeIs('medications.*') ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg shadow-indigo-200' : 'text-gray-700 hover:bg-gray-50'); ?>">
+                    <div class="<?php echo e(request()->routeIs('medications.*') ? 'bg-white/20' : 'bg-gray-100 group-hover:bg-indigo-50'); ?> p-2 rounded-lg transition-colors">
+                        <svg class="w-5 h-5 <?php echo e(request()->routeIs('medications.*') ? 'text-white' : 'text-gray-600 group-hover:text-indigo-600'); ?>" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+                        </svg>
+                    </div>
+                    <span class="font-semibold">Medications</span>
+                </a>
+            </li>
+
+            <!-- Stock Movements -->
+            <li>
+                <a href="<?php echo e(route('stock-movements.index')); ?>" 
+                   class="group flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-200 <?php echo e(request()->routeIs('stock-movements.*') ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg shadow-indigo-200' : 'text-gray-700 hover:bg-gray-50'); ?>">
+                    <div class="<?php echo e(request()->routeIs('stock-movements.*') ? 'bg-white/20' : 'bg-gray-100 group-hover:bg-indigo-50'); ?> p-2 rounded-lg transition-colors">
+                        <svg class="w-5 h-5 <?php echo e(request()->routeIs('stock-movements.*') ? 'text-white' : 'text-gray-600 group-hover:text-indigo-600'); ?>" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path>
+                        </svg>
+                    </div>
+                    <span class="font-semibold">Stock Movements</span>
+                </a>
+            </li>
             <?php endif; ?>
 
             <!-- Divider -->
@@ -148,6 +189,7 @@
             </li>
             <?php endif; ?>
 
+            <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('manage-inpatient')): ?>
             <!-- Inpatient -->
             <li>
                 <a href="<?php echo e(route('inpatient.index')); ?>" 
@@ -160,6 +202,7 @@
                     <span class="font-semibold">Inpatient</span>
                 </a>
             </li>
+            <?php endif; ?>
 
             <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('manage-master-data')): ?>
             <!-- Divider -->

@@ -34,25 +34,6 @@
                         @enderror
                     </div>
 
-                    <!-- Medical Record (Optional) -->
-                    <div>
-                        <label for="rekam_medis_id" class="block text-sm font-semibold text-gray-700 mb-2">
-                            Link to Medical Record (Optional)
-                        </label>
-                        <select name="rekam_medis_id" id="rekam_medis_id"
-                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
-                            <option value="">-- Select Medical Record --</option>
-                            @foreach($medicalRecords as $record)
-                                <option value="{{ $record->id }}" {{ old('rekam_medis_id') == $record->id ? 'selected' : '' }}>
-                                    {{ $record->record_number }} - {{ $record->pasien->nama }} - {{ $record->created_at->format('d/m/Y') }}
-                                </option>
-                            @endforeach
-                        </select>
-                        @error('rekam_medis_id')
-                            <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-                        @enderror
-                    </div>
-
                     <!-- Recording Date/Time -->
                     <div>
                         <label for="recorded_at" class="block text-sm font-semibold text-gray-700 mb-2">

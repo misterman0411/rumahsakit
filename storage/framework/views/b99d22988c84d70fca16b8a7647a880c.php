@@ -1,8 +1,6 @@
-@extends('layouts.app')
+<?php $__env->startSection('title', 'Medications'); ?>
 
-@section('title', 'Medications')
-
-@section('content')
+<?php $__env->startSection('content'); ?>
 <div class="container mx-auto px-4 py-8">
     <div class="max-w-7xl mx-auto">
         <!-- Header -->
@@ -11,20 +9,20 @@
                 <h1 class="text-3xl font-bold text-gray-800">Medications</h1>
                 <p class="text-gray-600 mt-2">Manajemen data dan stok obat</p>
             </div>
-            @if(auth()->user()->hasRole('pharmacist') || auth()->user()->hasRole('admin'))
-            <a href="{{ route('medications.create') }}" 
+            <?php if(auth()->user()->hasRole('pharmacist') || auth()->user()->hasRole('admin')): ?>
+            <a href="<?php echo e(route('medications.create')); ?>" 
                class="px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl hover:shadow-lg transition-all font-semibold">
                 + Add Medication
             </a>
-            @endif
+            <?php endif; ?>
         </div>
 
         <!-- Filters -->
         <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
-            <form method="GET" action="{{ route('medications.index') }}" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <form method="GET" action="<?php echo e(route('medications.index')); ?>" class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div class="md:col-span-2">
                     <label class="block text-sm font-semibold text-gray-700 mb-2">Search</label>
-                    <input type="text" name="search" value="{{ request('search') }}" 
+                    <input type="text" name="search" value="<?php echo e(request('search')); ?>" 
                            class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
                            placeholder="Cari nama atau kode obat...">
                 </div>
@@ -32,7 +30,8 @@
                 <div class="flex items-end gap-3">
                     <div class="flex-1">
                         <label class="flex items-center">
-                            <input type="checkbox" name="low_stock" value="1" {{ request('low_stock') ? 'checked' : '' }}
+                            <input type="checkbox" name="low_stock" value="1" <?php echo e(request('low_stock') ? 'checked' : ''); ?>
+
                                    class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 mr-2">
                             <span class="text-sm font-semibold text-gray-700">Stok Menipis</span>
                         </label>
@@ -58,39 +57,41 @@
                         </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
-                        @forelse($medications as $medication)
+                        <?php $__empty_1 = true; $__currentLoopData = $medications; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $medication): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
                         <tr class="hover:bg-gray-50 transition-colors">
                             <td class="px-6 py-4">
-                                <div class="font-bold text-gray-900">{{ $medication->nama }}</div>
-                                <div class="text-xs text-gray-500">{{ $medication->kode }}</div>
+                                <div class="font-bold text-gray-900"><?php echo e($medication->nama); ?></div>
+                                <div class="text-xs text-gray-500"><?php echo e($medication->kode); ?></div>
                             </td>
                             <td class="px-6 py-4 text-sm text-gray-700">
-                                <div>{{ $medication->bentuk_sediaan }}</div>
-                                <div class="text-xs text-gray-500">{{ $medication->kekuatan }}</div>
+                                <div><?php echo e($medication->bentuk_sediaan); ?></div>
+                                <div class="text-xs text-gray-500"><?php echo e($medication->kekuatan); ?></div>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-right">
-                                <div class="text-sm font-bold {{ $medication->stok < $medication->stok_minimum ? 'text-red-600' : 'text-gray-900' }}">
-                                    {{ number_format($medication->stok, 0) }} {{ $medication->satuan }}
+                                <div class="text-sm font-bold <?php echo e($medication->stok < $medication->stok_minimum ? 'text-red-600' : 'text-gray-900'); ?>">
+                                    <?php echo e(number_format($medication->stok, 0)); ?> <?php echo e($medication->satuan); ?>
+
                                 </div>
-                                @if($medication->stok < $medication->stok_minimum)
-                                <div class="text-xs text-red-500 font-semibold">⚠ Stok Minimum: {{ $medication->stok_minimum }}</div>
-                                @else
-                                <div class="text-xs text-gray-500">Min: {{ $medication->stok_minimum }}</div>
-                                @endif
+                                <?php if($medication->stok < $medication->stok_minimum): ?>
+                                <div class="text-xs text-red-500 font-semibold">⚠ Stok Minimum: <?php echo e($medication->stok_minimum); ?></div>
+                                <?php else: ?>
+                                <div class="text-xs text-gray-500">Min: <?php echo e($medication->stok_minimum); ?></div>
+                                <?php endif; ?>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-semibold text-gray-900">
-                                Rp {{ number_format($medication->harga, 0, ',', '.') }}
+                                Rp <?php echo e(number_format($medication->harga, 0, ',', '.')); ?>
+
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium space-x-2">
-                                <a href="{{ route('medications.show', $medication) }}" 
+                                <a href="<?php echo e(route('medications.show', $medication)); ?>" 
                                    class="text-blue-600 hover:text-blue-900 font-semibold">View</a>
-                                @if(auth()->user()->hasRole('pharmacist') || auth()->user()->hasRole('admin'))
-                                <a href="{{ route('medications.edit', $medication) }}" 
+                                <?php if(auth()->user()->hasRole('pharmacist') || auth()->user()->hasRole('admin')): ?>
+                                <a href="<?php echo e(route('medications.edit', $medication)); ?>" 
                                    class="text-green-600 hover:text-green-900 font-semibold">Edit</a>
-                                @endif
+                                <?php endif; ?>
                             </td>
                         </tr>
-                        @empty
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
                         <tr>
                             <td colspan="5" class="px-6 py-12 text-center">
                                 <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -99,18 +100,21 @@
                                 <p class="mt-4 text-gray-500 font-medium">Belum ada data obat</p>
                             </td>
                         </tr>
-                        @endforelse
+                        <?php endif; ?>
                     </tbody>
                 </table>
             </div>
 
             <!-- Pagination -->
-            @if($medications->hasPages())
+            <?php if($medications->hasPages()): ?>
             <div class="px-6 py-4 border-t border-gray-200">
-                {{ $medications->links() }}
+                <?php echo e($medications->links()); ?>
+
             </div>
-            @endif
+            <?php endif; ?>
         </div>
     </div>
 </div>
-@endsection
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\Users\User\Desktop\rumahsakit\resources\views/medications/index.blade.php ENDPATH**/ ?>

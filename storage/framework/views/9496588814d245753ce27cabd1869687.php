@@ -1,6 +1,4 @@
-@extends('layouts.app')
-
-@section('content')
+<?php $__env->startSection('content'); ?>
 <div class="container mx-auto px-4 py-8">
     <!-- Header -->
     <div class="flex justify-between items-center mb-6">
@@ -8,47 +6,49 @@
             <h1 class="text-3xl font-bold text-gray-800">Vital Signs Records</h1>
             <p class="text-gray-600 mt-2">Monitor and track patient vital signs</p>
         </div>
-        <a href="{{ route('vital-signs.create') }}" 
+        <a href="<?php echo e(route('vital-signs.create')); ?>" 
             class="px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg hover:from-indigo-700 hover:to-purple-700 transition-all shadow-sm">
             + Record Vital Signs
         </a>
     </div>
 
-    @if(session('success'))
+    <?php if(session('success')): ?>
         <div class="mb-6 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded">
-            {{ session('success') }}
+            <?php echo e(session('success')); ?>
+
         </div>
-    @endif
+    <?php endif; ?>
 
     <!-- Filters -->
     <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 mb-6">
-        <form method="GET" action="{{ route('vital-signs.index') }}" class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <form method="GET" action="<?php echo e(route('vital-signs.index')); ?>" class="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Patient</label>
                 <select name="pasien_id" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
                     <option value="">All Patients</option>
-                    @foreach($patients as $patient)
-                        <option value="{{ $patient->id }}" {{ request('patient_id') == $patient->id ? 'selected' : '' }}>
-                            {{ $patient->no_rekam_medis }} - {{ $patient->nama }}
+                    <?php $__currentLoopData = $patients; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $patient): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                        <option value="<?php echo e($patient->id); ?>" <?php echo e(request('patient_id') == $patient->id ? 'selected' : ''); ?>>
+                            <?php echo e($patient->no_rekam_medis); ?> - <?php echo e($patient->nama); ?>
+
                         </option>
-                    @endforeach
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                 </select>
             </div>
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Date From</label>
-                <input type="date" name="date_from" value="{{ request('date_from') }}"
+                <input type="date" name="date_from" value="<?php echo e(request('date_from')); ?>"
                     class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
             </div>
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Date To</label>
-                <input type="date" name="date_to" value="{{ request('date_to') }}"
+                <input type="date" name="date_to" value="<?php echo e(request('date_to')); ?>"
                     class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
             </div>
             <div class="flex items-end gap-2">
                 <button type="submit" class="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">
                     Filter
                 </button>
-                <a href="{{ route('vital-signs.index') }}" class="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50">
+                <a href="<?php echo e(route('vital-signs.index')); ?>" class="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50">
                     Reset
                 </a>
             </div>
@@ -74,65 +74,73 @@
                     </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
-                    @forelse($vitalSigns as $vital)
+                    <?php $__empty_1 = true; $__currentLoopData = $vitalSigns; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $vital): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
                         <tr class="hover:bg-gray-50">
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                {{ $vital->waktu_pengukuran ? $vital->waktu_pengukuran->format('d/m/Y H:i') : '-' }}
+                                <?php echo e($vital->waktu_pengukuran ? $vital->waktu_pengukuran->format('d/m/Y H:i') : '-'); ?>
+
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="text-sm font-medium text-gray-900">{{ $vital->pasien->nama }}</div>
-                                <div class="text-sm text-gray-500">{{ $vital->pasien->no_rekam_medis }}</div>
+                                <div class="text-sm font-medium text-gray-900"><?php echo e($vital->pasien->nama); ?></div>
+                                <div class="text-sm text-gray-500"><?php echo e($vital->pasien->no_rekam_medis); ?></div>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                {{ $vital->tekanan_darah_sistolik && $vital->tekanan_darah_diastolik ? $vital->tekanan_darah_sistolik . '/' . $vital->tekanan_darah_diastolik : '-' }}
+                                <?php echo e($vital->tekanan_darah_sistolik && $vital->tekanan_darah_diastolik ? $vital->tekanan_darah_sistolik . '/' . $vital->tekanan_darah_diastolik : '-'); ?>
+
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                {{ $vital->suhu ? number_format($vital->suhu, 1) . '°C' : '-' }}
+                                <?php echo e($vital->suhu ? number_format($vital->suhu, 1) . '°C' : '-'); ?>
+
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                {{ $vital->detak_jantung ? $vital->detak_jantung . ' bpm' : '-' }}
+                                <?php echo e($vital->detak_jantung ? $vital->detak_jantung . ' bpm' : '-'); ?>
+
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                {{ $vital->laju_pernapasan ? $vital->laju_pernapasan . '/min' : '-' }}
+                                <?php echo e($vital->laju_pernapasan ? $vital->laju_pernapasan . '/min' : '-'); ?>
+
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                {{ $vital->saturasi_oksigen ? number_format($vital->saturasi_oksigen, 1) . '%' : '-' }}
+                                <?php echo e($vital->saturasi_oksigen ? number_format($vital->saturasi_oksigen, 1) . '%' : '-'); ?>
+
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm">
-                                @if($vital->bmi)
+                                <?php if($vital->bmi): ?>
                                     <span class="px-2 py-1 rounded-full text-xs font-medium
-                                        @if($vital->bmi < 18.5) bg-yellow-100 text-yellow-800
-                                        @elseif($vital->bmi >= 18.5 && $vital->bmi < 25) bg-green-100 text-green-800
-                                        @elseif($vital->bmi >= 25 && $vital->bmi < 30) bg-orange-100 text-orange-800
-                                        @else bg-red-100 text-red-800
-                                        @endif">
-                                        {{ number_format($vital->bmi, 1) }}
+                                        <?php if($vital->bmi < 18.5): ?> bg-yellow-100 text-yellow-800
+                                        <?php elseif($vital->bmi >= 18.5 && $vital->bmi < 25): ?> bg-green-100 text-green-800
+                                        <?php elseif($vital->bmi >= 25 && $vital->bmi < 30): ?> bg-orange-100 text-orange-800
+                                        <?php else: ?> bg-red-100 text-red-800
+                                        <?php endif; ?>">
+                                        <?php echo e(number_format($vital->bmi, 1)); ?>
+
                                     </span>
-                                @else
+                                <?php else: ?>
                                     -
-                                @endif
+                                <?php endif; ?>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                {{ $vital->perawat->user->nama ?? '-' }}
+                                <?php echo e($vital->perawat->user->nama ?? '-'); ?>
+
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                 <div class="flex space-x-2">
-                                    <a href="{{ route('vital-signs.show', $vital) }}" 
+                                    <a href="<?php echo e(route('vital-signs.show', $vital)); ?>" 
                                         class="text-indigo-600 hover:text-indigo-900">View</a>
-                                    @if(auth()->user()->hasAnyRole(['nurse', 'admin']))
-                                    <a href="{{ route('vital-signs.edit', $vital) }}" 
+                                    <?php if(auth()->user()->hasAnyRole(['nurse', 'admin'])): ?>
+                                    <a href="<?php echo e(route('vital-signs.edit', $vital)); ?>" 
                                         class="text-blue-600 hover:text-blue-900">Edit</a>
-                                    <form action="{{ route('vital-signs.destroy', $vital) }}" method="POST" 
+                                    <form action="<?php echo e(route('vital-signs.destroy', $vital)); ?>" method="POST" 
                                         class="inline" onsubmit="return confirm('Are you sure?')">
-                                        @csrf
-                                        @method('DELETE')
+                                        <?php echo csrf_field(); ?>
+                                        <?php echo method_field('DELETE'); ?>
                                         <button type="submit" class="text-red-600 hover:text-red-900">Delete</button>
                                     </form>
-                                    @endif
+                                    <?php endif; ?>
                                 </div>
                             </td>
                         </tr>
-                    @empty
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
                         <tr>
                             <td colspan="10" class="px-6 py-12 text-center text-gray-500">
                                 <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -142,17 +150,20 @@
                                 <p class="text-sm mt-2">Start by recording patient vital signs</p>
                             </td>
                         </tr>
-                    @endforelse
+                    <?php endif; ?>
                 </tbody>
             </table>
         </div>
 
         <!-- Pagination -->
-        @if($vitalSigns->hasPages())
+        <?php if($vitalSigns->hasPages()): ?>
             <div class="px-6 py-4 border-t border-gray-200">
-                {{ $vitalSigns->links() }}
+                <?php echo e($vitalSigns->links()); ?>
+
             </div>
-        @endif
+        <?php endif; ?>
     </div>
 </div>
-@endsection
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\Users\User\Desktop\rumahsakit\resources\views/vital-signs/index.blade.php ENDPATH**/ ?>

@@ -12,16 +12,20 @@
                     <?php if($prescription->status === 'menunggu'): ?>
                         <form action="<?php echo e(route('prescriptions.verify', $prescription)); ?>" method="POST" class="inline">
                             <?php echo csrf_field(); ?>
-                            <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
-                                Verifikasi
+                            <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-semibold">
+                                ✓ Verifikasi
                             </button>
                         </form>
+                        <button type="button" onclick="document.getElementById('rejectModal').classList.remove('hidden')" 
+                            class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-semibold">
+                            ✗ Tolak
+                        </button>
                     <?php endif; ?>
                     <?php if($prescription->status === 'diverifikasi'): ?>
                         <form action="<?php echo e(route('prescriptions.dispense', $prescription)); ?>" method="POST" class="inline">
                             <?php echo csrf_field(); ?>
-                            <button type="submit" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
-                                Serahkan Obat
+                            <button type="submit" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-semibold">
+                                📦 Serahkan Obat
                             </button>
                         </form>
                     <?php endif; ?>
@@ -45,7 +49,8 @@
                             <span class="inline-flex px-3 py-1 rounded-full text-sm font-semibold
                                 <?php if($prescription->status === 'diserahkan'): ?> bg-green-100 text-green-800
                                 <?php elseif($prescription->status === 'diverifikasi'): ?> bg-blue-100 text-blue-800
-                                <?php elseif($prescription->status === 'dibatalkan'): ?> bg-red-100 text-red-800
+                                <?php elseif($prescription->status === 'ditolak'): ?> bg-red-100 text-red-800
+                                <?php elseif($prescription->status === 'dibatalkan'): ?> bg-gray-100 text-gray-800
                                 <?php else: ?> bg-yellow-100 text-yellow-800
                                 <?php endif; ?>">
                                 <?php echo e(ucfirst($prescription->status)); ?>
@@ -68,7 +73,19 @@
                             <p class="font-semibold"><?php echo e($prescription->waktu_diserahkan->format('d/m/Y H:i')); ?></p>
                         </div>
                         <?php endif; ?>
+                        <?php if($prescription->waktu_penolakan): ?>
+                        <div>
+                            <p class="text-sm text-gray-500">Ditolak</p>
+                            <p class="font-semibold"><?php echo e($prescription->waktu_penolakan->format('d/m/Y H:i')); ?></p>
+                        </div>
+                        <?php endif; ?>
                     </div>
+                    <?php if($prescription->alasan_penolakan): ?>
+                    <div class="mt-4 bg-red-50 border border-red-200 rounded-lg p-4">
+                        <p class="text-sm font-semibold text-red-800 mb-2">Alasan Penolakan:</p>
+                        <p class="text-sm text-red-700"><?php echo e($prescription->alasan_penolakan); ?></p>
+                    </div>
+                    <?php endif; ?>
                     <?php if($prescription->catatan): ?>
                     <div class="mt-4">
                         <p class="text-sm text-gray-500">Catatan</p>
@@ -215,6 +232,54 @@
                 <?php endif; ?>
             </div>
         </div>
+    </div>
+</div>
+
+<!-- Reject Modal -->
+<div id="rejectModal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-50 z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-xl shadow-2xl max-w-md w-full">
+        <div class="p-6 border-b border-gray-200">
+            <div class="flex justify-between items-center">
+                <h3 class="text-xl font-bold text-gray-900">Tolak Resep</h3>
+                <button type="button" onclick="document.getElementById('rejectModal').classList.add('hidden')" class="text-gray-400 hover:text-gray-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <form method="POST" action="<?php echo e(route('prescriptions.reject', $prescription)); ?>" class="p-6">
+            <?php echo csrf_field(); ?>
+            <div class="mb-4">
+                <label class="block text-sm font-semibold text-gray-700 mb-2">
+                    Alasan Penolakan <span class="text-red-500">*</span>
+                </label>
+                <textarea name="alasan_penolakan" rows="4" required 
+                    class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500" 
+                    placeholder="Jelaskan alasan penolakan resep ini (minimal 10 karakter)..."><?php echo e(old('alasan_penolakan')); ?></textarea>
+                <?php $__errorArgs = ['alasan_penolakan'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                    <p class="text-red-500 text-sm mt-1"><?php echo e($message); ?></p>
+                <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
+                <p class="text-xs text-gray-500 mt-1">Pastikan alasan jelas dan dapat dipahami oleh dokter</p>
+            </div>
+
+            <div class="flex justify-end space-x-3 pt-4 border-t border-gray-200">
+                <button type="button" onclick="document.getElementById('rejectModal').classList.add('hidden')" 
+                    class="px-6 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors font-semibold">
+                    Batal
+                </button>
+                <button type="submit" class="px-6 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-lg shadow-md hover:shadow-lg transition-all font-semibold">
+                    Tolak Resep
+                </button>
+            </div>
+        </form>
     </div>
 </div>
 <?php $__env->stopSection(); ?>
