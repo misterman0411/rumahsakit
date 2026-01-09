@@ -44,12 +44,20 @@ class MedicalRecordController extends Controller
     {
         $patients = Patient::orderBy('nama')->get();
         $doctors = Doctor::with('user')->get();
+        
+        // Get current doctor if logged in as doctor
+        $currentDoctor = null;
+        $user = Auth::user();
+        if ($user && $user->peran && $user->peran->nama === 'doctor') {
+            $currentDoctor = Doctor::where('user_id', $user->id)->first();
+        }
+        
         $appointments = Appointment::where('status', 'check_in')
             ->whereNotNull('tanggal_janji')
             ->with(['pasien', 'dokter.user'])
             ->get();
         
-        return view('medical-records.create', compact('patients', 'doctors', 'appointments'));
+        return view('medical-records.create', compact('patients', 'doctors', 'appointments', 'currentDoctor'));
     }
 
     public function store(Request $request)

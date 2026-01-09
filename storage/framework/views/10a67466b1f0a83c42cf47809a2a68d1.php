@@ -1,38 +1,36 @@
-@extends('layouts.app')
+<?php $__env->startSection('title', 'Rawat Inap'); ?>
 
-@section('title', 'Rawat Inap')
-
-@section('content')
+<?php $__env->startSection('content'); ?>
 <!-- Header Section -->
 <div class="flex justify-between items-center mb-8">
     <div>
         <h2 class="text-3xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">Rawat Inap</h2>
         <p class="text-gray-500 mt-1">Kelola data pasien rawat inap</p>
     </div>
-    @can('manage-inpatient')
-    <a href="{{ route('inpatient.create') }}" class="flex items-center space-x-2 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white px-6 py-3 rounded-xl shadow-lg shadow-indigo-200 hover:shadow-xl hover:scale-105 transition-all duration-200 font-semibold">
+    <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('manage-inpatient')): ?>
+    <a href="<?php echo e(route('inpatient.create')); ?>" class="flex items-center space-x-2 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white px-6 py-3 rounded-xl shadow-lg shadow-indigo-200 hover:shadow-xl hover:scale-105 transition-all duration-200 font-semibold">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
         </svg>
         <span>Rawat Inap Baru</span>
     </a>
-    @endcan
+    <?php endif; ?>
 </div>
 
 <!-- Filter Section -->
 <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
-    <form method="GET" action="{{ route('inpatient.index') }}" class="space-y-4">
+    <form method="GET" action="<?php echo e(route('inpatient.index')); ?>" class="space-y-4">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
                 <label class="block text-sm font-semibold text-gray-700 mb-2">Cari Pasien</label>
-                <input type="text" name="search" value="{{ request('search') }}" placeholder="Nama pasien atau No. RM..." class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                <input type="text" name="search" value="<?php echo e(request('search')); ?>" placeholder="Nama pasien atau No. RM..." class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
             </div>
             <div>
                 <label class="block text-sm font-semibold text-gray-700 mb-2">Status</label>
                 <select name="status" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
                     <option value="">Semua Status</option>
-                    <option value="dirawat" {{ request('status') == 'dirawat' ? 'selected' : '' }}>Dirawat</option>
-                    <option value="pulang" {{ request('status') == 'pulang' ? 'selected' : '' }}>Pulang</option>
+                    <option value="dirawat" <?php echo e(request('status') == 'dirawat' ? 'selected' : ''); ?>>Dirawat</option>
+                    <option value="pulang" <?php echo e(request('status') == 'pulang' ? 'selected' : ''); ?>>Pulang</option>
                 </select>
             </div>
         </div>
@@ -40,11 +38,11 @@
             <button type="submit" class="px-6 py-2.5 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white rounded-lg shadow-md hover:shadow-lg transition-all font-semibold">
                 Filter
             </button>
-            @if(request()->hasAny(['status', 'search']))
-            <a href="{{ route('inpatient.index') }}" class="px-6 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors font-semibold">
+            <?php if(request()->hasAny(['status', 'search'])): ?>
+            <a href="<?php echo e(route('inpatient.index')); ?>" class="px-6 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors font-semibold">
                 Reset
             </a>
-            @endif
+            <?php endif; ?>
         </div>
     </form>
 </div>
@@ -65,38 +63,39 @@
                 </tr>
             </thead>
             <tbody class="bg-white divide-y divide-gray-200">
-                @forelse($admissions as $admission)
+                <?php $__empty_1 = true; $__currentLoopData = $admissions; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $admission): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
                 <tr class="hover:bg-indigo-50/50 transition-colors">
                     <td class="px-6 py-4 whitespace-nowrap">
-                        <span class="text-sm font-bold text-indigo-600">{{ $admission->admission_number }}</span>
+                        <span class="text-sm font-bold text-indigo-600"><?php echo e($admission->admission_number); ?></span>
                     </td>
                     <td class="px-6 py-4">
-                        <div class="text-sm font-semibold text-gray-900">{{ $admission->pasien->nama }}</div>
-                        <div class="text-xs text-gray-500">{{ $admission->pasien->no_rekam_medis }}</div>
+                        <div class="text-sm font-semibold text-gray-900"><?php echo e($admission->pasien->nama); ?></div>
+                        <div class="text-xs text-gray-500"><?php echo e($admission->pasien->no_rekam_medis); ?></div>
                     </td>
                     <td class="px-6 py-4">
-                        <div class="text-sm text-gray-900">{{ $admission->dokter->user->nama }}</div>
-                        <div class="text-xs text-gray-500">{{ $admission->dokter->spesialisasi }}</div>
+                        <div class="text-sm text-gray-900"><?php echo e($admission->dokter->user->nama); ?></div>
+                        <div class="text-xs text-gray-500"><?php echo e($admission->dokter->spesialisasi); ?></div>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap">
-                        <div class="text-sm text-gray-900">{{ $admission->ruangan->nomor_ruangan }}</div>
-                        <div class="text-xs text-gray-500">Bed {{ $admission->tempatTidur->nomor_tempat_tidur }}</div>
+                        <div class="text-sm text-gray-900"><?php echo e($admission->ruangan->nomor_ruangan); ?></div>
+                        <div class="text-xs text-gray-500">Bed <?php echo e($admission->tempatTidur->nomor_tempat_tidur); ?></div>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {{ \Carbon\Carbon::parse($admission->tanggal_masuk)->format('d M Y H:i') }}
+                        <?php echo e(\Carbon\Carbon::parse($admission->tanggal_masuk)->format('d M Y H:i')); ?>
+
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap">
-                        @if($admission->status === 'dirawat')
+                        <?php if($admission->status === 'dirawat'): ?>
                             <span class="px-3 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">Dirawat</span>
-                        @else
+                        <?php else: ?>
                             <span class="px-3 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">Pulang</span>
-                        @endif
+                        <?php endif; ?>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm">
-                        <a href="{{ route('inpatient.show', $admission) }}" class="text-indigo-600 hover:text-indigo-900 font-semibold">Detail</a>
+                        <a href="<?php echo e(route('inpatient.show', $admission)); ?>" class="text-indigo-600 hover:text-indigo-900 font-semibold">Detail</a>
                     </td>
                 </tr>
-                @empty
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
                 <tr>
                     <td colspan="7" class="px-6 py-12 text-center text-gray-500">
                         <svg class="w-12 h-12 mx-auto mb-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -105,16 +104,19 @@
                         <p class="text-lg font-semibold">Tidak ada data rawat inap</p>
                     </td>
                 </tr>
-                @endforelse
+                <?php endif; ?>
             </tbody>
         </table>
     </div>
 </div>
 
 <!-- Pagination -->
-@if($admissions->hasPages())
+<?php if($admissions->hasPages()): ?>
 <div class="mt-6">
-    {{ $admissions->links() }}
+    <?php echo e($admissions->links()); ?>
+
 </div>
-@endif
-@endsection
+<?php endif; ?>
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\Users\User\Desktop\rumahsakit\resources\views/inpatient/index.blade.php ENDPATH**/ ?>

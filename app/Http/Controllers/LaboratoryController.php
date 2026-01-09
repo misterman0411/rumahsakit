@@ -9,6 +9,7 @@ use App\Models\Patient;
 use App\Models\Doctor;
 use App\Models\Invoice;
 use App\Models\MedicalRecord;
+use App\Models\Visit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -79,29 +80,61 @@ class LaboratoryController extends Controller
 
         $validated['status'] = 'menunggu';
 
+        // Find or create visit for this patient today
+        $visit = Visit::where('pasien_id', $validated['pasien_id'])
+            ->whereDate('tanggal_kunjungan', today())
+            ->where('status', 'aktif')
+            ->first();
+
+        if (!$visit) {
+            $visit = Visit::create([
+                'pasien_id' => $validated['pasien_id'],
+                'tanggal_kunjungan' => now(),
+                'jenis_kunjungan' => 'rawat_jalan',
+                'status' => 'aktif',
+            ]);
+        }
+
+        $validated['kunjungan_id'] = $visit->id;
         $order = LaboratoryOrder::create($validated);
 
-        // Create invoice
+        // Get or create invoice for this visit
         $testType = LabTestType::find($validated['jenis_tes_id']);
-        $invoice = Invoice::create([
-            'pasien_id' => $order->pasien_id,
-            'tagihan_untuk_id' => $order->id,
-            'tagihan_untuk_tipe' => LaboratoryOrder::class,
-            'subtotal' => $testType->harga,
-            'diskon' => 0,
-            'pajak' => 0,
-            'total' => $testType->harga,
-            'status' => 'belum_dibayar',
-            'jatuh_tempo' => now()->addDays(7),
-        ]);
+        
+        // Find invoice for this visit that is NOT paid yet
+        $invoice = Invoice::where('kunjungan_id', $visit->id)
+            ->where('pasien_id', $order->pasien_id)
+            ->where('status', '!=', 'lunas')
+            ->first();
 
-        // Create invoice item for lab test
+        // If no unpaid invoice found, create a new one
+        if (!$invoice) {
+            $invoice = Invoice::create([
+                'kunjungan_id' => $visit->id,
+                'pasien_id' => $order->pasien_id,
+                'tagihan_untuk_id' => $order->id,
+                'tagihan_untuk_tipe' => LaboratoryOrder::class,
+                'subtotal' => 0,
+                'diskon' => 0,
+                'pajak' => 0,
+                'total' => 0,
+                'status' => 'belum_dibayar',
+                'jatuh_tempo' => now()->addDays(7),
+            ]);
+        }
+
+        // Add lab test to invoice
         $invoice->itemTagihan()->create([
             'deskripsi' => 'Test Laboratorium - ' . $testType->nama,
             'jumlah' => 1,
             'harga_satuan' => $testType->harga,
             'total' => $testType->harga,
         ]);
+
+        // Update invoice totals
+        $invoice->subtotal += $testType->harga;
+        $invoice->total += $testType->harga;
+        $invoice->save();
 
         return redirect()->route('laboratory.show', $order)
             ->with('success', 'Order laboratorium berhasil dibuat dengan nomor: ' . $order->nomor_permintaan);

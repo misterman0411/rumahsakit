@@ -1,33 +1,31 @@
-@extends('layouts.app')
-
-@section('content')
+<?php $__env->startSection('content'); ?>
 <div class="container mx-auto px-4 py-8">
     <div class="max-w-6xl mx-auto">
         <!-- Header -->
         <div class="mb-6 flex justify-between items-start">
             <div>
                 <h1 class="text-3xl font-bold text-gray-800">Detail Resep</h1>
-                <p class="text-gray-600 mt-2">{{ $prescription->nomor_resep }}</p>
+                <p class="text-gray-600 mt-2"><?php echo e($prescription->nomor_resep); ?></p>
             </div>
             <div class="flex space-x-2">
-                @if(auth()->user()->hasRole('pharmacist'))
-                    @if($prescription->status === 'menunggu')
-                        <form action="{{ route('prescriptions.verify', $prescription) }}" method="POST" class="inline">
-                            @csrf
+                <?php if(auth()->user()->hasRole('pharmacist')): ?>
+                    <?php if($prescription->status === 'menunggu'): ?>
+                        <form action="<?php echo e(route('prescriptions.verify', $prescription)); ?>" method="POST" class="inline">
+                            <?php echo csrf_field(); ?>
                             <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
                                 Verifikasi
                             </button>
                         </form>
-                    @endif
-                    @if($prescription->status === 'diverifikasi')
-                        <form action="{{ route('prescriptions.dispense', $prescription) }}" method="POST" class="inline">
-                            @csrf
+                    <?php endif; ?>
+                    <?php if($prescription->status === 'diverifikasi'): ?>
+                        <form action="<?php echo e(route('prescriptions.dispense', $prescription)); ?>" method="POST" class="inline">
+                            <?php echo csrf_field(); ?>
                             <button type="submit" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
                                 Serahkan Obat
                             </button>
                         </form>
-                    @endif
-                @endif
+                    <?php endif; ?>
+                <?php endif; ?>
             </div>
         </div>
 
@@ -40,85 +38,86 @@
                     <div class="grid grid-cols-2 gap-4">
                         <div>
                             <p class="text-sm text-gray-500">Nomor Resep</p>
-                            <p class="font-semibold">{{ $prescription->nomor_resep }}</p>
+                            <p class="font-semibold"><?php echo e($prescription->nomor_resep); ?></p>
                         </div>
                         <div>
                             <p class="text-sm text-gray-500">Status</p>
                             <span class="inline-flex px-3 py-1 rounded-full text-sm font-semibold
-                                @if($prescription->status === 'diserahkan') bg-green-100 text-green-800
-                                @elseif($prescription->status === 'diverifikasi') bg-blue-100 text-blue-800
-                                @elseif($prescription->status === 'dibatalkan') bg-red-100 text-red-800
-                                @else bg-yellow-100 text-yellow-800
-                                @endif">
-                                {{ ucfirst($prescription->status) }}
+                                <?php if($prescription->status === 'diserahkan'): ?> bg-green-100 text-green-800
+                                <?php elseif($prescription->status === 'diverifikasi'): ?> bg-blue-100 text-blue-800
+                                <?php elseif($prescription->status === 'dibatalkan'): ?> bg-red-100 text-red-800
+                                <?php else: ?> bg-yellow-100 text-yellow-800
+                                <?php endif; ?>">
+                                <?php echo e(ucfirst($prescription->status)); ?>
+
                             </span>
                         </div>
                         <div>
                             <p class="text-sm text-gray-500">Tanggal Dibuat</p>
-                            <p class="font-semibold">{{ $prescription->created_at->format('d/m/Y H:i') }}</p>
+                            <p class="font-semibold"><?php echo e($prescription->created_at->format('d/m/Y H:i')); ?></p>
                         </div>
-                        @if($prescription->waktu_verifikasi)
+                        <?php if($prescription->waktu_verifikasi): ?>
                         <div>
                             <p class="text-sm text-gray-500">Diverifikasi</p>
-                            <p class="font-semibold">{{ $prescription->waktu_verifikasi->format('d/m/Y H:i') }}</p>
+                            <p class="font-semibold"><?php echo e($prescription->waktu_verifikasi->format('d/m/Y H:i')); ?></p>
                         </div>
-                        @endif
-                        @if($prescription->waktu_diserahkan)
+                        <?php endif; ?>
+                        <?php if($prescription->waktu_diserahkan): ?>
                         <div>
                             <p class="text-sm text-gray-500">Diserahkan</p>
-                            <p class="font-semibold">{{ $prescription->waktu_diserahkan->format('d/m/Y H:i') }}</p>
+                            <p class="font-semibold"><?php echo e($prescription->waktu_diserahkan->format('d/m/Y H:i')); ?></p>
                         </div>
-                        @endif
+                        <?php endif; ?>
                     </div>
-                    @if($prescription->catatan)
+                    <?php if($prescription->catatan): ?>
                     <div class="mt-4">
                         <p class="text-sm text-gray-500">Catatan</p>
-                        <p class="text-gray-800 mt-1">{{ $prescription->catatan }}</p>
+                        <p class="text-gray-800 mt-1"><?php echo e($prescription->catatan); ?></p>
                     </div>
-                    @endif
+                    <?php endif; ?>
                 </div>
 
                 <!-- Medications -->
                 <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
                     <h2 class="text-xl font-bold text-gray-800 mb-4">Daftar Obat</h2>
                     <div class="space-y-4">
-                        @foreach($prescription->itemResep as $item)
+                        <?php $__currentLoopData = $prescription->itemResep; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $item): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                         <div class="border border-gray-200 rounded-lg p-4">
                             <div class="flex justify-between items-start mb-3">
                                 <div>
-                                    <h3 class="font-bold text-gray-800 text-lg">{{ $item->obat->nama }}</h3>
-                                    <p class="text-sm text-gray-600">{{ $item->obat->kode }}</p>
+                                    <h3 class="font-bold text-gray-800 text-lg"><?php echo e($item->obat->nama); ?></h3>
+                                    <p class="text-sm text-gray-600"><?php echo e($item->obat->kode); ?></p>
                                 </div>
                                 <div class="text-right">
                                     <p class="text-sm text-gray-500">Harga</p>
-                                    <p class="font-bold text-indigo-600">Rp {{ number_format($item->obat->harga * $item->jumlah, 0, ',', '.') }}</p>
+                                    <p class="font-bold text-indigo-600">Rp <?php echo e(number_format($item->obat->harga * $item->jumlah, 0, ',', '.')); ?></p>
                                 </div>
                             </div>
                             <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mt-3">
                                 <div>
                                     <p class="text-xs text-gray-500">Jumlah</p>
-                                    <p class="font-semibold">{{ $item->jumlah }} {{ $item->obat->satuan }}</p>
+                                    <p class="font-semibold"><?php echo e($item->jumlah); ?> <?php echo e($item->obat->satuan); ?></p>
                                 </div>
                                 <div>
                                     <p class="text-xs text-gray-500">Dosis</p>
-                                    <p class="font-semibold">{{ $item->dosis }}</p>
+                                    <p class="font-semibold"><?php echo e($item->dosis); ?></p>
                                 </div>
                                 <div>
                                     <p class="text-xs text-gray-500">Frekuensi</p>
-                                    <p class="font-semibold">{{ $item->frekuensi }}</p>
+                                    <p class="font-semibold"><?php echo e($item->frekuensi); ?></p>
                                 </div>
                                 <div>
                                     <p class="text-xs text-gray-500">Durasi</p>
-                                    <p class="font-semibold">{{ $item->durasi }}</p>
+                                    <p class="font-semibold"><?php echo e($item->durasi); ?></p>
                                 </div>
                             </div>
-                            @if($item->instruksi)
+                            <?php if($item->instruksi): ?>
                             <div class="mt-3 bg-blue-50 p-3 rounded-lg">
-                                <p class="text-sm text-blue-800"><span class="font-semibold">Instruksi:</span> {{ $item->instruksi }}</p>
+                                <p class="text-sm text-blue-800"><span class="font-semibold">Instruksi:</span> <?php echo e($item->instruksi); ?></p>
                             </div>
-                            @endif
+                            <?php endif; ?>
                         </div>
-                        @endforeach
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                     </div>
 
                     <!-- Total -->
@@ -126,7 +125,8 @@
                         <div class="flex justify-between items-center">
                             <p class="text-lg font-bold text-gray-800">Total</p>
                             <p class="text-2xl font-bold text-indigo-600">
-                                Rp {{ number_format($prescription->itemResep->sum(function($item) { return $item->obat->harga * $item->jumlah; }), 0, ',', '.') }}
+                                Rp <?php echo e(number_format($prescription->itemResep->sum(function($item) { return $item->obat->harga * $item->jumlah; }), 0, ',', '.')); ?>
+
                             </p>
                         </div>
                     </div>
@@ -141,26 +141,26 @@
                     <div class="space-y-3">
                         <div>
                             <p class="text-sm text-gray-500">No. RM</p>
-                            <p class="font-semibold">{{ $prescription->pasien->no_rekam_medis }}</p>
+                            <p class="font-semibold"><?php echo e($prescription->pasien->no_rekam_medis); ?></p>
                         </div>
                         <div>
                             <p class="text-sm text-gray-500">Nama</p>
-                            <p class="font-semibold">{{ $prescription->pasien->nama }}</p>
+                            <p class="font-semibold"><?php echo e($prescription->pasien->nama); ?></p>
                         </div>
                         <div>
                             <p class="text-sm text-gray-500">Jenis Kelamin</p>
-                            <p>{{ $prescription->pasien->gender === 'male' ? 'Laki-laki' : 'Perempuan' }}</p>
+                            <p><?php echo e($prescription->pasien->gender === 'male' ? 'Laki-laki' : 'Perempuan'); ?></p>
                         </div>
                         <div>
                             <p class="text-sm text-gray-500">Tanggal Lahir</p>
-                            <p>{{ \Carbon\Carbon::parse($prescription->pasien->tanggal_lahir)->format('d/m/Y') }}</p>
+                            <p><?php echo e(\Carbon\Carbon::parse($prescription->pasien->tanggal_lahir)->format('d/m/Y')); ?></p>
                         </div>
-                        @if($prescription->pasien->alergi)
+                        <?php if($prescription->pasien->alergi): ?>
                         <div class="mt-3 bg-red-50 p-3 rounded-lg">
                             <p class="text-xs text-red-600 font-semibold mb-1">ALERGI:</p>
-                            <p class="text-sm text-red-800">{{ $prescription->pasien->alergi }}</p>
+                            <p class="text-sm text-red-800"><?php echo e($prescription->pasien->alergi); ?></p>
                         </div>
-                        @endif
+                        <?php endif; ?>
                     </div>
                 </div>
 
@@ -170,50 +170,53 @@
                     <div class="space-y-3">
                         <div>
                             <p class="text-sm text-gray-500">Nama</p>
-                            <p class="font-semibold">{{ $prescription->dokter->user->nama }}</p>
+                            <p class="font-semibold"><?php echo e($prescription->dokter->user->nama); ?></p>
                         </div>
                         <div>
                             <p class="text-sm text-gray-500">Spesialisasi</p>
-                            <p>{{ $prescription->dokter->spesialisasi }}</p>
+                            <p><?php echo e($prescription->dokter->spesialisasi); ?></p>
                         </div>
                         <div>
                             <p class="text-sm text-gray-500">No. Lisensi</p>
-                            <p>{{ $prescription->dokter->nomor_lisensi }}</p>
+                            <p><?php echo e($prescription->dokter->nomor_lisensi); ?></p>
                         </div>
                     </div>
                 </div>
 
                 <!-- Invoice -->
-                @if($prescription->tagihan)
+                <?php if($prescription->tagihan): ?>
                 <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
                     <h2 class="text-lg font-bold text-gray-800 mb-4">Tagihan</h2>
                     <div class="space-y-3">
                         <div>
                             <p class="text-sm text-gray-500">No. Invoice</p>
-                            <p class="font-semibold">{{ $prescription->tagihan->nomor_tagihan }}</p>
+                            <p class="font-semibold"><?php echo e($prescription->tagihan->nomor_tagihan); ?></p>
                         </div>
                         <div>
                             <p class="text-sm text-gray-500">Total</p>
-                            <p class="text-2xl font-bold text-indigo-600">Rp {{ number_format($prescription->tagihan->total, 0, ',', '.') }}</p>
+                            <p class="text-2xl font-bold text-indigo-600">Rp <?php echo e(number_format($prescription->tagihan->total, 0, ',', '.')); ?></p>
                         </div>
                         <div>
                             <p class="text-sm text-gray-500">Status</p>
                             <span class="inline-flex px-3 py-1 rounded-full text-sm font-semibold
-                                @if($prescription->tagihan->status === 'lunas') bg-green-100 text-green-800
-                                @else bg-yellow-100 text-yellow-800
-                                @endif">
-                                {{ ucfirst($prescription->tagihan->status) }}
+                                <?php if($prescription->tagihan->status === 'lunas'): ?> bg-green-100 text-green-800
+                                <?php else: ?> bg-yellow-100 text-yellow-800
+                                <?php endif; ?>">
+                                <?php echo e(ucfirst($prescription->tagihan->status)); ?>
+
                             </span>
                         </div>
-                        <a href="{{ route('billing.show', $prescription->tagihan) }}"
+                        <a href="<?php echo e(route('billing.show', $prescription->tagihan)); ?>"
                             class="block w-full text-center px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors">
                             Lihat Detail Tagihan
                         </a>
                     </div>
                 </div>
-                @endif
+                <?php endif; ?>
             </div>
         </div>
     </div>
 </div>
-@endsection
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\Users\User\Desktop\rumahsakit\resources\views/prescriptions/show.blade.php ENDPATH**/ ?>

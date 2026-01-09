@@ -10,6 +10,8 @@ use App\Models\Medication;
 use App\Models\Invoice;
 use App\Models\StockMovement;
 use App\Models\MedicalRecord;
+use App\Models\Visit;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
@@ -101,9 +103,26 @@ class PrescriptionController extends Controller
 
         DB::beginTransaction();
         try {
+            // Find or create visit for this patient today
+            $visit = Visit::where('pasien_id', $validated['pasien_id'])
+                ->whereDate('tanggal_kunjungan', today())
+                ->where('status', 'aktif')
+                ->first();
+
+            // If no active visit found, create one
+            if (!$visit) {
+                $visit = Visit::create([
+                    'pasien_id' => $validated['pasien_id'],
+                    'tanggal_kunjungan' => now(),
+                    'jenis_kunjungan' => 'rawat_jalan',
+                    'status' => 'aktif',
+                ]);
+            }
+
             $prescription = Prescription::create([
                 'pasien_id' => $validated['pasien_id'],
                 'dokter_id' => $validated['dokter_id'],
+                'kunjungan_id' => $visit->id,
                 'catatan' => $validated['catatan'] ?? null,
                 'status' => 'menunggu',
             ]);
@@ -127,31 +146,46 @@ class PrescriptionController extends Controller
                 $totalAmount += $totalPrice;
             }
 
-            // Create invoice
-            $invoice = Invoice::create([
-                'pasien_id' => $prescription->pasien_id,
-                'tagihan_untuk_id' => $prescription->id,
-                'tagihan_untuk_tipe' => Prescription::class,
-                'subtotal' => $totalAmount,
-                'diskon' => 0,
-                'pajak' => 0,
-                'total' => $totalAmount,
-                'status' => 'belum_dibayar',
-                'jatuh_tempo' => now()->addDays(7),
-            ]);
+            // Get or create invoice for this visit
+            // Find invoice for this visit that is NOT paid yet
+            $invoice = Invoice::where('kunjungan_id', $visit->id)
+                ->where('pasien_id', $prescription->pasien_id)
+                ->where('status', '!=', 'lunas')
+                ->first();
 
-            // Create invoice items from prescription items
+            // If no unpaid invoice found, create a new one
+            if (!$invoice) {
+                $invoice = Invoice::create([
+                    'kunjungan_id' => $visit->id,
+                    'pasien_id' => $prescription->pasien_id,
+                    'tagihan_untuk_id' => $prescription->id,
+                    'tagihan_untuk_tipe' => Prescription::class,
+                    'subtotal' => 0,
+                    'diskon' => 0,
+                    'pajak' => 0,
+                    'total' => 0,
+                    'status' => 'belum_dibayar',
+                    'jatuh_tempo' => now()->addDays(7),
+                ]);
+            }
+
+            // Add prescription items to invoice
             foreach ($validated['items'] as $item) {
                 $medication = Medication::find($item['obat_id']);
                 $itemTotal = $medication->harga * $item['jumlah'];
                 
                 $invoice->itemTagihan()->create([
-                    'deskripsi' => $medication->nama . ' - ' . $item['dosis'] . ' (' . $item['frekuensi'] . ')',
+                    'deskripsi' => 'Obat: ' . $medication->nama . ' - ' . $item['dosis'] . ' (' . $item['frekuensi'] . ')',
                     'jumlah' => $item['jumlah'],
                     'harga_satuan' => $medication->harga,
                     'total' => $itemTotal,
                 ]);
             }
+
+            // Update invoice totals
+            $invoice->subtotal += $totalAmount;
+            $invoice->total += $totalAmount;
+            $invoice->save();
 
             DB::commit();
 
@@ -172,6 +206,13 @@ class PrescriptionController extends Controller
 
     public function verify(Prescription $prescription)
     {
+        // Only pharmacist can verify prescriptions
+        /** @var User $user */
+        $user = Auth::user();
+        if (!$user->hasAnyRole(['pharmacist', 'admin'])) {
+            abort(403, 'Unauthorized. Only pharmacist can verify prescriptions.');
+        }
+
         $prescription->update([
             'status' => 'diverifikasi',
             'waktu_verifikasi' => now(),
@@ -184,6 +225,13 @@ class PrescriptionController extends Controller
 
     public function dispense(Prescription $prescription)
     {
+        // Only pharmacist can dispense prescriptions
+        /** @var User $user */
+        $user = Auth::user();
+        if (!$user->hasAnyRole(['pharmacist', 'admin'])) {
+            abort(403, 'Unauthorized. Only pharmacist can dispense prescriptions.');
+        }
+
         DB::beginTransaction();
         try {
             // Check stock availability

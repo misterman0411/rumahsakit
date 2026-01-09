@@ -18,6 +18,7 @@ class Payment extends Model
         'kartu_kredit',
         'bpjs',
         'asuransi',
+        'online',
     ];
 
     const PAYMENT_METHODS = [
@@ -27,6 +28,7 @@ class Payment extends Model
         'kartu_kredit',
         'bpjs',
         'asuransi',
+        'online',
     ];
 
     protected $fillable = [

@@ -10,6 +10,7 @@ use App\Models\Bed;
 use App\Models\Invoice;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 
 class InpatientController extends Controller
 {
@@ -17,8 +18,20 @@ class InpatientController extends Controller
     {
         $query = InpatientAdmission::with(['pasien', 'dokter.user', 'ruangan', 'tempatTidur']);
 
+        // Semua dokter bisa melihat semua rawat inap (karena ada tim dokter)
+        // Tidak ada filtering berdasarkan dokter
+
+        // Filter by status
         if ($request->filled('status')) {
             $query->where('status', $request->status);
+        }
+
+        // Filter by patient name
+        if ($request->filled('search')) {
+            $query->whereHas('pasien', function($q) use ($request) {
+                $q->where('nama', 'like', '%' . $request->search . '%')
+                  ->orWhere('no_rekam_medis', 'like', '%' . $request->search . '%');
+            });
         }
 
         $admissions = $query->latest()->paginate(20);

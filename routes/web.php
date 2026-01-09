@@ -37,6 +37,7 @@ Route::post('/api/midtrans/notification', [MidtransController::class, 'notificat
 Route::get('billing/payment-success', [MidtransController::class, 'paymentSuccess'])->name('billing.payment-success');
 Route::get('billing/payment-pending', [MidtransController::class, 'paymentPending'])->name('billing.payment-pending');
 Route::get('billing/payment-failed', [MidtransController::class, 'paymentFailed'])->name('billing.payment-failed');
+Route::get('billing/payment-multiple-success', [BillingController::class, 'paymentMultipleSuccess'])->name('billing.payment-multiple-success');
 
 // Public Queue Display (for TV screens in waiting rooms)
 Route::get('/queue/display/{department}', [QueueDisplayController::class, 'display'])->name('queue.display');
@@ -268,14 +269,17 @@ Route::middleware(['auth'])->group(function () {
     // Cashier - process payments
     Route::middleware(['role:cashier,admin'])->group(function () {
         Route::post('billing/{invoice}/payment', [BillingController::class, 'payment'])->name('billing.payment');
+        Route::get('billing/payment-multiple', [BillingController::class, 'showMultiplePayment'])->name('billing.payment-multiple.show');
         Route::post('billing/payment-multiple', [BillingController::class, 'paymentMultiple'])->name('billing.payment-multiple');
+        Route::post('billing/payment-multiple-midtrans', [BillingController::class, 'paymentMultipleMidtrans'])->name('billing.payment-multiple-midtrans');
     });
     
-    // Cashier + Management - view billing
-    Route::middleware(['role:cashier,management,admin'])->group(function () {
+    // Cashier + Management + Doctor - view billing
+    Route::middleware(['role:cashier,management,admin,doctor'])->group(function () {
         Route::get('billing', [BillingController::class, 'index'])->name('billing.index');
         Route::get('billing/{invoice}', [BillingController::class, 'show'])->name('billing.show');
         Route::get('billing/payments/history', [BillingController::class, 'payments'])->name('billing.payments');
+        Route::get('billing/payment-multiple/success', [BillingController::class, 'showPaymentSuccess'])->name('billing.payment-multiple.success');
         
         // Midtrans payment gateway
         Route::post('billing/{invoice}/midtrans/create', [MidtransController::class, 'createPayment'])->name('billing.midtrans.create');

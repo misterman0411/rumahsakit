@@ -8,6 +8,7 @@ use App\Models\Doctor;
 use App\Models\Department;
 use App\Models\Invoice;
 use App\Models\ServiceCharge;
+use App\Models\Visit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -86,32 +87,59 @@ class AppointmentController extends Controller
 
         $validated['status'] = 'terjadwal';
 
+        // Create or find active visit for this patient
+        $visit = Visit::firstOrCreate(
+            [
+                'pasien_id' => $validated['pasien_id'],
+                'tanggal_kunjungan' => now()->format('Y-m-d'),
+                'status' => 'aktif',
+            ],
+            [
+                'jenis_kunjungan' => $validated['jenis'] === 'rawat_inap' ? 'rawat_inap' : 'rawat_jalan',
+                'keluhan_utama' => $validated['alasan'],
+            ]
+        );
+
+        $validated['kunjungan_id'] = $visit->id;
         $appointment = Appointment::create($validated);
 
-        // Create invoice for consultation fee
+        // Get or create invoice for this visit
+        $invoice = Invoice::firstOrNew([
+            'kunjungan_id' => $visit->id,
+            'pasien_id' => $appointment->pasien_id,
+        ]);
+
+        // If invoice is new, set initial values
+        if (!$invoice->exists) {
+            $invoice->fill([
+                'tagihan_untuk_id' => $appointment->id,
+                'tagihan_untuk_tipe' => Appointment::class,
+                'subtotal' => 0,
+                'diskon' => 0,
+                'pajak' => 0,
+                'total' => 0,
+                'status' => 'belum_dibayar',
+                'jatuh_tempo' => now()->addDays(7),
+            ]);
+            $invoice->save();
+        }
+
+        // Add consultation fee to invoice
         $doctor = Doctor::find($validated['dokter_id']);
         $consultationFee = ServiceCharge::where('kode', 'CONSULT')->first();
         $feeAmount = $consultationFee->harga ?? $doctor->biaya_konsultasi;
         
-        $invoice = Invoice::create([
-            'pasien_id' => $appointment->pasien_id,
-            'tagihan_untuk_id' => $appointment->id,
-            'tagihan_untuk_tipe' => Appointment::class,
-            'subtotal' => $feeAmount,
-            'diskon' => 0,
-            'pajak' => 0,
-            'total' => $feeAmount,
-            'status' => 'belum_dibayar',
-            'jatuh_tempo' => now()->addDays(7),
-        ]);
-
-        // Create invoice item for consultation
         $invoice->itemTagihan()->create([
             'deskripsi' => 'Biaya Konsultasi - ' . $doctor->user->name,
             'jumlah' => 1,
             'harga_satuan' => $feeAmount,
             'total' => $feeAmount,
         ]);
+
+        // Update invoice totals
+        $invoice->subtotal += $feeAmount;
+        $invoice->total += $feeAmount;
+        $invoice->save();
 
         return redirect()->route('appointments.show', $appointment)
             ->with('success', 'Appointment berhasil dibuat dengan nomor: ' . $appointment->nomor_janji_temu);

@@ -15,6 +15,7 @@ class Prescription extends Model
         'nomor_resep',
         'pasien_id',
         'dokter_id',
+        'kunjungan_id',
         'status',
         'catatan',
         'waktu_verifikasi',
@@ -42,6 +43,11 @@ class Prescription extends Model
                 );
             }
         });
+    }
+
+    public function kunjungan()
+    {
+        return $this->belongsTo(Visit::class, 'kunjungan_id');
     }
 
     public function pasien()

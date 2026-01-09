@@ -8,6 +8,7 @@ use App\Models\Patient;
 use App\Models\Doctor;
 use App\Models\Invoice;
 use App\Models\MedicalRecord;
+use App\Models\Visit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -78,30 +79,62 @@ class RadiologyController extends Controller
 
         $validated['status'] = 'menunggu';
 
+        // Find or create visit for this patient today
+        $visit = Visit::where('pasien_id', $validated['pasien_id'])
+            ->whereDate('tanggal_kunjungan', today())
+            ->where('status', 'aktif')
+            ->first();
+
+        if (!$visit) {
+            $visit = Visit::create([
+                'pasien_id' => $validated['pasien_id'],
+                'tanggal_kunjungan' => now(),
+                'jenis_kunjungan' => 'rawat_jalan',
+                'status' => 'aktif',
+            ]);
+        }
+
+        $validated['kunjungan_id'] = $visit->id;
         // Model will auto-generate nomor_permintaan via boot() method
         $order = RadiologyOrder::create($validated);
 
-        // Create invoice (model will auto-generate nomor_tagihan)
+        // Get or create invoice for this visit (model will auto-generate nomor_tagihan)
         $testType = RadiologyTestType::find($validated['jenis_tes_id']);
-        $invoice = Invoice::create([
-            'pasien_id' => $order->pasien_id,
-            'tagihan_untuk_id' => $order->id,
-            'tagihan_untuk_tipe' => RadiologyOrder::class,
-            'subtotal' => $testType->harga,
-            'diskon' => 0,
-            'pajak' => 0,
-            'total' => $testType->harga,
-            'status' => 'belum_dibayar',
-            'jatuh_tempo' => now()->addDays(7),
-        ]);
+        
+        // Find invoice for this visit that is NOT paid yet
+        $invoice = Invoice::where('kunjungan_id', $visit->id)
+            ->where('pasien_id', $order->pasien_id)
+            ->where('status', '!=', 'lunas')
+            ->first();
 
-        // Create invoice item for radiology test
+        // If no unpaid invoice found, create a new one
+        if (!$invoice) {
+            $invoice = Invoice::create([
+                'kunjungan_id' => $visit->id,
+                'pasien_id' => $order->pasien_id,
+                'tagihan_untuk_id' => $order->id,
+                'tagihan_untuk_tipe' => RadiologyOrder::class,
+                'subtotal' => 0,
+                'diskon' => 0,
+                'pajak' => 0,
+                'total' => 0,
+                'status' => 'belum_dibayar',
+                'jatuh_tempo' => now()->addDays(7),
+            ]);
+        }
+
+        // Add radiology test to invoice
         $invoice->itemTagihan()->create([
             'deskripsi' => 'Test Radiologi - ' . $testType->nama,
             'jumlah' => 1,
             'harga_satuan' => $testType->harga,
             'total' => $testType->harga,
         ]);
+
+        // Update invoice totals
+        $invoice->subtotal += $testType->harga;
+        $invoice->total += $testType->harga;
+        $invoice->save();
 
         return redirect()->route('radiology.show', $order)
             ->with('success', 'Order radiologi berhasil dibuat dengan nomor: ' . $order->nomor_permintaan);

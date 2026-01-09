@@ -46,7 +46,7 @@ class AppServiceProvider extends ServiceProvider
         });
 
         Gate::define('view-billing', function ($user) {
-            return $user->hasAnyRole(['admin', 'front_office', 'cashier']);
+            return $user->hasAnyRole(['admin', 'front_office', 'cashier', 'doctor', 'management']);
         });
 
         Gate::define('manage-master-data', function ($user) {

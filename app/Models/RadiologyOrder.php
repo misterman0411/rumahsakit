@@ -16,6 +16,7 @@ class RadiologyOrder extends Model
         'pasien_id',
         'dokter_id',
         'jenis_tes_id',
+        'kunjungan_id',
         'status',
         'catatan_klinis',
         'hasil',

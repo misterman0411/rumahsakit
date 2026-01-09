@@ -95,12 +95,42 @@
             <div class="mb-6 pb-6 border-b">
                 <h3 class="text-lg font-semibold text-gray-900 mb-4">Service Details</h3>
                 <div class="bg-gray-50 rounded-lg p-4">
-                    <div class="flex justify-between items-start mb-3">
-                        <div>
-                            <span class="text-sm font-medium text-gray-500">Service Type:</span>
-                            <span class="ml-2 text-gray-900 font-semibold"><?php echo e(class_basename($invoice->tagihan_untuk_tipe)); ?></span>
+                    <?php if($invoice->itemTagihan && $invoice->itemTagihan->count() > 0): ?>
+                        <!-- New Visit-based Invoice (Multiple Items) -->
+                        <div class="space-y-3">
+                            <div class="text-sm text-gray-600 mb-3">
+                                <span class="font-medium">Visit ID:</span> 
+                                <span class="ml-2">#<?php echo e($invoice->kunjungan_id ?? '-'); ?></span>
+                            </div>
+                            
+                            <div class="border-t border-gray-200 pt-3">
+                                <p class="text-sm font-semibold text-gray-700 mb-3">Service Items:</p>
+                                <div class="space-y-2">
+                                    <?php $__currentLoopData = $invoice->itemTagihan; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $item): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                    <div class="flex justify-between items-start py-2 px-3 bg-white rounded border border-gray-200">
+                                        <div class="flex-1">
+                                            <p class="text-sm font-medium text-gray-900"><?php echo e($item->deskripsi); ?></p>
+                                            <p class="text-xs text-gray-500">
+                                                Qty: <?php echo e($item->jumlah); ?> × Rp <?php echo e(number_format($item->harga_satuan, 0, ',', '.')); ?>
+
+                                            </p>
+                                        </div>
+                                        <span class="text-sm font-bold text-blue-600">
+                                            Rp <?php echo e(number_format($item->total, 0, ',', '.')); ?>
+
+                                        </span>
+                                    </div>
+                                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                </div>
+                            </div>
                         </div>
-                        <?php if($invoice->tagihanUntuk): ?>
+                    <?php elseif($invoice->tagihanUntuk): ?>
+                        <!-- Old Single-Service Invoice -->
+                        <div class="flex justify-between items-start mb-3">
+                            <div>
+                                <span class="text-sm font-medium text-gray-500">Service Type:</span>
+                                <span class="ml-2 text-gray-900 font-semibold"><?php echo e(class_basename($invoice->tagihan_untuk_tipe)); ?></span>
+                            </div>
                             <?php if($invoice->tagihan_untuk_tipe == 'App\Models\Prescription'): ?>
                                 <a href="<?php echo e(route('prescriptions.show', $invoice->tagihanUntuk->id)); ?>" class="text-blue-600 hover:text-blue-900 text-sm">View Details →</a>
                             <?php elseif($invoice->tagihan_untuk_tipe == 'App\Models\LaboratoryOrder'): ?>
@@ -110,54 +140,56 @@
                             <?php elseif($invoice->tagihan_untuk_tipe == 'App\Models\InpatientAdmission'): ?>
                                 <a href="<?php echo e(route('inpatient.show', $invoice->tagihanUntuk->id)); ?>" class="text-blue-600 hover:text-blue-900 text-sm">View Details →</a>
                             <?php endif; ?>
+                        </div>
+                        
+                        <?php if($invoice->tagihan_untuk_tipe == 'App\Models\Prescription'): ?>
+                            <div class="space-y-2">
+                                <div class="text-sm">
+                                    <span class="text-gray-500">Prescription Number:</span>
+                                    <span class="ml-2 text-gray-900"><?php echo e($invoice->tagihanUntuk->nomor_resep); ?></span>
+                                </div>
+                                <div class="text-sm">
+                                    <span class="text-gray-500">Doctor:</span>
+                                    <span class="ml-2 text-gray-900"><?php echo e($invoice->tagihanUntuk->dokter->user->nama ?? '-'); ?></span>
+                                </div>
+                                <div class="text-sm">
+                                    <span class="text-gray-500">Total Items:</span>
+                                    <span class="ml-2 text-gray-900"><?php echo e($invoice->tagihanUntuk->itemResep->count()); ?> items</span>
+                                </div>
+                            </div>
+                        <?php elseif($invoice->tagihan_untuk_tipe == 'App\Models\LaboratoryOrder'): ?>
+                            <div class="space-y-2">
+                                <div class="text-sm">
+                                    <span class="text-gray-500">Order Number:</span>
+                                    <span class="ml-2 text-gray-900"><?php echo e($invoice->tagihanUntuk->nomor_permintaan); ?></span>
+                                </div>
+                                <div class="text-sm">
+                                    <span class="text-gray-500">Test Type:</span>
+                                    <span class="ml-2 text-gray-900"><?php echo e($invoice->tagihanUntuk->jenisTes->nama ?? '-'); ?></span>
+                                </div>
+                                <div class="text-sm">
+                                    <span class="text-gray-500">Doctor:</span>
+                                    <span class="ml-2 text-gray-900"><?php echo e($invoice->tagihanUntuk->dokter->user->nama ?? '-'); ?></span>
+                                </div>
+                            </div>
+                        <?php elseif($invoice->tagihan_untuk_tipe == 'App\Models\RadiologyOrder'): ?>
+                            <div class="space-y-2">
+                                <div class="text-sm">
+                                    <span class="text-gray-500">Order Number:</span>
+                                    <span class="ml-2 text-gray-900"><?php echo e($invoice->tagihanUntuk->nomor_permintaan); ?></span>
+                                </div>
+                                <div class="text-sm">
+                                    <span class="text-gray-500">Test Type:</span>
+                                    <span class="ml-2 text-gray-900"><?php echo e($invoice->tagihanUntuk->jenisTes->nama ?? '-'); ?></span>
+                                </div>
+                                <div class="text-sm">
+                                    <span class="text-gray-500">Doctor:</span>
+                                    <span class="ml-2 text-gray-900"><?php echo e($invoice->tagihanUntuk->dokter->user->nama ?? '-'); ?></span>
+                                </div>
+                            </div>
                         <?php endif; ?>
-                    </div>
-                    
-                    <?php if($invoice->tagihan_untuk_tipe == 'App\Models\Prescription' && $invoice->tagihanUntuk): ?>
-                        <div class="space-y-2">
-                            <div class="text-sm">
-                                <span class="text-gray-500">Prescription Number:</span>
-                                <span class="ml-2 text-gray-900"><?php echo e($invoice->tagihanUntuk->nomor_resep); ?></span>
-                            </div>
-                            <div class="text-sm">
-                                <span class="text-gray-500">Doctor:</span>
-                                <span class="ml-2 text-gray-900"><?php echo e($invoice->tagihanUntuk->dokter->user->nama ?? '-'); ?></span>
-                            </div>
-                            <div class="text-sm">
-                                <span class="text-gray-500">Total Items:</span>
-                                <span class="ml-2 text-gray-900"><?php echo e($invoice->tagihanUntuk->itemResep->count()); ?> items</span>
-                            </div>
-                        </div>
-                    <?php elseif($invoice->tagihan_untuk_tipe == 'App\Models\LaboratoryOrder' && $invoice->tagihanUntuk): ?>
-                        <div class="space-y-2">
-                            <div class="text-sm">
-                                <span class="text-gray-500">Order Number:</span>
-                                <span class="ml-2 text-gray-900"><?php echo e($invoice->tagihanUntuk->nomor_permintaan); ?></span>
-                            </div>
-                            <div class="text-sm">
-                                <span class="text-gray-500">Test Type:</span>
-                                <span class="ml-2 text-gray-900"><?php echo e($invoice->tagihanUntuk->jenisTes->nama ?? '-'); ?></span>
-                            </div>
-                            <div class="text-sm">
-                                <span class="text-gray-500">Doctor:</span>
-                                <span class="ml-2 text-gray-900"><?php echo e($invoice->tagihanUntuk->dokter->user->nama ?? '-'); ?></span>
-                            </div>
-                        </div>
-                    <?php elseif($invoice->tagihan_untuk_tipe == 'App\Models\RadiologyOrder' && $invoice->tagihanUntuk): ?>
-                        <div class="space-y-2">
-                            <div class="text-sm">
-                                <span class="text-gray-500">Order Number:</span>
-                                <span class="ml-2 text-gray-900"><?php echo e($invoice->tagihanUntuk->nomor_permintaan); ?></span>
-                            </div>
-                            <div class="text-sm">
-                                <span class="text-gray-500">Test Type:</span>
-                                <span class="ml-2 text-gray-900"><?php echo e($invoice->tagihanUntuk->jenisTes->nama ?? '-'); ?></span>
-                            </div>
-                            <div class="text-sm">
-                                <span class="text-gray-500">Doctor:</span>
-                                <span class="ml-2 text-gray-900"><?php echo e($invoice->tagihanUntuk->dokter->user->nama ?? '-'); ?></span>
-                            </div>
-                        </div>
+                    <?php else: ?>
+                        <p class="text-gray-500 text-sm">No service details available</p>
                     <?php endif; ?>
                 </div>
             </div>

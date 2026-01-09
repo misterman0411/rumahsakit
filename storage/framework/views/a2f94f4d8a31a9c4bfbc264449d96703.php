@@ -54,16 +54,18 @@
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
                             <a href="<?php echo e(route('prescriptions.show', $prescription)); ?>" class="text-blue-600 hover:text-blue-900">View</a>
-                            <?php if($prescription->status == 'menunggu'): ?>
-                            <form action="<?php echo e(route('prescriptions.verify', $prescription)); ?>" method="POST" class="inline">
-                                <?php echo csrf_field(); ?>
-                                <button type="submit" class="text-green-600 hover:text-green-900">Verify</button>
-                            </form>
-                            <?php elseif($prescription->status == 'diverifikasi'): ?>
-                            <form action="<?php echo e(route('prescriptions.dispense', $prescription)); ?>" method="POST" class="inline">
-                                <?php echo csrf_field(); ?>
-                                <button type="submit" class="text-green-600 hover:text-green-900">Dispense</button>
-                            </form>
+                            <?php if(auth()->user()->hasRole('pharmacist')): ?>
+                                <?php if($prescription->status == 'menunggu'): ?>
+                                <form action="<?php echo e(route('prescriptions.verify', $prescription)); ?>" method="POST" class="inline">
+                                    <?php echo csrf_field(); ?>
+                                    <button type="submit" class="text-green-600 hover:text-green-900">Verify</button>
+                                </form>
+                                <?php elseif($prescription->status == 'diverifikasi'): ?>
+                                <form action="<?php echo e(route('prescriptions.dispense', $prescription)); ?>" method="POST" class="inline">
+                                    <?php echo csrf_field(); ?>
+                                    <button type="submit" class="text-green-600 hover:text-green-900">Dispense</button>
+                                </form>
+                                <?php endif; ?>
                             <?php endif; ?>
                         </td>
                     </tr>
