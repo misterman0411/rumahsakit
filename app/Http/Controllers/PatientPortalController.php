@@ -117,7 +117,7 @@ class PatientPortalController extends Controller
     {
         $patient = $this->getPatient();
         $departments = Department::orderBy('nama')->get();
-        $doctors = Doctor::with(['user', 'departemen'])->where('status', 'aktif')->get();
+        $doctors = Doctor::with(['user', 'departemen'])->get();
 
         return view('patient.book-appointment', compact('patient', 'departments', 'doctors'));
     }

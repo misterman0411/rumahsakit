@@ -21,9 +21,16 @@ class DashboardController extends Controller
         $user = Auth::user();
         $role = $user->peran->nama ?? 'guest';
 
-        // Redirect management role to Management Dashboard
         if ($role === 'management') {
             return redirect()->route('management.index');
+        }
+
+        if ($role === 'patient') {
+            return redirect()->route('patient.dashboard');
+        }
+
+        if ($role === 'guest') {
+            return redirect()->route('home');
         }
 
         $stats = [];

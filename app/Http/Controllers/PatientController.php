@@ -22,12 +22,10 @@ class PatientController extends Controller
 
         $patients = $query->latest()->paginate(20);
 
-        return view('patients.index', compact('patients'));
+        return view('patient.index', compact('patients'));
     }
 
-    public function create()
-    {
-        return view('patients.create');
+        return view('patient.create');
     }
 
     public function store(Request $request)
@@ -77,12 +75,12 @@ class PatientController extends Controller
             'radiologyOrders.jenisTes',
         ]);
 
-        return view('patients.show', compact('patient'));
+        return view('patient.show', compact('patient'));
     }
 
     public function edit(Patient $patient)
     {
-        return view('patients.edit', compact('patient'));
+        return view('patient.edit', compact('patient'));
     }
 
     public function update(Request $request, Patient $patient)

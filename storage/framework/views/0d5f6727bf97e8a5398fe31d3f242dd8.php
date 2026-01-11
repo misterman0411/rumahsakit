@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Beli Obat - MedCare</title>
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <?php echo app('Illuminate\Foundation\Vite')(['resources/css/app.css', 'resources/js/app.js']); ?>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Poppins', sans-serif; }
@@ -47,7 +47,26 @@
 <body class="bg-gray-50">
 
     <!-- Navbar -->
-    <x-navbar />
+    <?php if (isset($component)) { $__componentOriginala591787d01fe92c5706972626cdf7231 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginala591787d01fe92c5706972626cdf7231 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.navbar','data' => []] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('navbar'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes([]); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginala591787d01fe92c5706972626cdf7231)): ?>
+<?php $attributes = $__attributesOriginala591787d01fe92c5706972626cdf7231; ?>
+<?php unset($__attributesOriginala591787d01fe92c5706972626cdf7231); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginala591787d01fe92c5706972626cdf7231)): ?>
+<?php $component = $__componentOriginala591787d01fe92c5706972626cdf7231; ?>
+<?php unset($__componentOriginala591787d01fe92c5706972626cdf7231); ?>
+<?php endif; ?>
 
     <!-- Clean Hero Banner -->
     <div class="pt-32 pb-16 bg-gradient-to-br from-indigo-900 via-purple-900 to-slate-900 text-white relative overflow-hidden">
@@ -82,15 +101,15 @@
     <div class="bg-white border-b border-gray-100 sticky top-20 z-40 shadow-sm/50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between py-4 overflow-x-auto no-scrollbar gap-4">
-                <a href="{{ route('shop.index') }}" class="flex items-center px-4 py-2 rounded-full whitespace-nowrap transition-all duration-200 {{ !request('category') ? 'bg-indigo-600 text-white shadow-md' : 'bg-gray-50 text-gray-600 hover:bg-gray-100' }}">
+                <a href="<?php echo e(route('shop.index')); ?>" class="flex items-center px-4 py-2 rounded-full whitespace-nowrap transition-all duration-200 <?php echo e(!request('category') ? 'bg-indigo-600 text-white shadow-md' : 'bg-gray-50 text-gray-600 hover:bg-gray-100'); ?>">
                     <span class="font-medium text-sm">All Products</span>
                 </a>
 
-                @foreach($categories as $cat)
-                <a href="{{ route('shop.index', ['category' => $cat]) }}" class="flex items-center space-x-2 px-4 py-2 rounded-full whitespace-nowrap transition-all duration-200 {{ request('category') == $cat ? 'bg-indigo-600 text-white shadow-md' : 'bg-gray-50 text-gray-600 hover:bg-gray-100' }}">
-                    <span class="font-medium text-sm">{{ $cat }}</span>
+                <?php $__currentLoopData = $categories; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $cat): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                <a href="<?php echo e(route('shop.index', ['category' => $cat])); ?>" class="flex items-center space-x-2 px-4 py-2 rounded-full whitespace-nowrap transition-all duration-200 <?php echo e(request('category') == $cat ? 'bg-indigo-600 text-white shadow-md' : 'bg-gray-50 text-gray-600 hover:bg-gray-100'); ?>">
+                    <span class="font-medium text-sm"><?php echo e($cat); ?></span>
                 </a>
-                @endforeach
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
             </div>
         </div>
     </div>
@@ -106,7 +125,7 @@
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
-            @foreach($medications as $med)
+            <?php $__currentLoopData = $medications; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $med): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
             <div class="bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 group overflow-hidden border border-gray-100 flex flex-col h-full">
                 <!-- Image Area -->
                 <div class="bg-gray-50 h-56 flex items-center justify-center p-8 relative overflow-hidden">
@@ -122,10 +141,12 @@
                 <div class="p-6 flex-1 flex flex-col">
                     <div class="mb-auto">
                         <span class="inline-block px-2.5 py-1 rounded-md bg-indigo-50 text-indigo-600 text-xs font-semibold mb-3 tracking-wide uppercase">
-                            {{ $med->kategori }}
+                            <?php echo e($med->kategori); ?>
+
                         </span>
                         <h3 class="text-lg font-bold text-gray-900 mb-2 leading-snug group-hover:text-indigo-600 transition-colors">
-                            {{ $med->nama }}
+                            <?php echo e($med->nama); ?>
+
                         </h3>
                         <p class="text-gray-500 text-sm line-clamp-2 mb-4">
                             Premium quality medication for your health needs. Ensure to consult a doctor before use.
@@ -134,7 +155,8 @@
                     
                     <div class="border-t border-gray-100 pt-4 mt-2 flex items-center justify-between">
                         <span class="text-2xl font-bold text-gray-900">
-                            <span class="text-sm font-medium text-gray-400 align-top mr-0.5">Rp</span>{{ number_format($med->harga, 0, ',', '.') }}
+                            <span class="text-sm font-medium text-gray-400 align-top mr-0.5">Rp</span><?php echo e(number_format($med->harga, 0, ',', '.')); ?>
+
                         </span>
                         <button class="w-10 h-10 rounded-full bg-gray-50 text-gray-600 flex items-center justify-center hover:bg-indigo-600 hover:text-white transition-all shadow-sm hover:shadow-indigo-200">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
@@ -142,11 +164,12 @@
                     </div>
                 </div>
             </div>
-            @endforeach
+            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
         </div>
 
         <div class="mt-16">
-            {{ $medications->withQueryString()->links() }}
+            <?php echo e($medications->withQueryString()->links()); ?>
+
         </div>
     </div>
 
@@ -171,7 +194,7 @@
 
     <script>
         // Profile Dropdown Functionality
-        @auth
+        <?php if(auth()->guard()->check()): ?>
             const profileBtn = document.getElementById('profileBtn');
             const profileDropdown = document.getElementById('profileDropdown');
 
@@ -187,7 +210,8 @@
                     }
                 });
             }
-        @endauth
+        <?php endif; ?>
     </script>
 </body>
 </html>
+<?php /**PATH E:\laragon\www\rumahsakit\resources\views/shop/index.blade.php ENDPATH**/ ?>

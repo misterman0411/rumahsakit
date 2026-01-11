@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<html lang="<?php echo e(str_replace('_', '-', app()->getLocale())); ?>">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{{ config('app.name', 'Hospital Management System') }}</title>
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <title><?php echo e(config('app.name', 'Hospital Management System')); ?></title>
+    <?php echo app('Illuminate\Foundation\Vite')(['resources/css/app.css', 'resources/js/app.js']); ?>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Poppins', sans-serif; }
@@ -74,7 +74,26 @@
 </head>
 <body class="bg-gray-50 text-gray-800 antialiased">
     <!-- Navbar -->
-    <x-navbar />
+    <?php if (isset($component)) { $__componentOriginala591787d01fe92c5706972626cdf7231 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginala591787d01fe92c5706972626cdf7231 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.navbar','data' => []] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('navbar'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes([]); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginala591787d01fe92c5706972626cdf7231)): ?>
+<?php $attributes = $__attributesOriginala591787d01fe92c5706972626cdf7231; ?>
+<?php unset($__attributesOriginala591787d01fe92c5706972626cdf7231); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginala591787d01fe92c5706972626cdf7231)): ?>
+<?php $component = $__componentOriginala591787d01fe92c5706972626cdf7231; ?>
+<?php unset($__componentOriginala591787d01fe92c5706972626cdf7231); ?>
+<?php endif; ?>
     
     <!-- Hero Section -->
     <div class="relative pt-20 pb-16 md:pt-32 md:pb-24 overflow-hidden bg-gradient-to-br from-indigo-50 via-purple-50 to-white">
@@ -104,7 +123,7 @@
                         Dapatkan layanan kesehatan terbaik dari dokter spesialis berpengalaman. Konsultasi online, beli obat, dan buat janji temu dengan mudah dan cepat.
                     </p>
                     <div class="flex flex-col sm:flex-row gap-4">
-                        <a href="{{ route('patient.appointments.book') }}" class="bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-8 py-3 rounded-full font-medium hover:shadow-lg hover:scale-105 transition-all duration-300 shadow-indigo-200">
+                        <a href="<?php echo e(route('patient.appointments.book')); ?>" class="bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-8 py-3 rounded-full font-medium hover:shadow-lg hover:scale-105 transition-all duration-300 shadow-indigo-200">
                             Konsultasi Sekarang
                         </a>
                     </div>
@@ -180,7 +199,7 @@
                     </div>
                     <h3 class="text-xl font-bold text-gray-900 mb-3">Apotek & Obat</h3>
                     <p class="text-gray-500 mb-6">Beli obat resep dan perlengkapan kesehatan dengan mudah, diantar langsung ke rumah Anda.</p>
-                    <a href="{{ route('shop.index') }}" class="text-indigo-600 font-semibold hover:text-indigo-700 flex items-center group-hover:gap-2 transition-all">
+                    <a href="<?php echo e(route('shop.index')); ?>" class="text-indigo-600 font-semibold hover:text-indigo-700 flex items-center group-hover:gap-2 transition-all">
                         Learn more <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
                     </a>
                 </div>
@@ -216,7 +235,7 @@
                 Bergabunglah dengan ribuan pengguna lainnya yang telah mempercayakan kesehatan mereka pada MedCare.
             </p>
             <div class="mt-8 flex justify-center gap-4">
-                <a href="{{ route('register') }}" class="px-8 py-3 border border-transparent text-base font-semibold rounded-full text-indigo-600 bg-white hover:bg-gray-50 md:text-lg shadow-md transition-all">
+                <a href="<?php echo e(route('register')); ?>" class="px-8 py-3 border border-transparent text-base font-semibold rounded-full text-indigo-600 bg-white hover:bg-gray-50 md:text-lg shadow-md transition-all">
                     Daftar Sekarang
                 </a>
             </div>
@@ -279,7 +298,7 @@
 
     <script>
         // Profile Dropdown Functionality
-        @auth
+        <?php if(auth()->guard()->check()): ?>
             const profileBtn = document.getElementById('profileBtn');
             const profileDropdown = document.getElementById('profileDropdown');
 
@@ -295,8 +314,9 @@
                     }
                 });
             }
-        @endauth
+        <?php endif; ?>
     </script>
 
 </body>
 </html>
+<?php /**PATH E:\laragon\www\rumahsakit\resources\views/welcome.blade.php ENDPATH**/ ?>
