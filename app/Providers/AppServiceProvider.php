@@ -64,5 +64,21 @@ class AppServiceProvider extends ServiceProvider
         Gate::define('manage-master-data', function ($user) {
             return $user->hasRole('admin');
         });
+
+        // Share cart count with navbar
+        \Illuminate\Support\Facades\View::composer('components.navbar', function ($view) {
+            $count = 0;
+            if (\Illuminate\Support\Facades\Auth::check()) {
+                $cart = \App\Models\Cart::where('user_id', \Illuminate\Support\Facades\Auth::id())->first();
+            } else {
+                $cart = \App\Models\Cart::where('session_id', \Illuminate\Support\Facades\Session::getId())->first();
+            }
+            
+            if ($cart) {
+                $count = $cart->items()->count();
+            }
+            
+            $view->with('cartCount', $count);
+        });
     }
 }

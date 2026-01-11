@@ -25,6 +25,8 @@ class PatientController extends Controller
         return view('patient.index', compact('patients'));
     }
 
+    public function create()
+    {
         return view('patient.create');
     }
 

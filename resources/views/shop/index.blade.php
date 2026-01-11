@@ -95,6 +95,22 @@
         </div>
     </div>
 
+    <!-- Toast Container -->
+    <div id="toast-container" class="fixed top-24 right-4 z-50 transition-all duration-300 transform translate-x-full opacity-0">
+        <div class="bg-white border-l-4 border-indigo-600 rounded-lg shadow-xl p-4 flex items-center gap-3 min-w-[300px]">
+            <div class="flex-shrink-0 text-indigo-600">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+            </div>
+            <div>
+                <h4 class="font-bold text-gray-900">Sukses!</h4>
+                <p class="text-sm text-gray-600" id="toast-message">Item ditambahkan.</p>
+            </div>
+            <button onclick="hideToast()" class="ml-auto text-gray-400 hover:text-gray-600">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+        </div>
+    </div>
+
     <!-- Products Grid -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 bg-gray-50/50 min-h-screen">
         <div class="flex justify-between items-end mb-8">
@@ -136,14 +152,101 @@
                         <span class="text-2xl font-bold text-gray-900">
                             <span class="text-sm font-medium text-gray-400 align-top mr-0.5">Rp</span>{{ number_format($med->harga, 0, ',', '.') }}
                         </span>
-                        <button class="w-10 h-10 rounded-full bg-gray-50 text-gray-600 flex items-center justify-center hover:bg-indigo-600 hover:text-white transition-all shadow-sm hover:shadow-indigo-200">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
-                        </button>
+                        <form action="{{ route('cart.add') }}" method="POST" id="addToCartForm-{{ $med->id }}" onsubmit="addToCart(event, {{ $med->id }})">
+                            @csrf
+                            <input type="hidden" name="medication_id" value="{{ $med->id }}">
+                            <input type="hidden" name="quantity" value="1">
+                            <button type="submit" class="w-10 h-10 rounded-full bg-gray-50 text-gray-600 flex items-center justify-center hover:bg-indigo-600 hover:text-white transition-all shadow-sm hover:shadow-indigo-200 cursor-pointer">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
+                            </button>
+                        </form>
                     </div>
                 </div>
             </div>
             @endforeach
         </div>
+
+    <script>
+        function addToCart(event, id) {
+            event.preventDefault();
+            const form = document.getElementById(`addToCartForm-${id}`);
+            const formData = new FormData(form);
+
+            const button = form.querySelector('button');
+            const originalContent = button.innerHTML;
+            button.innerHTML = '<svg class="animate-spin h-5 w-5 text-indigo-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>';
+            button.disabled = true;
+
+            fetch(form.action, {
+                method: 'POST',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value
+                },
+                body: formData
+            })
+            .then(response => {
+                if (response.status === 401 || response.url.includes('login')) {
+                    window.location.href = "{{ route('login') }}";
+                    return;
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data && data.success) {
+                    showToast(data.message);
+                    updateCartBadge(data.cart_count);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                // Fallback to normal submit if ajax fails
+                form.submit(); 
+            })
+            .finally(() => {
+                button.innerHTML = originalContent;
+                button.disabled = false;
+            });
+        }
+
+        function showToast(message) {
+            const container = document.getElementById('toast-container');
+            const msgEl = document.getElementById('toast-message');
+            msgEl.textContent = message;
+            
+            container.classList.remove('translate-x-full', 'opacity-0');
+            
+            setTimeout(() => {
+                hideToast();
+            }, 3000);
+        }
+
+        function hideToast() {
+            const container = document.getElementById('toast-container');
+            container.classList.add('translate-x-full', 'opacity-0');
+        }
+
+        function updateCartBadge(count) {
+            // Find the cart link in navbar (it is inside a component, but accessible via DOM)
+            // We look for the cart SVG and check if it has a sibling span
+            const cartIcons = document.querySelectorAll('a[href="{{ route('cart.index') }}"]');
+            
+            cartIcons.forEach(iconLink => {
+                let badge = iconLink.querySelector('span');
+                if (count > 0) {
+                    if (!badge) {
+                        badge = document.createElement('span');
+                        badge.className = 'absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-red-100 transform translate-x-1/4 -translate-y-1/4 bg-red-600 rounded-full';
+                        iconLink.appendChild(badge);
+                    }
+                    badge.textContent = count;
+                } else {
+                    if (badge) badge.remove();
+                }
+            });
+        }
+    </script>
 
         <div class="mt-16">
             {{ $medications->withQueryString()->links() }}

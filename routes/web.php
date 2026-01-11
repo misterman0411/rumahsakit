@@ -30,6 +30,19 @@ Route::get('/', function () {
 Route::get('/shop', [App\Http\Controllers\ShopController::class, 'index'])->name('shop.index');
 Route::get('/shop/{medication}', [App\Http\Controllers\ShopController::class, 'show'])->name('shop.show');
 
+// Authenticated Shop Routes
+Route::middleware(['auth'])->group(function () {
+    // Cart Routes
+    Route::get('/cart', [App\Http\Controllers\CartController::class, 'index'])->name('cart.index');
+    Route::post('/cart/add', [App\Http\Controllers\CartController::class, 'addToCart'])->name('cart.add');
+    Route::patch('/cart/{id}', [App\Http\Controllers\CartController::class, 'updateCart'])->name('cart.update');
+    Route::delete('/cart/{id}', [App\Http\Controllers\CartController::class, 'removeFromCart'])->name('cart.remove');
+
+    // Checkout Routes
+    Route::get('/checkout', [App\Http\Controllers\CheckoutController::class, 'index'])->name('checkout.index');
+    Route::post('/checkout', [App\Http\Controllers\CheckoutController::class, 'store'])->name('checkout.store');
+});
+
 
 // Midtrans Webhook (must be outside auth middleware)
 Route::post('/api/midtrans/notification', [MidtransController::class, 'notification'])->name('midtrans.notification');
