@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\PatientController;
+use App\Http\Controllers\PatientPortalController;
 use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\MedicalRecordController;
 use App\Http\Controllers\LaboratoryController;
@@ -41,6 +42,21 @@ Route::get('billing/payment-failed', [MidtransController::class, 'paymentFailed'
 // Public Queue Display (for TV screens in waiting rooms)
 Route::get('/queue/display/{department}', [QueueDisplayController::class, 'display'])->name('queue.display');
 Route::get('/queue/ticket/{appointment}', [QueueDisplayController::class, 'printTicket'])->name('queue.ticket');
+
+// ============================================
+// PATIENT PORTAL (for logged-in patients)
+// ============================================
+Route::middleware(['auth'])->prefix('patient')->name('patient.')->group(function () {
+    Route::get('/dashboard', [PatientPortalController::class, 'dashboard'])->name('dashboard');
+    Route::get('/appointments', [PatientPortalController::class, 'appointments'])->name('appointments');
+    Route::get('/appointments/book', [PatientPortalController::class, 'bookAppointment'])->name('appointments.book');
+    Route::post('/appointments', [PatientPortalController::class, 'storeAppointment'])->name('appointments.store');
+    Route::get('/medical-records', [PatientPortalController::class, 'medicalRecords'])->name('medical-records');
+    Route::get('/prescriptions', [PatientPortalController::class, 'prescriptions'])->name('prescriptions');
+    Route::get('/lab-results', [PatientPortalController::class, 'labResults'])->name('lab-results');
+    Route::get('/radiology-results', [PatientPortalController::class, 'radiologyResults'])->name('radiology-results');
+    Route::get('/invoices', [PatientPortalController::class, 'invoices'])->name('invoices');
+});
 
 Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');

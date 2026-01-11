@@ -94,7 +94,12 @@
                     <div class="ml-10 flex items-baseline space-x-8">
                         <a href="{{ route('home') }}" class="text-indigo-600 font-semibold px-3 py-2 rounded-md text-base transition-colors">Home</a>
                         <a href="{{ route('shop.index') }}" class="text-gray-600 hover:text-indigo-600 font-medium px-3 py-2 rounded-md text-base transition-colors">Beli Obat</a>
-                        <a href="#" class="text-gray-600 hover:text-indigo-600 font-medium px-3 py-2 rounded-md text-base transition-colors">Konsultasi</a>
+                        <a href="{{ route('patient.appointments.book') }}" class="text-gray-600 hover:text-indigo-600 font-medium px-3 py-2 rounded-md text-base transition-colors">Konsultasi</a>
+                        @auth
+                            @if(Auth::user()->isPatient())
+                                <a href="{{ route('patient.dashboard') }}" class="text-gray-600 hover:text-indigo-600 font-medium px-3 py-2 rounded-md text-base transition-colors">Dashboard</a>
+                            @endif
+                        @endauth
                     </div>
                 </div>
 
@@ -191,7 +196,7 @@
                         Dapatkan layanan kesehatan terbaik dari dokter spesialis berpengalaman. Konsultasi online, beli obat, dan buat janji temu dengan mudah dan cepat.
                     </p>
                     <div class="flex flex-col sm:flex-row gap-4">
-                        <a href="#" class="bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-8 py-3 rounded-full font-medium hover:shadow-lg hover:scale-105 transition-all duration-300 shadow-indigo-200">
+                        <a href="{{ route('patient.appointments.book') }}" class="bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-8 py-3 rounded-full font-medium hover:shadow-lg hover:scale-105 transition-all duration-300 shadow-indigo-200">
                             Konsultasi Sekarang
                         </a>
                     </div>

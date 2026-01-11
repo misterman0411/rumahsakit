@@ -80,7 +80,8 @@ class AuthenticatedSessionController extends Controller
                 return redirect()->intended(route('dashboard'));
             }
 
-            return redirect()->intended(route('home'));
+            // Redirect patients to patient portal dashboard
+            return redirect()->intended(route('patient.dashboard'));
         }
 
         // Record failed attempt

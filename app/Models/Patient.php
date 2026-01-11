@@ -12,6 +12,7 @@ class Patient extends Model
     protected $table = 'pasien';
 
     protected $fillable = [
+        'user_id',
         'no_rekam_medis',
         'nik',
         'nama',
@@ -33,6 +34,14 @@ class Patient extends Model
         'nomor_asuransi',
         'status',
     ];
+
+    /**
+     * Get the user account associated with the patient.
+     */
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 
     protected $casts = [
         'tanggal_lahir' => 'date',

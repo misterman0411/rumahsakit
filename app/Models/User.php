@@ -86,4 +86,26 @@ class User extends Authenticatable
     {
         return $this->hasOne(Nurse::class);
     }
+
+    /**
+     * Get the patient record associated with the user.
+     */
+    public function patient()
+    {
+        return $this->hasOne(Patient::class);
+    }
+
+    /**
+     * Check if user is a patient (non-staff).
+     */
+    public function isPatient(): bool
+    {
+        $staffRoles = [
+            'admin', 'doctor', 'nurse', 'front_office',
+            'pharmacist', 'lab_technician', 'radiologist',
+            'cashier', 'management'
+        ];
+
+        return !$this->hasAnyRole($staffRoles);
+    }
 }
