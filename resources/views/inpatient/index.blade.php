@@ -21,23 +21,31 @@
 
 <!-- Filter Section -->
 <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
-    <form method="GET" action="{{ route('inpatient.index') }}" class="flex items-end space-x-4">
-        <div class="flex-1">
-            <label class="block text-sm font-semibold text-gray-700 mb-2">Status</label>
-            <select name="status" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
-                <option value="">Semua Status</option>
-                <option value="admitted" {{ request('status') == 'admitted' ? 'selected' : '' }}>Dirawat</option>
-                <option value="discharged" {{ request('status') == 'discharged' ? 'selected' : '' }}>Pulang</option>
-            </select>
+    <form method="GET" action="{{ route('inpatient.index') }}" class="space-y-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">Cari Pasien</label>
+                <input type="text" name="search" value="{{ request('search') }}" placeholder="Nama pasien atau No. RM..." class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+            </div>
+            <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">Status</label>
+                <select name="status" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                    <option value="">Semua Status</option>
+                    <option value="dirawat" {{ request('status') == 'dirawat' ? 'selected' : '' }}>Dirawat</option>
+                    <option value="pulang" {{ request('status') == 'pulang' ? 'selected' : '' }}>Pulang</option>
+                </select>
+            </div>
         </div>
-        <button type="submit" class="px-6 py-2.5 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white rounded-lg shadow-md hover:shadow-lg transition-all font-semibold">
-            Filter
-        </button>
-        @if(request()->hasAny(['status']))
-        <a href="{{ route('inpatient.index') }}" class="px-6 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors font-semibold">
-            Reset
-        </a>
-        @endif
+        <div class="flex space-x-2">
+            <button type="submit" class="px-6 py-2.5 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white rounded-lg shadow-md hover:shadow-lg transition-all font-semibold">
+                Filter
+            </button>
+            @if(request()->hasAny(['status', 'search']))
+            <a href="{{ route('inpatient.index') }}" class="px-6 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors font-semibold">
+                Reset
+            </a>
+            @endif
+        </div>
     </form>
 </div>
 
@@ -60,7 +68,7 @@
                 @forelse($admissions as $admission)
                 <tr class="hover:bg-indigo-50/50 transition-colors">
                     <td class="px-6 py-4 whitespace-nowrap">
-                        <span class="text-sm font-bold text-indigo-600">{{ $admission->admission_number }}</span>
+                        <span class="text-sm font-bold text-indigo-600">{{ $admission->nomor_rawat_inap }}</span>
                     </td>
                     <td class="px-6 py-4">
                         <div class="text-sm font-semibold text-gray-900">{{ $admission->pasien->nama }}</div>
@@ -78,7 +86,7 @@
                         {{ \Carbon\Carbon::parse($admission->tanggal_masuk)->format('d M Y H:i') }}
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap">
-                        @if($admission->status === 'admitted')
+                        @if($admission->status === 'dirawat')
                             <span class="px-3 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">Dirawat</span>
                         @else
                             <span class="px-3 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">Pulang</span>

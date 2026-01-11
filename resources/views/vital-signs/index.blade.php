@@ -77,26 +77,26 @@
                     @forelse($vitalSigns as $vital)
                         <tr class="hover:bg-gray-50">
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                {{ $vital->recorded_at->format('d/m/Y H:i') }}
+                                {{ $vital->waktu_pengukuran ? $vital->waktu_pengukuran->format('d/m/Y H:i') : '-' }}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="text-sm font-medium text-gray-900">{{ $vital->pasien->nama }}</div>
                                 <div class="text-sm text-gray-500">{{ $vital->pasien->no_rekam_medis }}</div>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                {{ $vital->blood_pressure ?? '-' }}
+                                {{ $vital->tekanan_darah_sistolik && $vital->tekanan_darah_diastolik ? $vital->tekanan_darah_sistolik . '/' . $vital->tekanan_darah_diastolik : '-' }}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                {{ $vital->temperature ?? '-' }}
+                                {{ $vital->suhu ? number_format($vital->suhu, 1) . '°C' : '-' }}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                {{ $vital->heart_rate ?? '-' }}
+                                {{ $vital->detak_jantung ? $vital->detak_jantung . ' bpm' : '-' }}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                {{ $vital->respiratory_rate ?? '-' }}
+                                {{ $vital->laju_pernapasan ? $vital->laju_pernapasan . '/min' : '-' }}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                {{ $vital->oxygen_saturation ?? '-' }}
+                                {{ $vital->saturasi_oksigen ? number_format($vital->saturasi_oksigen, 1) . '%' : '-' }}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm">
                                 @if($vital->bmi)
@@ -113,7 +113,7 @@
                                 @endif
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                {{ $vital->recordedBy->nama ?? '-' }}
+                                {{ $vital->perawat->user->nama ?? '-' }}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                 <div class="flex space-x-2">

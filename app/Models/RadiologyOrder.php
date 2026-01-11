@@ -16,16 +16,27 @@ class RadiologyOrder extends Model
         'pasien_id',
         'dokter_id',
         'jenis_tes_id',
+        'kunjungan_id',
         'status',
         'catatan_klinis',
         'hasil',
         'interpretasi',
         'diperiksa_oleh',
         'waktu_pemeriksaan',
+        'image_path',
+        'report_status',
+        'signed_by',
+        'signed_at',
+        'version',
+        'parent_revision_id',
+        'hasil_diinput_oleh',
+        'waktu_input_hasil',
     ];
 
     protected $casts = [
         'waktu_pemeriksaan' => 'datetime',
+        'signed_at' => 'datetime',
+        'waktu_input_hasil' => 'datetime',
     ];
 
     protected static function boot()
@@ -59,7 +70,7 @@ class RadiologyOrder extends Model
         return $this->belongsTo(RadiologyTestType::class, 'jenis_tes_id');
     }
 
-    public function dipriksaOleh()
+    public function diperiksaOleh()
     {
         return $this->belongsTo(User::class, 'diperiksa_oleh');
     }
@@ -67,5 +78,25 @@ class RadiologyOrder extends Model
     public function tagihan()
     {
         return $this->morphOne(Invoice::class, 'tagihan_untuk', 'tagihan_untuk_tipe', 'tagihan_untuk_id');
+    }
+
+    public function signedBy()
+    {
+        return $this->belongsTo(User::class, 'signed_by');
+    }
+
+    public function hasilDiinputOleh()
+    {
+        return $this->belongsTo(User::class, 'hasil_diinput_oleh');
+    }
+
+    public function parentRevision()
+    {
+        return $this->belongsTo(RadiologyOrder::class, 'parent_revision_id');
+    }
+
+    public function revisions()
+    {
+        return $this->hasMany(RadiologyOrder::class, 'parent_revision_id');
     }
 }

@@ -9,6 +9,9 @@ use App\Models\Doctor;
 use App\Models\Medication;
 use App\Models\Invoice;
 use App\Models\StockMovement;
+use App\Models\MedicalRecord;
+use App\Models\Visit;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
@@ -18,6 +21,20 @@ class PrescriptionController extends Controller
     public function index(Request $request)
     {
         $query = Prescription::with(['pasien', 'dokter.user', 'itemResep.obat']);
+
+        // Filter berdasarkan role user
+        $user = Auth::user();
+        $role = $user->peran->nama ?? null;
+
+        if ($role === 'doctor') {
+            // Jika login sebagai dokter, hanya tampilkan resep dokter tersebut
+            $doctor = Doctor::where('user_id', $user->id)->first();
+            if ($doctor) {
+                $query->where('dokter_id', $doctor->id);
+            }
+        } elseif ($role === 'pharmacist') {
+            // Pharmacist bisa melihat semua resep
+        }
 
         if ($request->filled('status')) {
             $query->where('status', $request->status);
@@ -30,15 +47,47 @@ class PrescriptionController extends Controller
 
     public function create()
     {
-        $patients = Patient::orderBy('nama')->get();
+        $user = Auth::user();
+        $role = $user->peran->nama ?? null;
+        
+        $currentDoctor = null;
+        
+        // Filter pasien berdasarkan role
+        if ($role === 'doctor') {
+            // Hanya tampilkan pasien yang sudah pernah diperiksa oleh dokter ini
+            $doctor = Doctor::where('user_id', $user->id)->first();
+            $currentDoctor = $doctor;
+            if ($doctor) {
+                $patients = Patient::whereHas('rekamMedis', function ($query) use ($doctor) {
+                    $query->where('dokter_id', $doctor->id);
+                })->orderBy('nama')->get();
+            } else {
+                $patients = collect(); // empty collection
+            }
+        } else {
+            // Admin, pharmacist, dll bisa lihat semua pasien
+            $patients = Patient::orderBy('nama')->get();
+        }
+        
         $doctors = Doctor::with('user')->get();
         $medications = Medication::where('stok', '>', 0)->orderBy('nama')->get();
 
-        return view('prescriptions.create', compact('patients', 'doctors', 'medications'));
+        return view('prescriptions.create', compact('patients', 'doctors', 'medications', 'currentDoctor'));
     }
 
     public function store(Request $request)
     {
+        $user = Auth::user();
+        $role = $user->peran->nama ?? null;
+        
+        // Jika dokter, auto-set dokter_id dari user yang login
+        if ($role === 'doctor') {
+            $doctor = Doctor::where('user_id', $user->id)->first();
+            if ($doctor) {
+                $request->merge(['dokter_id' => $doctor->id]);
+            }
+        }
+        
         $validated = $request->validate([
             'pasien_id' => 'required|exists:pasien,id',
             'dokter_id' => 'required|exists:dokter,id',
@@ -54,12 +103,28 @@ class PrescriptionController extends Controller
 
         DB::beginTransaction();
         try {
-            $validated['status'] = 'pending';
+            // Find or create visit for this patient today
+            $visit = Visit::where('pasien_id', $validated['pasien_id'])
+                ->whereDate('tanggal_kunjungan', today())
+                ->where('status', 'aktif')
+                ->first();
+
+            // If no active visit found, create one
+            if (!$visit) {
+                $visit = Visit::create([
+                    'pasien_id' => $validated['pasien_id'],
+                    'tanggal_kunjungan' => now(),
+                    'jenis_kunjungan' => 'rawat_jalan',
+                    'status' => 'aktif',
+                ]);
+            }
+
             $prescription = Prescription::create([
                 'pasien_id' => $validated['pasien_id'],
                 'dokter_id' => $validated['dokter_id'],
+                'kunjungan_id' => $visit->id,
                 'catatan' => $validated['catatan'] ?? null,
-                'status' => 'pending',
+                'status' => 'menunggu',
             ]);
 
             $totalAmount = 0;
@@ -76,37 +141,51 @@ class PrescriptionController extends Controller
                     'frekuensi' => $item['frekuensi'],
                     'durasi' => $item['durasi'],
                     'instruksi' => $item['instruksi'] ?? null,
-                    'harga' => $totalPrice,
                 ]);
 
                 $totalAmount += $totalPrice;
             }
 
-            // Create invoice
-            $invoice = Invoice::create([
-                'pasien_id' => $prescription->pasien_id,
-                'tagihan_untuk_id' => $prescription->id,
-                'tagihan_untuk_tipe' => Prescription::class,
-                'subtotal' => $totalAmount,
-                'diskon' => 0,
-                'pajak' => 0,
-                'total' => $totalAmount,
-                'status' => 'unpaid',
-                'jatuh_tempo' => now()->addDays(7),
-            ]);
+            // Get or create invoice for this visit
+            // Find invoice for this visit that is NOT paid yet
+            $invoice = Invoice::where('kunjungan_id', $visit->id)
+                ->where('pasien_id', $prescription->pasien_id)
+                ->where('status', '!=', 'lunas')
+                ->first();
 
-            // Create invoice items from prescription items
+            // If no unpaid invoice found, create a new one
+            if (!$invoice) {
+                $invoice = Invoice::create([
+                    'kunjungan_id' => $visit->id,
+                    'pasien_id' => $prescription->pasien_id,
+                    'tagihan_untuk_id' => $prescription->id,
+                    'tagihan_untuk_tipe' => Prescription::class,
+                    'subtotal' => 0,
+                    'diskon' => 0,
+                    'pajak' => 0,
+                    'total' => 0,
+                    'status' => 'belum_dibayar',
+                    'jatuh_tempo' => now()->addDays(7),
+                ]);
+            }
+
+            // Add prescription items to invoice
             foreach ($validated['items'] as $item) {
                 $medication = Medication::find($item['obat_id']);
                 $itemTotal = $medication->harga * $item['jumlah'];
                 
                 $invoice->itemTagihan()->create([
-                    'deskripsi' => $medication->nama . ' - ' . $item['dosis'] . ' (' . $item['frekuensi'] . ')',
+                    'deskripsi' => 'Obat: ' . $medication->nama . ' - ' . $item['dosis'] . ' (' . $item['frekuensi'] . ')',
                     'jumlah' => $item['jumlah'],
                     'harga_satuan' => $medication->harga,
                     'total' => $itemTotal,
                 ]);
             }
+
+            // Update invoice totals
+            $invoice->subtotal += $totalAmount;
+            $invoice->total += $totalAmount;
+            $invoice->save();
 
             DB::commit();
 
@@ -120,17 +199,29 @@ class PrescriptionController extends Controller
 
     public function show(Prescription $prescription)
     {
-        $prescription->load(['patient', 'doctor.user', 'items.medication', 'invoice']);
+        $prescription->load(['pasien', 'dokter.user', 'itemResep.obat', 'tagihan']);
 
         return view('prescriptions.show', compact('prescription'));
     }
 
     public function verify(Prescription $prescription)
     {
+        // Only pharmacist can verify prescriptions
+        /** @var User $user */
+        $user = Auth::user();
+        if (!$user->hasAnyRole(['pharmacist', 'admin'])) {
+            abort(403, 'Unauthorized. Only pharmacist can verify prescriptions.');
+        }
+
+        // WAJIB: Verify hanya bisa saat status Menunggu
+        if ($prescription->status !== 'menunggu') {
+            return redirect()->back()->with('error', 'Resep hanya dapat diverifikasi saat status Menunggu. Status saat ini: ' . $prescription->status);
+        }
+
         $prescription->update([
-            'status' => 'verified',
-            'verified_at' => now(),
-            'verified_by' => Auth::id(),
+            'status' => 'diverifikasi',
+            'waktu_verifikasi' => now(),
+            'diverifikasi_oleh' => Auth::id(),
         ]);
 
         return redirect()->route('prescriptions.show', $prescription)
@@ -139,31 +230,45 @@ class PrescriptionController extends Controller
 
     public function dispense(Prescription $prescription)
     {
+        // Only pharmacist can dispense prescriptions
+        /** @var User $user */
+        $user = Auth::user();
+        
+        // WAJIB: Dispense hanya bisa saat Diverifikasi
+        if ($prescription->status !== 'diverifikasi') {
+            return redirect()->back()->with('error', 'Resep hanya dapat diserahkan saat status Diverifikasi. Status saat ini: ' . $prescription->status);
+        }
+        
+        /** @var User $user */
+        if (!$user->hasAnyRole(['pharmacist', 'admin'])) {
+            abort(403, 'Unauthorized. Only pharmacist can dispense prescriptions.');
+        }
+
         DB::beginTransaction();
         try {
             // Check stock availability
-            foreach ($prescription->items as $item) {
-                if ($item->medication->stock_quantity < $item->quantity) {
-                    throw new \Exception("Stok {$item->medication->name} tidak mencukupi. Tersedia: {$item->medication->stock_quantity}, Dibutuhkan: {$item->quantity}");
+            foreach ($prescription->itemResep as $item) {
+                if ($item->obat->stok < $item->jumlah) {
+                    throw new \Exception("Stok {$item->obat->nama} tidak mencukupi. Tersedia: {$item->obat->stok}, Dibutuhkan: {$item->jumlah}");
                 }
             }
 
             // Reduce stock and record movement
-            foreach ($prescription->items as $item) {
+            foreach ($prescription->itemResep as $item) {
                 StockMovement::recordMovement(
-                    $item->medication,
-                    'out',
-                    $item->quantity,
+                    $item->obat,
+                    'keluar',
+                    $item->jumlah,
                     Prescription::class,
                     $prescription->id,
-                    "Dispensed prescription {$prescription->prescription_number} for patient {$prescription->patient->name}"
+                    "Dispensed prescription {$prescription->nomor_resep} for patient {$prescription->pasien->nama}"
                 );
             }
 
             $prescription->update([
-                'status' => 'dispensed',
-                'dispensed_at' => now(),
-                'dispensed_by' => Auth::id(),
+                'status' => 'diserahkan',
+                'waktu_diserahkan' => now(),
+                'diserahkan_oleh' => Auth::id(),
             ]);
 
             DB::commit();
@@ -174,5 +279,35 @@ class PrescriptionController extends Controller
             DB::rollBack();
             return back()->with('error', 'Gagal menyerahkan obat: ' . $e->getMessage());
         }
+    }
+
+    // WAJIB: Reject prescription dengan alasan
+    public function reject(Request $request, Prescription $prescription)
+    {
+        // Only pharmacist can reject prescriptions
+        /** @var User $user */
+        $user = Auth::user();
+        if (!$user->hasAnyRole(['pharmacist', 'admin'])) {
+            abort(403, 'Unauthorized. Only pharmacist can reject prescriptions.');
+        }
+
+        // Reject hanya bisa saat status Menunggu
+        if ($prescription->status !== 'menunggu') {
+            return redirect()->back()->with('error', 'Resep hanya dapat ditolak saat status Menunggu. Status saat ini: ' . $prescription->status);
+        }
+
+        $validated = $request->validate([
+            'alasan_penolakan' => 'required|string|min:10',
+        ]);
+
+        $prescription->update([
+            'status' => 'ditolak',
+            'alasan_penolakan' => $validated['alasan_penolakan'],
+            'ditolak_oleh' => Auth::id(),
+            'waktu_penolakan' => now(),
+        ]);
+
+        return redirect()->route('prescriptions.show', $prescription)
+            ->with('success', 'Resep berhasil ditolak');
     }
 }

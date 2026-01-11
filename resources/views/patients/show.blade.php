@@ -97,7 +97,7 @@
                                 {{ $appointment->tanggal_janji->format('d M Y H:i') }}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                {{ $appointment->dokter->user->name }}
+                                {{ $appointment->dokter->user->nama }}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                 {{ ucfirst(str_replace('_', ' ', $appointment->jenis)) }}

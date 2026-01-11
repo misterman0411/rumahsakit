@@ -7,12 +7,25 @@ use App\Models\Appointment;
 use App\Models\Patient;
 use App\Models\Doctor;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class MedicalRecordController extends Controller
 {
     public function index(Request $request)
     {
         $query = MedicalRecord::with(['pasien', 'dokter.user', 'janjiTemu']);
+
+        // Filter berdasarkan role user
+        $user = Auth::user();
+        $role = $user->peran->nama ?? null;
+
+        if ($role === 'doctor') {
+            // Jika login sebagai dokter, hanya tampilkan rekam medis dokter tersebut
+            $doctor = Doctor::where('user_id', $user->id)->first();
+            if ($doctor) {
+                $query->where('dokter_id', $doctor->id);
+            }
+        }
 
         if ($request->filled('search')) {
             $search = $request->search;
@@ -31,12 +44,20 @@ class MedicalRecordController extends Controller
     {
         $patients = Patient::orderBy('nama')->get();
         $doctors = Doctor::with('user')->get();
+        
+        // Get current doctor if logged in as doctor
+        $currentDoctor = null;
+        $user = Auth::user();
+        if ($user && $user->peran && $user->peran->nama === 'doctor') {
+            $currentDoctor = Doctor::where('user_id', $user->id)->first();
+        }
+        
         $appointments = Appointment::where('status', 'check_in')
             ->whereNotNull('tanggal_janji')
             ->with(['pasien', 'dokter.user'])
             ->get();
         
-        return view('medical-records.create', compact('patients', 'doctors', 'appointments'));
+        return view('medical-records.create', compact('patients', 'doctors', 'appointments', 'currentDoctor'));
     }
 
     public function store(Request $request)

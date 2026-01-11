@@ -92,22 +92,22 @@ class Patient extends Model
 
     public function vitalSigns()
     {
-        return $this->hasMany(VitalSign::class);
+        return $this->hasMany(VitalSign::class, 'pasien_id');
     }
 
     public function inpatientAdmissions()
     {
-        return $this->hasMany(InpatientAdmission::class);
+        return $this->hasMany(InpatientAdmission::class, 'pasien_id');
     }
 
     public function invoices()
     {
-        return $this->hasMany(Invoice::class);
+        return $this->hasMany(Invoice::class, 'pasien_id');
     }
 
     public function payments()
     {
-        return $this->hasMany(Payment::class);
+        return $this->hasMany(Payment::class, 'pasien_id');
     }
 
     // Accessor for full name

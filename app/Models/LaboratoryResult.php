@@ -32,7 +32,7 @@ class LaboratoryResult extends Model
         return $this->belongsTo(LaboratoryOrder::class, 'permintaan_id');
     }
 
-    public function dipriksaOleh()
+    public function diperiksaOleh()
     {
         return $this->belongsTo(User::class, 'diperiksa_oleh');
     }

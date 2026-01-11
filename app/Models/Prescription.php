@@ -15,17 +15,22 @@ class Prescription extends Model
         'nomor_resep',
         'pasien_id',
         'dokter_id',
+        'kunjungan_id',
         'status',
         'catatan',
         'waktu_verifikasi',
         'diverifikasi_oleh',
         'waktu_penyerahan',
         'diserahkan_oleh',
+        'alasan_penolakan',
+        'ditolak_oleh',
+        'waktu_penolakan',
     ];
 
     protected $casts = [
         'waktu_verifikasi' => 'datetime',
         'waktu_penyerahan' => 'datetime',
+        'waktu_penolakan' => 'datetime',
     ];
 
     protected static function boot()
@@ -42,6 +47,11 @@ class Prescription extends Model
                 );
             }
         });
+    }
+
+    public function kunjungan()
+    {
+        return $this->belongsTo(Visit::class, 'kunjungan_id');
     }
 
     public function pasien()

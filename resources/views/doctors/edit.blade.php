@@ -68,7 +68,7 @@
                                     class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
                                     <option value="">-- Pilih Departemen --</option>
                                     @foreach($departments as $department)
-                                        <option value="{{ $department->id }}" {{ old('departemen_id', $doctor->department_id) == $department->id ? 'selected' : '' }}>
+                                        <option value="{{ $department->id }}" {{ old('departemen_id', $doctor->departemen_id) == $department->id ? 'selected' : '' }}>
                                             {{ $department->nama }}
                                         </option>
                                     @endforeach

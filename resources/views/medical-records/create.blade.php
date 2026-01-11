@@ -42,14 +42,19 @@
                         </label>
                         <select name="dokter_id" id="dokter_id" required
                             class="select2 w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                            data-placeholder="-- Pilih Dokter --">
+                            data-placeholder="-- Pilih Dokter --"
+                            {{ isset($currentDoctor) ? 'readonly' : '' }}>
                             <option value="">-- Pilih Dokter --</option>
                             @foreach($doctors as $doctor)
-                                <option value="{{ $doctor->id }}" {{ old('dokter_id') == $doctor->id ? 'selected' : '' }}>
-                                    {{ $doctor->user->nama }} - {{ $doctor->spesialisasi }}
+                                <option value="{{ $doctor->id }}" 
+                                    {{ (old('dokter_id') == $doctor->id || (isset($currentDoctor) && $currentDoctor->id == $doctor->id)) ? 'selected' : '' }}>
+                                    {{ $doctor->user->name }} - {{ $doctor->spesialisasi }}
                                 </option>
                             @endforeach
                         </select>
+                        @if(isset($currentDoctor))
+                            <p class="text-sm text-gray-500 mt-1">✓ Auto-selected (Anda sedang login sebagai dokter)</p>
+                        @endif
                         @error('dokter_id')
                             <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                         @enderror
@@ -57,20 +62,25 @@
 
                     <!-- Appointment (Optional) -->
                     <div>
-                        <label for="appointment_id" class="block text-sm font-semibold text-gray-700 mb-2">
+                        <label for="janji_temu_id" class="block text-sm font-semibold text-gray-700 mb-2">
                             Appointment (Opsional)
                         </label>
-                        <select name="appointment_id" id="appointment_id"
+                        <select name="janji_temu_id" id="janji_temu_id"
                             class="select2 w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                            data-placeholder="-- Pilih Appointment --">
+                            data-placeholder="-- Pilih Appointment --"
+                            data-has-current-doctor="{{ isset($currentDoctor) ? 'true' : 'false' }}">
                             <option value="">-- Pilih Appointment --</option>
                             @foreach($appointments as $appointment)
-                                <option value="{{ $appointment->id }}" {{ old('appointment_id') == $appointment->id ? 'selected' : '' }}>
+                                <option value="{{ $appointment->id }}" 
+                                    data-patient-id="{{ $appointment->pasien_id }}"
+                                    data-doctor-id="{{ $appointment->dokter_id }}"
+                                    {{ old('janji_temu_id') == $appointment->id ? 'selected' : '' }}>
                                     {{ $appointment->nomor_janji_temu }} - {{ $appointment->pasien->nama }} - {{ $appointment->tanggal_janji->format('d/m/Y') }}
                                 </option>
                             @endforeach
                         </select>
-                        @error('appointment_id')
+                        <p class="text-sm text-gray-500 mt-1">Jika dipilih, data pasien dan dokter akan otomatis terisi</p>
+                        @error('janji_temu_id')
                             <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                         @enderror
                     </div>
@@ -300,5 +310,25 @@ function addIcd9Procedure() {
     `;
     container.appendChild(div);
 }
+
+// Auto-populate patient and doctor when appointment is selected
+document.getElementById('janji_temu_id').addEventListener('change', function() {
+    const selectedOption = this.options[this.selectedIndex];
+    if (selectedOption.value) {
+        const patientId = selectedOption.getAttribute('data-patient-id');
+        const doctorId = selectedOption.getAttribute('data-doctor-id');
+        const hasCurrentDoctor = this.getAttribute('data-has-current-doctor') === 'true';
+        
+        // Set patient
+        if (patientId) {
+            $('#pasien_id').val(patientId).trigger('change');
+        }
+        
+        // Set doctor (only if not already set by current doctor)
+        if (doctorId && !hasCurrentDoctor) {
+            $('#dokter_id').val(doctorId).trigger('change');
+        }
+    }
+});
 </script>
 @endsection

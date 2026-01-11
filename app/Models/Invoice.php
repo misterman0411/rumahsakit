@@ -14,6 +14,7 @@ class Invoice extends Model
     protected $fillable = [
         'nomor_tagihan',
         'pasien_id',
+        'kunjungan_id',
         'tagihan_untuk_id',
         'tagihan_untuk_tipe',
         'subtotal',
@@ -48,9 +49,14 @@ class Invoice extends Model
         });
     }
 
+    public function kunjungan()
+    {
+        return $this->belongsTo(Visit::class, 'kunjungan_id');
+    }
+
     public function pasien()
     {
-        return $this->belongsTo(Patient::class, 'pasien_id');
+        return $this->belongsTo(\App\Models\Patient::class, 'pasien_id');
     }
 
     public function tagihanUntuk()

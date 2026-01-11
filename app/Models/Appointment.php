@@ -16,6 +16,7 @@ class Appointment extends Model
         'pasien_id',
         'dokter_id',
         'departemen_id',
+        'kunjungan_id',
         'tanggal_janji',
         'jenis',
         'status',
@@ -47,6 +48,11 @@ class Appointment extends Model
                 );
             }
         });
+    }
+
+    public function kunjungan()
+    {
+        return $this->belongsTo(Visit::class, 'kunjungan_id');
     }
 
     public function pasien()

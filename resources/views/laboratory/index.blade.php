@@ -33,7 +33,7 @@
                             {{ $order->nomor_permintaan }}
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                            {{ $order->pasien->nama_lengkap }}
+                            {{ $order->pasien->nama }}
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                             {{ $order->jenisTes->nama }}

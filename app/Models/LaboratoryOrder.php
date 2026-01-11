@@ -16,8 +16,14 @@ class LaboratoryOrder extends Model
         'pasien_id',
         'dokter_id',
         'jenis_tes_id',
+        'kunjungan_id',
         'status',
         'catatan',
+        'sampel_diambil_oleh',
+        'hasil_diinput_oleh',
+        'waktu_input_hasil',
+        'diverifikasi_oleh',
+        'waktu_verifikasi',
     ];
 
     protected static function boot()
@@ -59,5 +65,20 @@ class LaboratoryOrder extends Model
     public function tagihan()
     {
         return $this->morphOne(Invoice::class, 'tagihan_untuk', 'tagihan_untuk_tipe', 'tagihan_untuk_id');
+    }
+
+    public function sampelDiambilOleh()
+    {
+        return $this->belongsTo(User::class, 'sampel_diambil_oleh');
+    }
+
+    public function hasilDiinputOleh()
+    {
+        return $this->belongsTo(User::class, 'hasil_diinput_oleh');
+    }
+
+    public function diverifikasiOleh()
+    {
+        return $this->belongsTo(User::class, 'diverifikasi_oleh');
     }
 }

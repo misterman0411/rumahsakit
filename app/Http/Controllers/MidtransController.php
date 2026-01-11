@@ -26,7 +26,7 @@ class MidtransController extends Controller
     {
         try {
             // Check if invoice is already paid
-            if ($invoice->status === 'paid') {
+            if ($invoice->status === 'lunas') {
                 return response()->json([
                     'success' => false,
                     'message' => 'Invoice already paid',
@@ -78,13 +78,13 @@ class MidtransController extends Controller
             DB::beginTransaction();
             
             // Check if there's already a payment that covers the full amount
-            $totalPaid = $invoice->payments()->sum('amount');
-            if ($totalPaid >= $invoice->total_amount) {
+            $totalPaid = $invoice->pembayaran->sum('jumlah');
+            if ($totalPaid >= $invoice->total) {
                 DB::rollBack();
                 return response()->json([
                     'success' => true,
                     'message' => 'Invoice already fully paid',
-                    'status' => 'paid'
+                    'status' => 'lunas'
                 ]);
             }
             
@@ -126,16 +126,15 @@ class MidtransController extends Controller
             // If no payment found, create manual verification payment
             if (!$found) {
                 $payment = Payment::create([
-                    'patient_id' => $invoice->patient_id,
-                    'amount' => $invoice->total_amount - $totalPaid,
-                    'payment_method' => 'transfer',
-                    'payment_date' => now(),
-                    'notes' => 'Midtrans payment - Manual verification (No order found in API)',
-                    'processed_by' => Auth::id(),
+                    'tagihan_id' => $invoice->id,
+                    'jumlah' => $invoice->total - $totalPaid,
+                    'metode_pembayaran' => 'transfer',
+                    'tanggal_pembayaran' => now(),
+                    'catatan' => 'Midtrans payment - Manual verification (No order found in API)',
+                    'diterima_oleh' => Auth::id(),
                 ]);
 
-                $payment->invoices()->attach($invoice->id);
-                $invoice->update(['status' => 'paid']);
+                $invoice->update(['status' => 'lunas']);
 
                 DB::commit();
 
@@ -147,7 +146,7 @@ class MidtransController extends Controller
                 return response()->json([
                     'success' => true,
                     'message' => 'Payment marked as paid (manual verification)',
-                    'status' => 'paid'
+                    'status' => 'lunas'
                 ]);
             }
             
@@ -248,25 +247,22 @@ class MidtransController extends Controller
 
         // Create payment record
         $payment = Payment::create([
-            'patient_id' => $invoice->patient_id,
-            'amount' => $amount,
-            'payment_method' => $this->mapPaymentMethod($paymentType),
-            'payment_date' => now(),
-            'notes' => 'Payment via Midtrans - Transaction ID: ' . $transactionId,
-            'processed_by' => Auth::id() ?? 1, // Use system user if no auth
+            'tagihan_id' => $invoice->id,
+            'jumlah' => $amount,
+            'metode_pembayaran' => $this->mapPaymentMethod($paymentType),
+            'tanggal_pembayaran' => now(),
+            'catatan' => 'Payment via Midtrans - Transaction ID: ' . $transactionId,
+            'diterima_oleh' => Auth::id() ?? 1, // Use system user if no auth
         ]);
 
-        // Attach payment to invoice
-        $payment->invoices()->attach($invoice->id);
-
         // Calculate total paid
-        $totalPaid = $invoice->payments()->sum('amount');
+        $totalPaid = $invoice->pembayaran->sum('jumlah');
 
         // Update invoice status
-        if ($totalPaid >= $invoice->total_amount) {
-            $invoice->update(['status' => 'paid']);
+        if ($totalPaid >= $invoice->total) {
+            $invoice->update(['status' => 'lunas']);
         } elseif ($totalPaid > 0) {
-            $invoice->update(['status' => 'partially_paid']);
+            $invoice->update(['status' => 'dibayar_sebagian']);
         }
 
         Log::info('Midtrans Payment Processed Successfully', [
@@ -283,7 +279,7 @@ class MidtransController extends Controller
     protected function mapPaymentMethod($paymentType)
     {
         $mapping = [
-            'credit_card' => 'card',
+            'credit_card' => 'kartu_kredit',
             'bank_transfer' => 'transfer',
             'echannel' => 'transfer',
             'bca_va' => 'transfer',
@@ -291,9 +287,9 @@ class MidtransController extends Controller
             'bri_va' => 'transfer',
             'permata_va' => 'transfer',
             'other_va' => 'transfer',
-            'gopay' => 'card',
-            'shopeepay' => 'card',
-            'qris' => 'card',
+            'gopay' => 'kartu_debit',
+            'shopeepay' => 'kartu_debit',
+            'qris' => 'kartu_debit',
         ];
 
         return $mapping[$paymentType] ?? 'transfer';
@@ -338,7 +334,7 @@ class MidtransController extends Controller
                 if ($status && in_array($status['transaction_status'], ['settlement', 'capture'])) {
                     // Process payment immediately
                     $invoice = Invoice::find($invoiceId);
-                    if ($invoice && $invoice->status !== 'paid') {
+                    if ($invoice && $invoice->status !== 'lunas') {
                         DB::beginTransaction();
                         try {
                             $this->processSuccessfulPayment($invoice, $status);

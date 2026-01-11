@@ -15,7 +15,7 @@ class VitalSignController extends Controller
      */
     public function index(Request $request)
     {
-        $query = VitalSign::with(['pasien', 'rekamMedis', 'dicatatOleh']);
+        $query = VitalSign::with(['pasien', 'perawat']);
 
         // Filter by patient
         if ($request->filled('pasien_id')) {
@@ -24,13 +24,13 @@ class VitalSignController extends Controller
 
         // Filter by date range
         if ($request->filled('date_from')) {
-            $query->whereDate('waktu_pencatatan', '>=', $request->date_from);
+            $query->whereDate('waktu_pengukuran', '>=', $request->date_from);
         }
         if ($request->filled('date_to')) {
-            $query->whereDate('waktu_pencatatan', '<=', $request->date_to);
+            $query->whereDate('waktu_pengukuran', '<=', $request->date_to);
         }
 
-        $vitalSigns = $query->latest('waktu_pencatatan')->paginate(15);
+        $vitalSigns = $query->latest('waktu_pengukuran')->paginate(15);
         $patients = Patient::orderBy('nama')->get();
 
         return view('vital-signs.index', compact('vitalSigns', 'patients'));
@@ -41,13 +41,9 @@ class VitalSignController extends Controller
      */
     public function create()
     {
-        $patients = Patient::where('status', 'active')->orderBy('nama')->get();
-        $medicalRecords = MedicalRecord::with(['pasien', 'dokter.user'])
-            ->latest()
-            ->take(50)
-            ->get();
+        $patients = Patient::orderBy('nama')->get();
 
-        return view('vital-signs.create', compact('patients', 'medicalRecords'));
+        return view('vital-signs.create', compact('patients'));
     }
 
     /**
@@ -57,20 +53,30 @@ class VitalSignController extends Controller
     {
         $validated = $request->validate([
             'pasien_id' => 'required|exists:pasien,id',
-            'rekam_medis_id' => 'nullable|exists:rekam_medis,id',
-            'tekanan_darah' => 'nullable|string|max:20',
+            'rawat_inap_id' => 'nullable|exists:rawat_inap,id',
             'suhu' => 'nullable|numeric|between:30,45',
+            'tekanan_darah_sistolik' => 'nullable|integer|between:50,250',
+            'tekanan_darah_diastolik' => 'nullable|integer|between:30,150',
             'detak_jantung' => 'nullable|integer|between:30,250',
             'laju_pernapasan' => 'nullable|integer|between:5,60',
-            'saturasi_oksigen' => 'nullable|integer|between:50,100',
+            'saturasi_oksigen' => 'nullable|numeric|between:50,100',
             'berat_badan' => 'nullable|numeric|between:0.5,500',
             'tinggi_badan' => 'nullable|numeric|between:20,300',
             'catatan' => 'nullable|string',
-            'waktu_pencatatan' => 'nullable|date',
+            'waktu_pengukuran' => 'nullable|date',
         ]);
 
-        $validated['dicatat_oleh'] = Auth::id();
-        $validated['waktu_pencatatan'] = $validated['waktu_pencatatan'] ?? now();
+        // Set perawat_id from authenticated user if they are a nurse
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+        if ($user && $user->hasRole('nurse')) {
+            $nurse = \App\Models\Nurse::where('user_id', Auth::id())->first();
+            if ($nurse) {
+                $validated['perawat_id'] = $nurse->id;
+            }
+        }
+        
+        $validated['waktu_pengukuran'] = $validated['waktu_pengukuran'] ?? now();
 
         $vitalSign = VitalSign::create($validated);
 
@@ -83,7 +89,7 @@ class VitalSignController extends Controller
      */
     public function show(VitalSign $vitalSign)
     {
-        $vitalSign->load(['pasien', 'rekamMedis.dokter.user', 'dicatatOleh']);
+        $vitalSign->load(['pasien', 'perawat.user', 'rawatInap']);
 
         return view('vital-signs.show', compact('vitalSign'));
     }
@@ -93,14 +99,9 @@ class VitalSignController extends Controller
      */
     public function edit(VitalSign $vitalSign)
     {
-        $patients = Patient::where('status', 'active')->orderBy('nama')->get();
-        $medicalRecords = MedicalRecord::with(['pasien', 'dokter.user'])
-            ->where('pasien_id', $vitalSign->pasien_id)
-            ->latest()
-            ->take(20)
-            ->get();
+        $patients = Patient::orderBy('nama')->get();
 
-        return view('vital-signs.edit', compact('vitalSign', 'patients', 'medicalRecords'));
+        return view('vital-signs.edit', compact('vitalSign', 'patients'));
     }
 
     /**
@@ -109,17 +110,18 @@ class VitalSignController extends Controller
     public function update(Request $request, VitalSign $vitalSign)
     {
         $validated = $request->validate([
-            'patient_id' => 'required|exists:patients,id',
-            'medical_record_id' => 'nullable|exists:medical_records,id',
-            'blood_pressure' => 'nullable|string|max:20',
-            'temperature' => 'nullable|numeric|between:30,45',
-            'heart_rate' => 'nullable|integer|between:30,250',
-            'respiratory_rate' => 'nullable|integer|between:5,60',
-            'oxygen_saturation' => 'nullable|integer|between:50,100',
-            'weight' => 'nullable|numeric|between:0.5,500',
-            'height' => 'nullable|numeric|between:20,300',
-            'notes' => 'nullable|string',
-            'recorded_at' => 'nullable|date',
+            'pasien_id' => 'required|exists:pasien,id',
+            'rawat_inap_id' => 'nullable|exists:rawat_inap,id',
+            'suhu' => 'nullable|numeric|between:30,45',
+            'tekanan_darah_sistolik' => 'nullable|integer|between:50,250',
+            'tekanan_darah_diastolik' => 'nullable|integer|between:30,150',
+            'detak_jantung' => 'nullable|integer|between:30,250',
+            'laju_pernapasan' => 'nullable|integer|between:5,60',
+            'saturasi_oksigen' => 'nullable|numeric|between:50,100',
+            'berat_badan' => 'nullable|numeric|between:0.5,500',
+            'tinggi_badan' => 'nullable|numeric|between:20,300',
+            'catatan' => 'nullable|string',
+            'waktu_pengukuran' => 'nullable|date',
         ]);
 
         $vitalSign->update($validated);

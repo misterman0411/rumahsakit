@@ -5,8 +5,8 @@
     <div class="max-w-3xl mx-auto">
         <!-- Header -->
         <div class="mb-6">
-            <h1 class="text-3xl font-bold text-gray-800">Add New Medication</h1>
-            <p class="text-gray-600 mt-2">Add medication to the pharmacy inventory</p>
+            <h1 class="text-3xl font-bold text-gray-800">Tambah Obat Baru</h1>
+            <p class="text-gray-600 mt-2">Tambahkan obat ke inventaris farmasi</p>
         </div>
 
         <!-- Form Card -->
@@ -15,139 +15,152 @@
                 @csrf
 
                 <div class="p-6 space-y-6">
-                    <!-- Medication Name -->
-                    <div>
-                        <label for="name" class="block text-sm font-semibold text-gray-700 mb-2">
-                            Medication Name <span class="text-red-500">*</span>
-                        </label>
-                        <input type="text" name="nama" id="name" required value="{{ old('nama') }}"
-                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                            placeholder="Enter medication name">
-                        @error('nama')
-                            <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-                        @enderror
-                    </div>
-
-                    <!-- Generic Name -->
-                    <div>
-                        <label for="generic_name" class="block text-sm font-semibold text-gray-700 mb-2">
-                            Generic Name
-                        </label>
-                        <input type="text" name="generic_name" id="generic_name" value="{{ old('generic_name') }}"
-                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
-                            placeholder="Enter generic name">
-                        @error('generic_name')
-                            <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-                        @enderror
-                    </div>
-
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <!-- Type -->
+                        <!-- Nama Obat -->
                         <div>
-                            <label for="type" class="block text-sm font-semibold text-gray-700 mb-2">
-                                Type <span class="text-red-500">*</span>
+                            <label for="nama" class="block text-sm font-semibold text-gray-700 mb-2">
+                                Nama Obat <span class="text-red-500">*</span>
                             </label>
-                            <select name="type" id="type" required
-                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
-                                <option value="">-- Select Type --</option>
-                                <option value="tablet" {{ old('type') == 'tablet' ? 'selected' : '' }}>Tablet</option>
-                                <option value="capsule" {{ old('type') == 'capsule' ? 'selected' : '' }}>Capsule</option>
-                                <option value="syrup" {{ old('type') == 'syrup' ? 'selected' : '' }}>Syrup</option>
-                                <option value="injection" {{ old('type') == 'injection' ? 'selected' : '' }}>Injection</option>
-                                <option value="cream" {{ old('type') == 'cream' ? 'selected' : '' }}>Cream/Ointment</option>
-                                <option value="drops" {{ old('type') == 'drops' ? 'selected' : '' }}>Drops</option>
-                                <option value="inhaler" {{ old('type') == 'inhaler' ? 'selected' : '' }}>Inhaler</option>
-                                <option value="other" {{ old('type') == 'other' ? 'selected' : '' }}>Other</option>
-                            </select>
-                            @error('type')
-                                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-                            @enderror
-                        </div>
-
-                        <!-- Dosage -->
-                        <div>
-                            <label for="dosage" class="block text-sm font-semibold text-gray-700 mb-2">
-                                Dosage <span class="text-red-500">*</span>
-                            </label>
-                            <input type="text" name="dosage" id="dosage" required value="{{ old('dosage') }}"
+                            <input type="text" name="nama" id="nama" required value="{{ old('nama') }}"
                                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
-                                placeholder="e.g., 500mg, 10ml">
-                            @error('dosage')
+                                placeholder="Contoh: Paracetamol">
+                            @error('nama')
                                 <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                             @enderror
                         </div>
 
-                        <!-- Unit Price -->
+                        <!-- Kode Obat -->
                         <div>
-                            <label for="unit_price" class="block text-sm font-semibold text-gray-700 mb-2">
-                                Unit Price (Rp) <span class="text-red-500">*</span>
+                            <label for="kode" class="block text-sm font-semibold text-gray-700 mb-2">
+                                Kode Obat <span class="text-red-500">*</span>
                             </label>
-                            <input type="number" step="0.01" name="harga_satuan" id="unit_price" required value="{{ old('unit_price') }}"
+                            <input type="text" name="kode" id="kode" required value="{{ old('kode') }}"
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
+                                placeholder="Contoh: PCT-500">
+                            @error('kode')
+                                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <!-- Bentuk Sediaan -->
+                        <div>
+                            <label for="bentuk_sediaan" class="block text-sm font-semibold text-gray-700 mb-2">
+                                Bentuk Sediaan <span class="text-red-500">*</span>
+                            </label>
+                            <select name="bentuk_sediaan" id="bentuk_sediaan" required
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
+                                <option value="">-- Pilih Bentuk Sediaan --</option>
+                                <option value="Tablet" {{ old('bentuk_sediaan') == 'Tablet' ? 'selected' : '' }}>Tablet</option>
+                                <option value="Kapsul" {{ old('bentuk_sediaan') == 'Kapsul' ? 'selected' : '' }}>Kapsul</option>
+                                <option value="Sirup" {{ old('bentuk_sediaan') == 'Sirup' ? 'selected' : '' }}>Sirup</option>
+                                <option value="Injeksi" {{ old('bentuk_sediaan') == 'Injeksi' ? 'selected' : '' }}>Injeksi</option>
+                                <option value="Salep" {{ old('bentuk_sediaan') == 'Salep' ? 'selected' : '' }}>Salep</option>
+                                <option value="Tetes" {{ old('bentuk_sediaan') == 'Tetes' ? 'selected' : '' }}>Tetes</option>
+                            </select>
+                            @error('bentuk_sediaan')
+                                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <!-- Kekuatan -->
+                        <div>
+                            <label for="kekuatan" class="block text-sm font-semibold text-gray-700 mb-2">
+                                Kekuatan/Dosis <span class="text-red-500">*</span>
+                            </label>
+                            <input type="text" name="kekuatan" id="kekuatan" required value="{{ old('kekuatan') }}"
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
+                                placeholder="Contoh: 500mg">
+                            @error('kekuatan')
+                                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <!-- Satuan -->
+                        <div>
+                            <label for="satuan" class="block text-sm font-semibold text-gray-700 mb-2">
+                                Satuan <span class="text-red-500">*</span>
+                            </label>
+                            <input type="text" name="satuan" id="satuan" required value="{{ old('satuan', 'tablet') }}"
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
+                                placeholder="Contoh: tablet, botol, strip">
+                            @error('satuan')
+                                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <!-- Harga -->
+                        <div>
+                            <label for="harga" class="block text-sm font-semibold text-gray-700 mb-2">
+                                Harga (Rp) <span class="text-red-500">*</span>
+                            </label>
+                            <input type="number" step="0.01" name="harga" id="harga" required value="{{ old('harga') }}"
+                                min="0" max="99999999"
                                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
                                 placeholder="0.00">
-                            @error('unit_price')
+                            <p class="text-xs text-gray-500 mt-1">Maksimal: Rp 99,999,999.99</p>
+                            @error('harga')
                                 <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                             @enderror
                         </div>
 
-                        <!-- Stock Quantity -->
+                        <!-- Stok -->
                         <div>
-                            <label for="stock_quantity" class="block text-sm font-semibold text-gray-700 mb-2">
-                                Stock Quantity <span class="text-red-500">*</span>
+                            <label for="stok" class="block text-sm font-semibold text-gray-700 mb-2">
+                                Stok <span class="text-red-500">*</span>
                             </label>
-                            <input type="number" name="stock_quantity" id="stock_quantity" required value="{{ old('stock_quantity', 0) }}"
+                            <input type="number" name="stok" id="stok" required value="{{ old('stok', 0) }}"
+                                min="0" max="2147483647"
                                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
                                 placeholder="0">
-                            @error('stock_quantity')
+                            @error('stok')
                                 <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                             @enderror
                         </div>
 
-                        <!-- Minimum Stock -->
+                        <!-- Stok Minimum -->
                         <div>
-                            <label for="minimum_stock" class="block text-sm font-semibold text-gray-700 mb-2">
-                                Minimum Stock Level
+                            <label for="stok_minimum" class="block text-sm font-semibold text-gray-700 mb-2">
+                                Stok Minimum <span class="text-red-500">*</span>
                             </label>
-                            <input type="number" name="minimum_stock" id="minimum_stock" value="{{ old('minimum_stock', 10) }}"
-                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
+                            <input type="number" name="stok_minimum" id="stok_minimum" required value="{{ old('stok_minimum', 10) }}"                                min="0" max="2147483647"                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
                                 placeholder="10">
-                            @error('minimum_stock')
+                            @error('stok_minimum')
                                 <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                             @enderror
                         </div>
 
-                        <!-- Expiry Date -->
+                        <!-- Kategori -->
                         <div>
-                            <label for="expiry_date" class="block text-sm font-semibold text-gray-700 mb-2">
-                                Expiry Date
+                            <label for="kategori" class="block text-sm font-semibold text-gray-700 mb-2">
+                                Kategori
                             </label>
-                            <input type="date" name="expiry_date" id="expiry_date" value="{{ old('expiry_date') }}"
+                            <input type="text" name="kategori" id="kategori" value="{{ old('kategori') }}"
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
+                                placeholder="Contoh: Analgesik, Antibiotik">
+                            @error('kategori')
+                                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <!-- Tanggal Kadaluarsa -->
+                        <div>
+                            <label for="tanggal_kadaluarsa" class="block text-sm font-semibold text-gray-700 mb-2">
+                                Tanggal Kadaluarsa
+                            </label>
+                            <input type="date" name="tanggal_kadaluarsa" id="tanggal_kadaluarsa" value="{{ old('tanggal_kadaluarsa') }}"
                                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
-                            @error('expiry_date')
+                            @error('tanggal_kadaluarsa')
                                 <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                             @enderror
                         </div>
                     </div>
 
-                    <!-- Manufacturer -->
+                    <!-- Deskripsi -->
                     <div>
-                        <label for="manufacturer" class="block text-sm font-semibold text-gray-700 mb-2">
-                            Manufacturer
+                        <label for="deskripsi" class="block text-sm font-semibold text-gray-700 mb-2">
+                            Deskripsi
                         </label>
-                        <input type="text" name="manufacturer" id="manufacturer" value="{{ old('manufacturer') }}"
-                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
-                            placeholder="Manufacturer name">
-                        @error('manufacturer')
-                            <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-                        @enderror
-                    </div>
-
-                    <!-- Description -->
-                    <div>
-                        <label for="description" class="block text-sm font-semibold text-gray-700 mb-2">
-                            Description
-                        </label>
-                        <textarea name="description" id="description" rows="3"
+                        <textarea name="deskripsi" id="deskripsi" rows="3"
                             class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
                             placeholder="Medication description, indications, contraindications">{{ old('description') }}</textarea>
                         @error('description')
@@ -155,18 +168,15 @@
                         @enderror
                     </div>
 
-                    <!-- Status -->
+                    <!-- Deskripsi -->
                     <div>
-                        <label for="status" class="block text-sm font-semibold text-gray-700 mb-2">
-                            Status
+                        <label for="deskripsi" class="block text-sm font-semibold text-gray-700 mb-2">
+                            Deskripsi
                         </label>
-                        <select name="status" id="status"
-                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
-                            <option value="available" {{ old('status', 'available') == 'available' ? 'selected' : '' }}>Available</option>
-                            <option value="out_of_stock" {{ old('status') == 'out_of_stock' ? 'selected' : '' }}>Out of Stock</option>
-                            <option value="discontinued" {{ old('status') == 'discontinued' ? 'selected' : '' }}>Discontinued</option>
-                        </select>
-                        @error('status')
+                        <textarea name="deskripsi" id="deskripsi" rows="3"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
+                            placeholder="Deskripsi obat, indikasi, kontraindikasi">{{ old('deskripsi') }}</textarea>
+                        @error('deskripsi')
                             <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                         @enderror
                     </div>
@@ -176,11 +186,11 @@
                 <div class="bg-gray-50 px-6 py-4 border-t border-gray-200 flex justify-end space-x-3">
                     <a href="{{ route('medications.index') }}"
                         class="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">
-                        Cancel
+                        Batal
                     </a>
                     <button type="submit"
                         class="px-6 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg hover:from-indigo-700 hover:to-purple-700 transition-all">
-                        Save Medication
+                        Simpan Obat
                     </button>
                 </div>
             </form>

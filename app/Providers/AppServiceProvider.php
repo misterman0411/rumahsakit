@@ -22,31 +22,43 @@ class AppServiceProvider extends ServiceProvider
     {
         // Define Gates for role-based permissions
         Gate::define('manage-patients', function ($user) {
-            return $user->hasAnyRole(['admin', 'doctor', 'nurse', 'front_office']);
+            return $user->hasAnyRole(['admin', 'front_office', 'nurse', 'doctor', 'pharmacist', 'lab_technician', 'radiologist']);
         });
 
         Gate::define('manage-appointments', function ($user) {
-            return $user->hasAnyRole(['admin', 'doctor', 'front_office']);
+            return $user->hasAnyRole(['admin', 'doctor', 'front_office', 'nurse']);
         });
 
         Gate::define('view-medical-records', function ($user) {
             return $user->hasAnyRole(['admin', 'doctor', 'nurse']);
         });
 
+        Gate::define('manage-vital-signs', function ($user) {
+            return $user->hasAnyRole(['admin', 'nurse', 'doctor']);
+        });
+
         Gate::define('view-laboratory', function ($user) {
-            return $user->hasAnyRole(['admin', 'doctor', 'lab_technician']);
+            return $user->hasAnyRole(['admin', 'doctor', 'lab_technician', 'nurse']);
         });
 
         Gate::define('view-radiology', function ($user) {
-            return $user->hasAnyRole(['admin', 'doctor', 'radiologist']);
+            return $user->hasAnyRole(['admin', 'doctor', 'radiologist', 'nurse']);
         });
 
         Gate::define('view-pharmacy', function ($user) {
-            return $user->hasAnyRole(['admin', 'doctor', 'pharmacist']);
+            return $user->hasAnyRole(['admin', 'doctor', 'pharmacist', 'nurse']);
+        });
+
+        Gate::define('manage-pharmacy', function ($user) {
+            return $user->hasAnyRole(['admin', 'pharmacist']);
         });
 
         Gate::define('view-billing', function ($user) {
-            return $user->hasAnyRole(['admin', 'front_office', 'doctor']);
+            return $user->hasAnyRole(['admin', 'front_office', 'cashier', 'doctor']);
+        });
+
+        Gate::define('manage-inpatient', function ($user) {
+            return $user->hasAnyRole(['admin', 'nurse', 'doctor']);
         });
 
         Gate::define('manage-master-data', function ($user) {

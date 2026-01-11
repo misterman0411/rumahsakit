@@ -123,6 +123,98 @@ class MidtransService
     }
 
     /**
+     * Create Snap Token for multiple invoices payment
+     */
+    public function createMultipleSnapToken($invoices, $customerName, $customerEmail = null, $customerPhone = null)
+    {
+        $orderId = 'MULTI-INV-' . time();
+        $totalAmount = $invoices->sum('total');
+        
+        // Create item details for each invoice
+        $itemDetails = [];
+        foreach ($invoices as $invoice) {
+            $itemDetails[] = [
+                'id' => 'INV-' . $invoice->id,
+                'price' => (int) $invoice->total,
+                'quantity' => 1,
+                'name' => 'Invoice #' . $invoice->nomor_tagihan,
+            ];
+        }
+        
+        $params = [
+            'transaction_details' => [
+                'order_id' => $orderId,
+                'gross_amount' => (int) $totalAmount,
+            ],
+            'customer_details' => [
+                'first_name' => $customerName,
+                'email' => $customerEmail ?? 'noreply@hospital.com',
+                'phone' => $customerPhone ?? '08123456789',
+            ],
+            'item_details' => $itemDetails,
+            'callbacks' => [
+                'finish' => route('billing.payment-multiple-success') . '?order_id=' . $orderId,
+            ],
+            'custom_field1' => implode(',', $invoices->pluck('id')->toArray()), // Store invoice IDs
+        ];
+
+        Log::info('Midtrans Multiple Payment Request', [
+            'params' => $params,
+            'invoice_count' => $invoices->count(),
+        ]);
+
+        try {
+            $snapUrl = $this->isProduction 
+                ? 'https://app.midtrans.com/snap/v1/transactions' 
+                : 'https://app.sandbox.midtrans.com/snap/v1/transactions';
+            
+            $response = Http::withBasicAuth($this->serverKey, '')
+                ->withHeaders([
+                    'Accept' => 'application/json',
+                    'Content-Type' => 'application/json',
+                ])
+                ->post($snapUrl, $params);
+
+            if ($response->successful()) {
+                $result = $response->json();
+                
+                Log::info('Midtrans Multiple Snap Token Created', [
+                    'order_id' => $orderId,
+                    'invoice_count' => $invoices->count(),
+                    'token' => $result['token'] ?? null,
+                ]);
+
+                return [
+                    'success' => true,
+                    'token' => $result['token'] ?? null,
+                    'redirect_url' => $result['redirect_url'] ?? null,
+                    'order_id' => $orderId,
+                ];
+            }
+
+            Log::error('Midtrans Multiple Snap Token Failed', [
+                'status' => $response->status(),
+                'response' => $response->json(),
+            ]);
+
+            return [
+                'success' => false,
+                'message' => $response->json()['error_messages'][0] ?? 'Failed to create payment',
+            ];
+        } catch (\Exception $e) {
+            Log::error('Midtrans Multiple Payment Exception', [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return [
+                'success' => false,
+                'message' => 'Payment gateway error: ' . $e->getMessage(),
+            ];
+        }
+    }
+
+    /**
      * Verify notification from Midtrans
      */
     public function verifyNotification($payload)

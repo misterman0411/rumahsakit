@@ -5,8 +5,8 @@
 @section('content')
 @php
     // Calculate outstanding balance at the top
-    $paidAmount = $invoice->pembayarans->sum('amount');
-    $outstanding = $invoice->total_amount - $paidAmount;
+    $paidAmount = $invoice->pembayaran->sum('jumlah');
+    $outstanding = $invoice->total - $paidAmount;
 @endphp
 
 <div class="max-w-4xl mx-auto">
@@ -57,15 +57,15 @@
                         </div>
                         <div>
                             <label class="text-sm font-medium text-gray-500">Due Date</label>
-                            <p class="mt-1 text-gray-900">{{ $invoice->due_date ? $invoice->due_date->format('d F Y') : '-' }}</p>
+                            <p class="mt-1 text-gray-900">{{ $invoice->jatuh_tempo ? $invoice->jatuh_tempo->format('d F Y') : '-' }}</p>
                         </div>
                         <div>
                             <label class="text-sm font-medium text-gray-500">Status</label>
                             <p class="mt-1">
                                 <span class="px-3 py-1 text-sm rounded-full 
-                                    @if($invoice->status == 'paid') bg-green-100 text-green-800
-                                    @elseif($invoice->status == 'partially_paid') bg-yellow-100 text-yellow-800
-                                    @elseif($invoice->status == 'cancelled') bg-gray-100 text-gray-800
+                                    @if($invoice->status == 'lunas') bg-green-100 text-green-800
+                                    @elseif($invoice->status == 'dibayar_sebagian') bg-yellow-100 text-yellow-800
+                                    @elseif($invoice->status == 'dibatalkan') bg-gray-100 text-gray-800
                                     @else bg-red-100 text-red-800 @endif">
                                     {{ ucfirst(str_replace('_', ' ', $invoice->status)) }}
                                 </span>
@@ -78,15 +78,15 @@
                     <div class="space-y-3">
                         <div>
                             <label class="text-sm font-medium text-gray-500">Name</label>
-                            <p class="mt-1 text-gray-900 font-semibold">{{ $invoice->pasien->nama_lengkap }}</p>
+                            <p class="mt-1 text-gray-900 font-semibold">{{ $invoice->pasien->nama }}</p>
                         </div>
                         <div>
                             <label class="text-sm font-medium text-gray-500">MRN</label>
-                            <p class="mt-1 text-gray-900">{{ $invoice->pasien->mrn }}</p>
+                            <p class="mt-1 text-gray-900">{{ $invoice->pasien->no_rekam_medis }}</p>
                         </div>
                         <div>
                             <label class="text-sm font-medium text-gray-500">Phone</label>
-                            <p class="mt-1 text-gray-900">{{ $invoice->pasien->telepon ?? '-' }}</p>
+                            <p class="mt-1 text-gray-900">{{ $invoice->pasien->no_telepon ?? '-' }}</p>
                         </div>
                     </div>
                 </div>
@@ -96,69 +96,99 @@
             <div class="mb-6 pb-6 border-b">
                 <h3 class="text-lg font-semibold text-gray-900 mb-4">Service Details</h3>
                 <div class="bg-gray-50 rounded-lg p-4">
-                    <div class="flex justify-between items-start mb-3">
-                        <div>
-                            <span class="text-sm font-medium text-gray-500">Service Type:</span>
-                            <span class="ml-2 text-gray-900 font-semibold">{{ class_basename($invoice->billable_type) }}</span>
+                    @if($invoice->itemTagihan && $invoice->itemTagihan->count() > 0)
+                        <!-- New Visit-based Invoice (Multiple Items) -->
+                        <div class="space-y-3">
+                            <div class="text-sm text-gray-600 mb-3">
+                                <span class="font-medium">Visit ID:</span> 
+                                <span class="ml-2">#{{ $invoice->kunjungan_id ?? '-' }}</span>
+                            </div>
+                            
+                            <div class="border-t border-gray-200 pt-3">
+                                <p class="text-sm font-semibold text-gray-700 mb-3">Service Items:</p>
+                                <div class="space-y-2">
+                                    @foreach($invoice->itemTagihan as $item)
+                                    <div class="flex justify-between items-start py-2 px-3 bg-white rounded border border-gray-200">
+                                        <div class="flex-1">
+                                            <p class="text-sm font-medium text-gray-900">{{ $item->deskripsi }}</p>
+                                            <p class="text-xs text-gray-500">
+                                                Qty: {{ $item->jumlah }} × Rp {{ number_format($item->harga_satuan, 0, ',', '.') }}
+                                            </p>
+                                        </div>
+                                        <span class="text-sm font-bold text-blue-600">
+                                            Rp {{ number_format($item->total, 0, ',', '.') }}
+                                        </span>
+                                    </div>
+                                    @endforeach
+                                </div>
+                            </div>
                         </div>
-                        @if($invoice->billable)
-                            @if($invoice->billable_type == 'App\Models\Prescription')
-                                <a href="{{ route('prescriptions.show', $invoice->billable->id) }}" class="text-blue-600 hover:text-blue-900 text-sm">View Details →</a>
-                            @elseif($invoice->billable_type == 'App\Models\LaboratoryOrder')
-                                <a href="{{ route('laboratory.show', $invoice->billable->id) }}" class="text-blue-600 hover:text-blue-900 text-sm">View Details →</a>
-                            @elseif($invoice->billable_type == 'App\Models\RadiologyOrder')
-                                <a href="{{ route('radiology.show', $invoice->billable->id) }}" class="text-blue-600 hover:text-blue-900 text-sm">View Details →</a>
-                            @elseif($invoice->billable_type == 'App\Models\InpatientAdmission')
-                                <a href="{{ route('inpatient.show', $invoice->billable->id) }}" class="text-blue-600 hover:text-blue-900 text-sm">View Details →</a>
+                    @elseif($invoice->tagihanUntuk)
+                        <!-- Old Single-Service Invoice -->
+                        <div class="flex justify-between items-start mb-3">
+                            <div>
+                                <span class="text-sm font-medium text-gray-500">Service Type:</span>
+                                <span class="ml-2 text-gray-900 font-semibold">{{ class_basename($invoice->tagihan_untuk_tipe) }}</span>
+                            </div>
+                            @if($invoice->tagihan_untuk_tipe == 'App\Models\Prescription')
+                                <a href="{{ route('prescriptions.show', $invoice->tagihanUntuk->id) }}" class="text-blue-600 hover:text-blue-900 text-sm">View Details →</a>
+                            @elseif($invoice->tagihan_untuk_tipe == 'App\Models\LaboratoryOrder')
+                                <a href="{{ route('laboratory.show', $invoice->tagihanUntuk->id) }}" class="text-blue-600 hover:text-blue-900 text-sm">View Details →</a>
+                            @elseif($invoice->tagihan_untuk_tipe == 'App\Models\RadiologyOrder')
+                                <a href="{{ route('radiology.show', $invoice->tagihanUntuk->id) }}" class="text-blue-600 hover:text-blue-900 text-sm">View Details →</a>
+                            @elseif($invoice->tagihan_untuk_tipe == 'App\Models\InpatientAdmission')
+                                <a href="{{ route('inpatient.show', $invoice->tagihanUntuk->id) }}" class="text-blue-600 hover:text-blue-900 text-sm">View Details →</a>
                             @endif
+                        </div>
+                        
+                        @if($invoice->tagihan_untuk_tipe == 'App\Models\Prescription')
+                            <div class="space-y-2">
+                                <div class="text-sm">
+                                    <span class="text-gray-500">Prescription Number:</span>
+                                    <span class="ml-2 text-gray-900">{{ $invoice->tagihanUntuk->nomor_resep }}</span>
+                                </div>
+                                <div class="text-sm">
+                                    <span class="text-gray-500">Doctor:</span>
+                                    <span class="ml-2 text-gray-900">{{ $invoice->tagihanUntuk->dokter->user->nama ?? '-' }}</span>
+                                </div>
+                                <div class="text-sm">
+                                    <span class="text-gray-500">Total Items:</span>
+                                    <span class="ml-2 text-gray-900">{{ $invoice->tagihanUntuk->itemResep->count() }} items</span>
+                                </div>
+                            </div>
+                        @elseif($invoice->tagihan_untuk_tipe == 'App\Models\LaboratoryOrder')
+                            <div class="space-y-2">
+                                <div class="text-sm">
+                                    <span class="text-gray-500">Order Number:</span>
+                                    <span class="ml-2 text-gray-900">{{ $invoice->tagihanUntuk->nomor_permintaan }}</span>
+                                </div>
+                                <div class="text-sm">
+                                    <span class="text-gray-500">Test Type:</span>
+                                    <span class="ml-2 text-gray-900">{{ $invoice->tagihanUntuk->jenisTes->nama ?? '-' }}</span>
+                                </div>
+                                <div class="text-sm">
+                                    <span class="text-gray-500">Doctor:</span>
+                                    <span class="ml-2 text-gray-900">{{ $invoice->tagihanUntuk->dokter->user->nama ?? '-' }}</span>
+                                </div>
+                            </div>
+                        @elseif($invoice->tagihan_untuk_tipe == 'App\Models\RadiologyOrder')
+                            <div class="space-y-2">
+                                <div class="text-sm">
+                                    <span class="text-gray-500">Order Number:</span>
+                                    <span class="ml-2 text-gray-900">{{ $invoice->tagihanUntuk->nomor_permintaan }}</span>
+                                </div>
+                                <div class="text-sm">
+                                    <span class="text-gray-500">Test Type:</span>
+                                    <span class="ml-2 text-gray-900">{{ $invoice->tagihanUntuk->jenisTes->nama ?? '-' }}</span>
+                                </div>
+                                <div class="text-sm">
+                                    <span class="text-gray-500">Doctor:</span>
+                                    <span class="ml-2 text-gray-900">{{ $invoice->tagihanUntuk->dokter->user->nama ?? '-' }}</span>
+                                </div>
+                            </div>
                         @endif
-                    </div>
-                    
-                    @if($invoice->billable_type == 'App\Models\Prescription' && $invoice->billable)
-                        <div class="space-y-2">
-                            <div class="text-sm">
-                                <span class="text-gray-500">Prescription Number:</span>
-                                <span class="ml-2 text-gray-900">{{ $invoice->billable->nomor_resep }}</span>
-                            </div>
-                            <div class="text-sm">
-                                <span class="text-gray-500">Doctor:</span>
-                                <span class="ml-2 text-gray-900">{{ $invoice->billable->dokter->user->nama ?? '-' }}</span>
-                            </div>
-                            <div class="text-sm">
-                                <span class="text-gray-500">Total Items:</span>
-                                <span class="ml-2 text-gray-900">{{ $invoice->billable->items->count() }} items</span>
-                            </div>
-                        </div>
-                    @elseif($invoice->billable_type == 'App\Models\LaboratoryOrder' && $invoice->billable)
-                        <div class="space-y-2">
-                            <div class="text-sm">
-                                <span class="text-gray-500">Order Number:</span>
-                                <span class="ml-2 text-gray-900">{{ $invoice->billable->order_number }}</span>
-                            </div>
-                            <div class="text-sm">
-                                <span class="text-gray-500">Test Type:</span>
-                                <span class="ml-2 text-gray-900">{{ $invoice->billable->testType->nama ?? '-' }}</span>
-                            </div>
-                            <div class="text-sm">
-                                <span class="text-gray-500">Doctor:</span>
-                                <span class="ml-2 text-gray-900">{{ $invoice->billable->dokter->user->nama ?? '-' }}</span>
-                            </div>
-                        </div>
-                    @elseif($invoice->billable_type == 'App\Models\RadiologyOrder' && $invoice->billable)
-                        <div class="space-y-2">
-                            <div class="text-sm">
-                                <span class="text-gray-500">Order Number:</span>
-                                <span class="ml-2 text-gray-900">{{ $invoice->billable->order_number }}</span>
-                            </div>
-                            <div class="text-sm">
-                                <span class="text-gray-500">Test Type:</span>
-                                <span class="ml-2 text-gray-900">{{ $invoice->billable->testType->nama ?? '-' }}</span>
-                            </div>
-                            <div class="text-sm">
-                                <span class="text-gray-500">Doctor:</span>
-                                <span class="ml-2 text-gray-900">{{ $invoice->billable->dokter->user->nama ?? '-' }}</span>
-                            </div>
-                        </div>
+                    @else
+                        <p class="text-gray-500 text-sm">No service details available</p>
                     @endif
                 </div>
             </div>
@@ -186,7 +216,7 @@
                         @endif
                         <div class="flex justify-between text-xl font-bold text-gray-900 border-t pt-3">
                             <span>Total Amount</span>
-                            <span>Rp {{ number_format($invoice->total_amount, 0, ',', '.') }}</span>
+                            <span>Rp {{ number_format($invoice->total, 0, ',', '.') }}</span>
                         </div>
                         @if($paidAmount > 0)
                         <div class="flex justify-between text-lg text-green-600 font-semibold">
@@ -205,7 +235,7 @@
             </div>
 
             <!-- Payment History -->
-            @if($invoice->pembayarans && $invoice->pembayarans->count() > 0)
+            @if($invoice->pembayaran && $invoice->pembayaran->count() > 0)
             <div>
                 <h3 class="text-lg font-semibold text-gray-900 mb-4">Payment History</h3>
                 <div class="overflow-x-auto">
@@ -220,16 +250,16 @@
                             </tr>
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200">
-                            @foreach($invoice->pembayarans as $payment)
+                            @foreach($invoice->pembayaran as $payment)
                             <tr>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                    {{ $payment->pembayaran_number }}
+                                    {{ $payment->nomor_pembayaran }}
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                    {{ $payment->pembayaran_date ? date('d M Y H:i', strtotime($payment->pembayaran_date)) : '-' }}
+                                    {{ $payment->tanggal_pembayaran ? \Carbon\Carbon::parse($payment->tanggal_pembayaran)->format('d M Y H:i') : '-' }}
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-semibold">
-                                    Rp {{ number_format($payment->amount, 0, ',', '.') }}
+                                    Rp {{ number_format($payment->jumlah, 0, ',', '.') }}
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                     <span class="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs">
@@ -237,7 +267,7 @@
                                     </span>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                    {{ $payment->processedBy->nama ?? '-' }}
+                                    {{ $payment->diterimaOleh->name ?? '-' }}
                                 </td>
                             </tr>
                             @endforeach
@@ -254,8 +284,8 @@
 @php
     // Recalculate for modal (in case it's not calculated yet)
     if (!isset($outstanding)) {
-        $paidAmount = $invoice->pembayarans->sum('amount');
-        $outstanding = $invoice->total_amount - $paidAmount;
+        $paidAmount = $invoice->pembayaran->sum('jumlah');
+        $outstanding = $invoice->total - $paidAmount;
     }
 @endphp
 <div id="paymentModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
@@ -267,7 +297,7 @@
                 <div class="space-y-4">
                     <div>
                         <label class="block text-sm font-medium text-gray-700">Amount *</label>
-                        <input type="number" name="amount" step="0.01" required
+                        <input type="number" name="jumlah" step="0.01" required
                             value="{{ $outstanding }}"
                             max="{{ $outstanding }}"
                             class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
@@ -275,7 +305,7 @@
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700">Payment Date *</label>
-                        <input type="datetime-local" name="payment_date" required
+                        <input type="datetime-local" name="tanggal_pembayaran" required
                             value="{{ now()->format('Y-m-d\TH:i') }}"
                             class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
                     </div>
@@ -283,10 +313,11 @@
                         <label class="block text-sm font-medium text-gray-700">Payment Method *</label>
                         <select name="metode_pembayaran" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
                             <option value="">-- Select Method --</option>
-                            <option value="cash">Cash</option>
-                            <option value="card">Card/Debit</option>
+                            <option value="tunai">Cash</option>
+                            <option value="kartu_debit">Card/Debit</option>
+                            <option value="kartu_kredit">Credit Card</option>
                             <option value="transfer">Bank Transfer</option>
-                            <option value="insurance">Insurance</option>
+                            <option value="asuransi">Insurance</option>
                             <option value="bpjs">BPJS</option>
                         </select>
                     </div>

@@ -113,8 +113,8 @@
                             <div class="text-xs text-gray-500">{{ $appointment->dokter->spesialisasi ?? '-' }}</div>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-sm font-medium text-gray-900">{{ \Carbon\Carbon::parse($appointment->janjiTemu_date)->format('d M Y') }}</div>
-                            <div class="text-xs text-gray-500">{{ \Carbon\Carbon::parse($appointment->janjiTemu_date)->format('H:i') }} WIB</div>
+                            <div class="text-sm font-medium text-gray-900">{{ \Carbon\Carbon::parse($appointment->tanggal_janji)->format('d M Y') }}</div>
+                            <div class="text-xs text-gray-500">{{ \Carbon\Carbon::parse($appointment->tanggal_janji)->format('H:i') }} WIB</div>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             @php
@@ -166,6 +166,7 @@
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
                                         </svg>
                                     </a>
+                                    @if(auth()->user()->hasAnyRole(['front_office', 'doctor', 'admin']))
                                     @if($appointment->status !== 'completed' && $appointment->status !== 'cancelled')
                                     <a href="{{ route('appointments.edit', $appointment) }}" class="text-indigo-600 hover:text-indigo-900" title="Edit">
                                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -192,6 +193,7 @@
                                             </svg>
                                         </button>
                                     </form>
+                                    @endif
                                     @endif
                                 </div>
                             </td>

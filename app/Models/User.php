@@ -2,21 +2,18 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
+/**
+ * @method bool hasRole(string $roleName)
+ * @method bool hasAnyRole(array $roles)
+ */
 class User extends Authenticatable
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var list<string>
-     */
     protected $fillable = [
         'nama',
         'email',
@@ -24,21 +21,11 @@ class User extends Authenticatable
         'peran_id',
     ];
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var list<string>
-     */
     protected $hidden = [
         'password',
         'remember_token',
     ];
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
     protected function casts(): array
     {
         return [
@@ -48,7 +35,7 @@ class User extends Authenticatable
     }
 
     /**
-     * Get the role that owns the user.
+     * Relasi role / peran
      */
     public function peran()
     {
@@ -56,7 +43,7 @@ class User extends Authenticatable
     }
 
     /**
-     * Check if user has a specific role.
+     * Cek role spesifik
      */
     public function hasRole(string $roleName): bool
     {
@@ -64,7 +51,7 @@ class User extends Authenticatable
     }
 
     /**
-     * Check if user has any of the given roles.
+     * Cek salah satu dari banyak role
      */
     public function hasAnyRole(array $roles): bool
     {
@@ -72,23 +59,20 @@ class User extends Authenticatable
     }
 
     /**
-     * Get the doctor associated with the user.
+     * Relasi staf medis
      */
     public function dokter()
     {
         return $this->hasOne(Doctor::class);
     }
 
-    /**
-     * Get the nurse associated with the user.
-     */
     public function perawat()
     {
         return $this->hasOne(Nurse::class);
     }
 
     /**
-     * Get the patient record associated with the user.
+     * Relasi pasien
      */
     public function patient()
     {
@@ -96,16 +80,38 @@ class User extends Authenticatable
     }
 
     /**
-     * Check if user is a patient (non-staff).
+     * Cek apakah user adalah pasien (non-staff)
      */
     public function isPatient(): bool
     {
         $staffRoles = [
-            'admin', 'doctor', 'nurse', 'front_office',
-            'pharmacist', 'lab_technician', 'radiologist',
-            'cashier', 'management'
+            'admin',
+            'doctor',
+            'nurse',
+            'front_office',
+            'pharmacist',
+            'lab_technician',
+            'radiologist',
+            'cashier',
+            'management',
         ];
 
         return !$this->hasAnyRole($staffRoles);
+    }
+
+    /**
+     * Relasi hasil lab (oleh petugas lab)
+     */
+    public function laboratoryResultsEntered()
+    {
+        return $this->hasMany(LaboratoryOrder::class, 'hasil_diinput_oleh');
+    }
+
+    /**
+     * Relasi laporan radiologi (oleh radiolog)
+     */
+    public function radiologySignedReports()
+    {
+        return $this->hasMany(RadiologyOrder::class, 'signed_by');
     }
 }

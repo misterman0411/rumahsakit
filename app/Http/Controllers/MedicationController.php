@@ -36,11 +36,15 @@ class MedicationController extends Controller
         $validated = $request->validate([
             'nama' => 'required|string|max:255',
             'kode' => 'required|string|unique:obat,kode',
+            'bentuk_sediaan' => 'required|string',
+            'kekuatan' => 'required|string',
+            'kategori' => 'nullable|string',
             'deskripsi' => 'nullable|string',
             'satuan' => 'required|string|max:50',
-            'harga' => 'required|numeric|min:0',
-            'stok' => 'required|integer|min:0',
-            'stok_minimum' => 'required|integer|min:0',
+            'harga' => 'required|numeric|min:0|max:99999999.99',
+            'stok' => 'required|integer|min:0|max:2147483647',
+            'stok_minimum' => 'required|integer|min:0|max:2147483647',
+            'tanggal_kadaluarsa' => 'nullable|date',
         ]);
 
         $medication = Medication::create($validated);
@@ -63,11 +67,15 @@ class MedicationController extends Controller
     {
         $validated = $request->validate([
             'nama' => 'required|string|max:255',
+            'bentuk_sediaan' => 'required|string',
+            'kekuatan' => 'required|string',
+            'kategori' => 'nullable|string',
             'deskripsi' => 'nullable|string',
             'satuan' => 'required|string|max:50',
-            'harga' => 'required|numeric|min:0',
-            'stok' => 'required|integer|min:0',
-            'stok_minimum' => 'required|integer|min:0',
+            'harga' => 'required|numeric|min:0|max:99999999.99',
+            'stok' => 'required|integer|min:0|max:2147483647',
+            'stok_minimum' => 'required|integer|min:0|max:2147483647',
+            'tanggal_kadaluarsa' => 'nullable|date',
         ]);
 
         $medication->update($validated);

@@ -17,7 +17,7 @@
                 <h2 class="text-3xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">Detail Rawat Inap</h2>
                 <p class="text-gray-500 mt-1">{{ $inpatient->admission_number }}</p>
             </div>
-            @if($inpatient->status === 'admitted')
+            @if($inpatient->status === 'dirawat')
             <button type="button" onclick="document.getElementById('dischargeModal').classList.remove('hidden')" class="px-6 py-3 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white rounded-xl shadow-lg hover:shadow-xl transition-all font-semibold">
                 Pulangkan Pasien
             </button>
@@ -89,7 +89,7 @@
             </div>
 
             <!-- Discharge Info (if discharged) -->
-            @if($inpatient->status === 'discharged')
+            @if($inpatient->status === 'pulang')
             <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
                 <div class="px-6 py-4 bg-gradient-to-r from-green-50 to-white border-b border-gray-200">
                     <h3 class="text-lg font-bold text-gray-900">Informasi Kepulangan</h3>
@@ -158,11 +158,11 @@
                 <div class="space-y-2">
                     <div class="flex justify-between">
                         <span class="text-sm text-gray-600">Total Tagihan</span>
-                        <span class="text-sm font-bold text-gray-900">Rp {{ number_format($inpatient->tagihan->total_amount, 0, ',', '.') }}</span>
+                        <span class="text-sm font-bold text-gray-900">Rp {{ number_format($inpatient->tagihan->total, 0, ',', '.') }}</span>
                     </div>
                     <div class="flex justify-between">
                         <span class="text-sm text-gray-600">Status</span>
-                        <span class="text-sm font-semibold {{ $inpatient->tagihan->status === 'paid' ? 'text-green-600' : 'text-yellow-600' }}">
+                        <span class="text-sm font-semibold {{ $inpatient->tagihan->status === 'lunas' ? 'text-green-600' : 'text-yellow-600' }}">
                             {{ ucfirst($inpatient->tagihan->status) }}
                         </span>
                     </div>
@@ -196,32 +196,44 @@
                 <div class="grid grid-cols-2 gap-4">
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 mb-2">Tanggal Pulang <span class="text-red-500">*</span></label>
-                        <input type="datetime-local" name="tanggal_keluar" value="{{ now()->format('Y-m-d\TH:i') }}" required class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                        <input type="datetime-local" name="tanggal_keluar" value="{{ old('tanggal_keluar', now()->format('Y-m-d\TH:i')) }}" required class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                        @error('tanggal_keluar')
+                            <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                        @enderror
                     </div>
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 mb-2">Status Pulang <span class="text-red-500">*</span></label>
-                        <select name="discharge_status" required class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
-                            <option value="recovered">Sembuh</option>
-                            <option value="referred">Dirujuk</option>
-                            <option value="deceased">Meninggal</option>
-                            <option value="against_medical_advice">Pulang Paksa</option>
+                        <select name="status_pulang" required class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                            <option value="sembuh" {{ old('status_pulang') == 'sembuh' ? 'selected' : '' }}>Sembuh</option>
+                            <option value="dirujuk" {{ old('status_pulang') == 'dirujuk' ? 'selected' : '' }}>Dirujuk</option>
+                            <option value="meninggal" {{ old('status_pulang') == 'meninggal' ? 'selected' : '' }}>Meninggal</option>
+                            <option value="aps" {{ old('status_pulang') == 'aps' ? 'selected' : '' }}>Pulang Paksa (APS)</option>
                         </select>
+                        @error('status_pulang')
+                            <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                        @enderror
                     </div>
                 </div>
 
                 <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-2">Ringkasan Kepulangan <span class="text-red-500">*</span></label>
-                    <textarea name="discharge_summary" rows="4" required class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"></textarea>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Ringkasan Kepulangan (Resume Keluar) <span class="text-red-500">*</span></label>
+                    <textarea name="resume_keluar" rows="4" required class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" placeholder="Diagnosis akhir, tindakan yang dilakukan, kondisi pasien saat pulang...">{{ old('resume_keluar') }}</textarea>
+                    @error('resume_keluar')
+                        <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                    @enderror
                 </div>
 
                 <div>
                     <label class="block text-sm font-semibold text-gray-700 mb-2">Instruksi Kepulangan</label>
-                    <textarea name="discharge_instructions" rows="3" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"></textarea>
+                    <textarea name="instruksi_pulang" rows="3" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" placeholder="Obat yang harus diminum, pantangan, jadwal kontrol...">{{ old('instruksi_pulang') }}</textarea>
+                    @error('instruksi_pulang')
+                        <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                    @enderror
                 </div>
 
                 <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-2">Tanggal Follow Up</label>
-                    <input type="date" name="follow_up_date" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Tanggal Kontrol</label>
+                    <input type="date" name="tanggal_kontrol" value="{{ old('tanggal_kontrol') }}" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
                 </div>
 
                 <div class="grid grid-cols-2 gap-4">

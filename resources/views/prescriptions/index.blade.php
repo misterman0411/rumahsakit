@@ -40,8 +40,8 @@
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             <span class="px-2 py-1 text-xs rounded-full 
-                                @if($prescription->status == 'dispensed') bg-green-100 text-green-800
-                                @elseif($prescription->status == 'verified') bg-blue-100 text-blue-800
+                                @if($prescription->status == 'diserahkan') bg-green-100 text-green-800
+                                @elseif($prescription->status == 'diverifikasi') bg-blue-100 text-blue-800
                                 @else bg-yellow-100 text-yellow-800 @endif">
                                 {{ ucfirst($prescription->status) }}
                             </span>
@@ -51,16 +51,18 @@
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
                             <a href="{{ route('prescriptions.show', $prescription) }}" class="text-blue-600 hover:text-blue-900">View</a>
-                            @if($prescription->status == 'pending')
-                            <form action="{{ route('prescriptions.verify', $prescription) }}" method="POST" class="inline">
-                                @csrf
-                                <button type="submit" class="text-green-600 hover:text-green-900">Verify</button>
-                            </form>
-                            @elseif($prescription->status == 'verified')
-                            <form action="{{ route('prescriptions.dispense', $prescription) }}" method="POST" class="inline">
-                                @csrf
-                                <button type="submit" class="text-green-600 hover:text-green-900">Dispense</button>
-                            </form>
+                            @if(auth()->user()->hasRole('pharmacist'))
+                                @if($prescription->status == 'menunggu')
+                                <form action="{{ route('prescriptions.verify', $prescription) }}" method="POST" class="inline">
+                                    @csrf
+                                    <button type="submit" class="text-green-600 hover:text-green-900">Verify</button>
+                                </form>
+                                @elseif($prescription->status == 'diverifikasi')
+                                <form action="{{ route('prescriptions.dispense', $prescription) }}" method="POST" class="inline">
+                                    @csrf
+                                    <button type="submit" class="text-green-600 hover:text-green-900">Dispense</button>
+                                </form>
+                                @endif
                             @endif
                         </td>
                     </tr>

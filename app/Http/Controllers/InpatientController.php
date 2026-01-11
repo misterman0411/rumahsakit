@@ -10,6 +10,7 @@ use App\Models\Bed;
 use App\Models\Invoice;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 
 class InpatientController extends Controller
 {
@@ -17,8 +18,20 @@ class InpatientController extends Controller
     {
         $query = InpatientAdmission::with(['pasien', 'dokter.user', 'ruangan', 'tempatTidur']);
 
+        // Semua dokter bisa melihat semua rawat inap (karena ada tim dokter)
+        // Tidak ada filtering berdasarkan dokter
+
+        // Filter by status
         if ($request->filled('status')) {
             $query->where('status', $request->status);
+        }
+
+        // Filter by patient name
+        if ($request->filled('search')) {
+            $query->whereHas('pasien', function($q) use ($request) {
+                $q->where('nama', 'like', '%' . $request->search . '%')
+                  ->orWhere('no_rekam_medis', 'like', '%' . $request->search . '%');
+            });
         }
 
         $admissions = $query->latest()->paginate(20);
@@ -30,7 +43,7 @@ class InpatientController extends Controller
     {
         $patients = Patient::orderBy('nama')->get();
         $doctors = Doctor::with('user')->get();
-        $rooms = Room::where('status', 'available')->with('tempatTidur')->get();
+        $rooms = Room::where('status', 'tersedia')->with('tempatTidur')->get();
 
         return view('inpatient.create', compact('patients', 'doctors', 'rooms'));
     }
@@ -43,18 +56,18 @@ class InpatientController extends Controller
             'ruangan_id' => 'required|exists:ruangan,id',
             'tempat_tidur_id' => 'required|exists:tempat_tidur,id',
             'tanggal_masuk' => 'required|date',
-            'jenis_masuk' => 'required|in:emergency,elective',
+            'jenis_masuk' => 'required|in:darurat,elektif',
             'alasan_masuk' => 'required|string',
         ]);
 
         DB::beginTransaction();
         try {
-            $validated['status'] = 'admitted';
+            $validated['status'] = 'dirawat';
 
             $admission = InpatientAdmission::create($validated);
 
             // Update bed status
-            Bed::find($validated['tempat_tidur_id'])->update(['status' => 'occupied']);
+            Bed::find($validated['tempat_tidur_id'])->update(['status' => 'terisi']);
 
             DB::commit();
 
@@ -80,21 +93,21 @@ class InpatientController extends Controller
             'resume_keluar' => 'required|string',
             'instruksi_pulang' => 'nullable|string',
             'tanggal_kontrol' => 'nullable|date|after:tanggal_keluar',
-            'status_pulang' => 'required|in:recovered,referred,deceased,against_medical_advice',
+            'status_pulang' => 'required|in:sembuh,dirujuk,meninggal,aps',
             'diskon' => 'nullable|numeric|min:0',
             'pajak' => 'nullable|numeric|min:0',
         ]);
 
         DB::beginTransaction();
         try {
-            $validated['status'] = 'discharged';
+            $validated['status'] = 'pulang';
             $validated['diskon'] = $validated['diskon'] ?? 0;
             $validated['pajak'] = $validated['pajak'] ?? 0;
 
             $inpatient->update($validated);
 
             // Update bed status
-            $inpatient->tempatTidur->update(['status' => 'available']);
+            $inpatient->tempatTidur->update(['status' => 'tersedia']);
 
             // Calculate total cost
             $totalCost = $inpatient->calculateTotalCost();
@@ -108,7 +121,7 @@ class InpatientController extends Controller
                 'diskon' => $validated['diskon'],
                 'pajak' => $validated['pajak'],
                 'total' => $totalCost,
-                'status' => 'unpaid',
+                'status' => 'belum_dibayar',
                 'jatuh_tempo' => now()->addDays(7),
             ]);
 
