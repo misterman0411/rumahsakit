@@ -10,7 +10,7 @@
                         </svg>
                     </div>
                     <span class="font-bold text-2xl bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-purple-600">
-                        MedCare
+                        MediCare
                     </span>
                 </a>
             </div>

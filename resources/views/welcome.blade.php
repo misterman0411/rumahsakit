@@ -166,7 +166,7 @@
                     </div>
                     <h3 class="text-xl font-bold text-gray-900 mb-3">Konsultasi Dokter</h3>
                     <p class="text-gray-500 mb-6">Konsultasi dengan dokter umum dan spesialis secara online melalui video call atau chat.</p>
-                    <a href="#" class="text-indigo-600 font-semibold hover:text-indigo-700 flex items-center group-hover:gap-2 transition-all">
+                    <a href="{{ route('patient.appointments.book') }}" class="text-indigo-600 font-semibold hover:text-indigo-700 flex items-center group-hover:gap-2 transition-all">
                         Learn more <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
                     </a>
                 </div>
@@ -194,7 +194,7 @@
                     </div>
                     <h3 class="text-xl font-bold text-gray-900 mb-3">Buat Janji Temu</h3>
                     <p class="text-gray-500 mb-6">Jadwalkan kunjungan ke rumah sakit atau klinik kami tanpa perlu antri lama.</p>
-                    <a href="#" class="text-indigo-600 font-semibold hover:text-indigo-700 flex items-center group-hover:gap-2 transition-all">
+                    <a href="{{ route('patient.appointments.book') }}" class="text-indigo-600 font-semibold hover:text-indigo-700 flex items-center group-hover:gap-2 transition-all">
                         Learn more <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
                     </a>
                 </div>

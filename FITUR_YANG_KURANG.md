@@ -6,11 +6,6 @@
 ---
 ## ❌ FITUR-FITUR YANG MASIH BELUM ADA
 
-### ❌ Telemedicine (Konsultasi Online Real-time) 📹
-Saat ini fitur "Konsultasi" hanya sebatas Booking Jadwal (Janji Temu Fisik/Offline).
-Chat/Video Room: Belum ada fitur chat atau video call antara Pasien dan Dokter.
-Media Sharing: Pasien belum bisa kirim foto keluhan atau file lab ke dokter via chat.
-
 ### ❌ Notifikasi & Pengingat 🔔
 Pengingat Jatuh Tempo: Belum ada notifikasi (Email/WA) otomatis H-1 sebelum jadwal konsultasi.
 Status Update: Notifikasi realtime saat status obat berubah (misal: "Obat sedang dikirim").

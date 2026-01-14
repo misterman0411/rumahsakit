@@ -13,7 +13,15 @@
 
 <body class="bg-gray-50">
 
-<div class="min-h-screen flex items-center justify-center p-4">
+<div class="min-h-screen flex items-center justify-center p-4 relative">
+    <!-- Back Button -->
+    <a href="<?php echo e(url('/')); ?>" class="absolute top-6 left-6 md:top-8 md:left-8 flex items-center gap-2 text-gray-500 hover:text-indigo-600 transition-all duration-300 z-50 group">
+        <div class="w-10 h-10 rounded-full bg-white shadow-md flex items-center justify-center border border-gray-100 group-hover:shadow-lg group-hover:border-indigo-100 transition-all">
+            <svg class="w-5 h-5 transform group-hover:-translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+            </svg>
+        </div>
+    </a>
     <div class="bg-white rounded-3xl shadow-2xl overflow-hidden max-w-5xl w-full flex flex-col md:flex-row min-h-[600px] border border-gray-100">
 
         <!-- Left Side - Branding -->
