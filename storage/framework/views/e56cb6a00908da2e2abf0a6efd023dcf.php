@@ -111,7 +111,7 @@
                                 <span class="text-xs text-gray-500 ml-1"><?php echo e($movement->obat->satuan); ?></span>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-semibold text-gray-900">
-                                <?php echo e(number_format($movement->stok_setelah, 0)); ?>
+                                <?php echo e(number_format($movement->stok_sesudah, 0)); ?>
 
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">

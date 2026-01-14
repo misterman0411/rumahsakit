@@ -119,6 +119,56 @@
         </div>
     </div>
 
+    <!-- Recent Payments -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <h2 class="text-lg font-bold text-gray-800 mb-4">Recent Payments (<?php echo e(ucfirst($period)); ?>)</h2>
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Invoice #</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Patient</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Method</th>
+                        <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    <?php $__empty_1 = true; $__currentLoopData = $recentPayments; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $payment): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
+                    <tr>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                            <?php echo e($payment->created_at->format('d M Y H:i')); ?>
+
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-bold">
+                            <?php echo e($payment->tagihan->nomor_tagihan ?? '-'); ?>
+
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                            <?php echo e($payment->tagihan->pasien->nama ?? 'Unknown'); ?>
+
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                            <?php echo e(ucfirst(str_replace('_', ' ', $payment->metode_pembayaran))); ?>
+
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-green-600 text-right">
+                            Rp <?php echo e(number_format($payment->jumlah, 0, ',', '.')); ?>
+
+                        </td>
+                    </tr>
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
+                    <tr>
+                        <td colspan="5" class="px-6 py-4 whitespace-nowrap text-center text-gray-500">
+                            No payments found for this period.
+                        </td>
+                    </tr>
+                    <?php endif; ?>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
     <!-- Outstanding Invoices -->
     <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
         <h2 class="text-lg font-bold text-gray-800 mb-4">Outstanding Invoices</h2>

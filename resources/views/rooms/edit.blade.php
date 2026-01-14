@@ -112,7 +112,7 @@
                         </label>
                         <input type="text" value="{{ $room->kapasitas }} beds" readonly
                             class="w-full px-4 py-2 bg-gray-100 border border-gray-300 rounded-lg text-gray-600">
-                        <p class="text-sm text-gray-500 mt-1">Capacity cannot be changed. Current beds: {{ $room->tempatTidurs->count() }}</p>
+                        <p class="text-sm text-gray-500 mt-1">Capacity cannot be changed. Current beds: {{ $room->tempatTidur->count() }}</p>
                     </div>
                 </div>
 

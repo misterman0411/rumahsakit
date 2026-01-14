@@ -100,6 +100,13 @@ class ManagementReportController extends Controller
             ->groupBy('metode_pembayaran')
             ->get();
 
+        // Recent Payments (Detailed List)
+        $recentPayments = Payment::with(['tagihan.pasien', 'kasir'])
+            ->whereBetween('tanggal_pembayaran', [$startDate, $endDate])
+            ->orderBy('tanggal_pembayaran', 'desc')
+            ->limit(50)
+            ->get();
+
         // Summary stats
         $stats = [
             'total_revenue' => $payments->sum('total'),
@@ -108,7 +115,7 @@ class ManagementReportController extends Controller
             'paid_invoices' => Invoice::whereBetween('updated_at', [$startDate, $endDate])->where('status', 'lunas')->count(),
         ];
 
-        return view('management.financial', compact('stats', 'dailyRevenue', 'outstandingInvoices', 'revenueByMethod', 'period'));
+        return view('management.financial', compact('stats', 'dailyRevenue', 'outstandingInvoices', 'revenueByMethod', 'period', 'recentPayments'));
     }
 
     /**
@@ -190,9 +197,17 @@ class ManagementReportController extends Controller
             },
         ])->get();
 
+        // Recent Stock Movements (for Operational Report)
+        $recentStockMovements = \App\Models\StockMovement::with(['obat', 'user'])
+            ->whereBetween('created_at', [$startDate, $endDate])
+            ->orderBy('created_at', 'desc')
+            ->limit(50)
+            ->get();
+
         return view('management.operational', compact(
             'labStats', 'radStats', 'rxStats', 'clinicStats', 'period',
-            'lowStockMedications', 'expiringMedications', 'topMedications', 'inventoryStats'
+            'lowStockMedications', 'expiringMedications', 'topMedications', 'inventoryStats',
+            'recentStockMovements'
         ));
     }
 
@@ -251,9 +266,17 @@ class ManagementReportController extends Controller
             ->having('total_beds', '>', 0)
             ->get();
 
+        // Recent patient visits (Detailed Table)
+        $recentVisits = Appointment::with(['pasien', 'dokter.user', 'departemen'])
+            ->whereBetween('tanggal_janji', [$startDate, $endDate])
+            ->orderBy('tanggal_janji', 'desc')
+            ->limit(50)
+            ->get();
+
         return view('management.patient-flow', compact(
             'totalPatients', 'newPatients', 'totalAppointments', 'currentInpatients',
-            'appointmentsByStatus', 'inpatientStats', 'dailyVisits', 'roomOccupancy', 'period'
+            'appointmentsByStatus', 'inpatientStats', 'dailyVisits', 'roomOccupancy', 'period',
+            'recentVisits'
         ));
     }
 
@@ -305,7 +328,15 @@ class ManagementReportController extends Controller
             }])
             ->get();
 
-        return view('management.staff-performance', compact('doctorPerformance', 'labTechPerformance', 'radiologistPerformance', 'period'));
+        // Detailed Staff Logs (Recent Activities)
+        $recentStaffActivities = Appointment::with(['dokter.user', 'pasien', 'departemen'])
+            ->whereBetween('tanggal_janji', [$startDate, $endDate])
+            ->whereIn('status', ['selesai', 'sedang_diperiksa'])
+            ->orderBy('updated_at', 'desc')
+            ->limit(50)
+            ->get();
+
+        return view('management.staff-performance', compact('doctorPerformance', 'labTechPerformance', 'radiologistPerformance', 'period', 'recentStaffActivities'));
     }
 
     /**

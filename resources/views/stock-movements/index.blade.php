@@ -109,7 +109,7 @@
                                 <span class="text-xs text-gray-500 ml-1">{{ $movement->obat->satuan }}</span>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-semibold text-gray-900">
-                                {{ number_format($movement->stok_setelah, 0) }}
+                                {{ number_format($movement->stok_sesudah, 0) }}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
                                 {{ $movement->user->nama ?? '-' }}

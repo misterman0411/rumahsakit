@@ -60,7 +60,7 @@
                     <select name="ruangan_id" id="ruangan_id" required class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 @error('ruangan_id') border-red-500 @enderror">
                         <option value="">Pilih Kamar</option>
                         @foreach($rooms as $room)
-                        <option value="{{ $room->id }}" data-beds="{{ json_encode($room->tempatTidurs) }}" {{ old('ruangan_id') == $room->id ? 'selected' : '' }}>
+                        <option value="{{ $room->id }}" data-beds="{{ json_encode($room->tempatTidur) }}" {{ old('ruangan_id') == $room->id ? 'selected' : '' }}>
                             {{ $room->nomor_ruangan }} - {{ $room->ruangan_type }}
                         </option>
                         @endforeach
@@ -86,8 +86,8 @@
                 <!-- Admission Date -->
                 <div>
                     <label class="block text-sm font-semibold text-gray-700 mb-2">Tanggal Masuk <span class="text-red-500">*</span></label>
-                    <input type="datetime-local" name="tanggal_masuk" value="{{ old('tanggal_masuk', now()->format('Y-m-d\TH:i')) }}" required class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 @error('admission_date') border-red-500 @enderror">
-                    @error('admission_date')
+                    <input type="datetime-local" name="tanggal_masuk" value="{{ old('tanggal_masuk', now()->format('Y-m-d\TH:i')) }}" required class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 @error('tanggal_masuk') border-red-500 @enderror">
+                    @error('tanggal_masuk')
                         <p class="mt-1 text-sm text-red-500">{{ $message }}</p>
                     @enderror
                 </div>
@@ -99,7 +99,7 @@
                         <option value="darurat" {{ old('jenis_masuk') == 'darurat' ? 'selected' : '' }}>Darurat (Emergency)</option>
                         <option value="elektif" {{ old('jenis_masuk') == 'elektif' ? 'selected' : '' }}>Elektif (Scheduled)</option>
                     </select>
-                    @error('admission_type')
+                    @error('jenis_masuk')
                         <p class="mt-1 text-sm text-red-500">{{ $message }}</p>
                     @enderror
                 </div>
@@ -108,8 +108,8 @@
             <!-- Reason -->
             <div class="mb-8">
                 <label class="block text-sm font-semibold text-gray-700 mb-2">Alasan Rawat Inap <span class="text-red-500">*</span></label>
-                <textarea name="reason" rows="4" required class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 @error('reason') border-red-500 @enderror">{{ old('reason') }}</textarea>
-                @error('reason')
+                <textarea name="alasan_masuk" rows="4" required class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 @error('alasan_masuk') border-red-500 @enderror">{{ old('alasan_masuk') }}</textarea>
+                @error('alasan_masuk')
                     <p class="mt-1 text-sm text-red-500">{{ $message }}</p>
                 @enderror
             </div>
@@ -128,27 +128,36 @@
 </div>
 
 <script>
-document.getElementById('room_id').addEventListener('change', function() {
-    const bedSelect = document.getElementById('bed_id');
+document.getElementById('ruangan_id').addEventListener('change', function() {
+    const bedSelect = document.getElementById('tempat_tidur_id');
     bedSelect.innerHTML = '<option value="">Pilih Tempat Tidur</option>';
     
     const selectedOption = this.options[this.selectedIndex];
     if (selectedOption.value) {
-        const beds = JSON.parse(selectedOption.dataset.beds);
-        beds.forEach(bed => {
-            if (bed.status === 'tersedia') {
-                const option = document.createElement('option');
-                option.value = bed.id;
-                option.textContent = `Bed ${bed.bed_number}`;
-                bedSelect.appendChild(option);
+        // Safe check if dataset.beds exists/is not empty
+        try {
+            const beds = JSON.parse(selectedOption.dataset.beds);
+            if (beds && beds.length > 0) {
+                beds.forEach(bed => {
+                    if (bed.status === 'tersedia') {
+                        const option = document.createElement('option');
+                        option.value = bed.id;
+                        option.textContent = `Bed ${bed.nomor_tempat_tidur}`;
+                        bedSelect.appendChild(option);
+                    }
+                });
+            } else {
+                 console.log("No beds found in data for this room.");
             }
-        });
+        } catch (e) {
+            console.error("Error parsing beds data:", e);
+        }
     }
 });
 
 // Trigger change if room already selected (for old input)
-if (document.getElementById('room_id').value) {
-    document.getElementById('room_id').dispatchEvent(new Event('change'));
+if (document.getElementById('ruangan_id').value) {
+    document.getElementById('ruangan_id').dispatchEvent(new Event('change'));
 }
 </script>
 @endsection

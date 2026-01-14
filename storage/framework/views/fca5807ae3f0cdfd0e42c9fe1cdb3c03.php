@@ -289,6 +289,60 @@
         </div>
     </div>
 
+    <!-- Recent Stock Movements -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
+        <h2 class="text-lg font-bold text-gray-800 mb-4">Recent Stock Movements (<?php echo e(ucfirst($period)); ?>)</h2>
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Time</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Medication</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
+                        <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    <?php $__empty_1 = true; $__currentLoopData = $recentStockMovements; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $movement): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
+                    <tr>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                            <?php echo e($movement->created_at->format('d M Y H:i')); ?>
+
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                            <div class="font-bold"><?php echo e($movement->obat->nama); ?></div>
+                            <div class="text-xs text-gray-500"><?php echo e($movement->obat->kode); ?></div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                                <?php echo e($movement->jenis_mutasi === 'masuk' ? 'bg-green-100 text-green-800' : 
+                                   ($movement->jenis_mutasi === 'keluar' ? 'bg-red-100 text-red-800' : 'bg-blue-100 text-blue-800')); ?>">
+                                <?php echo e(ucfirst($movement->jenis_mutasi)); ?>
+
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-bold <?php echo e($movement->jenis_mutasi === 'masuk' ? 'text-green-600' : 'text-red-600'); ?>">
+                            <?php echo e($movement->jenis_mutasi === 'masuk' ? '+' : '-'); ?><?php echo e(number_format($movement->jumlah, 0)); ?>
+
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            <?php echo e($movement->user->nama ?? '-'); ?>
+
+                        </td>
+                    </tr>
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
+                    <tr>
+                        <td colspan="5" class="px-6 py-4 whitespace-nowrap text-center text-gray-500">
+                            No stock movements in this period.
+                        </td>
+                    </tr>
+                    <?php endif; ?>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
     <!-- Clinic Performance by Department -->
     <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
         <h2 class="text-lg font-bold text-gray-800 mb-4">Clinic Performance by Department</h2>

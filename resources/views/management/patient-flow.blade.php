@@ -178,6 +178,61 @@
         </div>
     </div>
 
+    <!-- Recent Patient Visits -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <h2 class="text-lg font-bold text-gray-800 mb-4">Patient Visits Log ({{ ucfirst($period) }})</h2>
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date & Time</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Queue No</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Patient</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Doctor</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Department</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    @forelse($recentVisits as $visit)
+                    <tr>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                            {{ \Carbon\Carbon::parse($visit->tanggal_janji)->format('d M Y H:i') }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-bold">
+                            {{ $visit->nomor_antrian }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                            {{ $visit->pasien->nama ?? 'Unknown' }}
+                            <div class="text-xs text-gray-500">{{ $visit->pasien->no_rekam_medis ?? '-' }}</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                            {{ $visit->dokter->user->nama ?? 'Unknown' }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                            {{ $visit->departemen->nama ?? '-' }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                                {{ $visit->status === 'selesai' ? 'bg-green-100 text-green-800' : 
+                                   ($visit->status === 'terjadwal' ? 'bg-blue-100 text-blue-800' : 
+                                   ($visit->status === 'dibatalkan' ? 'bg-red-100 text-red-800' : 'bg-yellow-100 text-yellow-800')) }}">
+                                {{ ucfirst($visit->status) }}
+                            </span>
+                        </td>
+                    </tr>
+                    @empty
+                    <tr>
+                        <td colspan="6" class="px-6 py-4 whitespace-nowrap text-center text-gray-500">
+                            No visits found for this period.
+                        </td>
+                    </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+    </div>
+
     <!-- Room Occupancy -->
     <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
         <h2 class="text-lg font-bold text-gray-800 mb-4">Room Occupancy</h2>
