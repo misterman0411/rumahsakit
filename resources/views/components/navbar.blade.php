@@ -45,9 +45,9 @@
                     </a>
                     @auth
                         <!-- Profile Section with Dropdown -->
-                        <div class="relative group">
+                        <div class="relative">
                             <!-- Profile Button -->
-                            <button class="flex items-center space-x-3 hover:opacity-80 transition-opacity cursor-pointer focus:outline-none">
+                            <button id="profileBtn" class="flex items-center space-x-3 hover:opacity-80 transition-opacity cursor-pointer focus:outline-none">
                                 <div class="text-right">
                                     <p class="text-sm font-semibold text-gray-700">{{ Auth::user()->nama }}</p>
                                     <p class="text-xs text-gray-500">{{ Auth::user()->email }}</p>
@@ -58,7 +58,7 @@
                             </button>
 
                             <!-- Dropdown Menu -->
-                            <div class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-xl border border-gray-100 py-1 hidden group-hover:block z-50">
+                            <div id="profileDropdown" class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-xl border border-gray-100 py-1 hidden z-50">
                                 <div class="px-4 py-3 bg-gradient-to-r from-indigo-50 to-purple-50 border-b border-gray-100">
                                     <p class="text-xs font-semibold text-indigo-500 uppercase tracking-wider">Akun</p>
                                 </div>
@@ -73,6 +73,27 @@
                                 </form>
                             </div>
                         </div>
+                        <script>
+                            document.addEventListener('DOMContentLoaded', function() {
+                                const profileBtn = document.getElementById('profileBtn');
+                                const profileDropdown = document.getElementById('profileDropdown');
+
+                                if(profileBtn && profileDropdown) {
+                                    // Toggle dropdown on click
+                                    profileBtn.addEventListener('click', function(e) {
+                                        e.stopPropagation();
+                                        profileDropdown.classList.toggle('hidden');
+                                    });
+
+                                    // Close dropdown when clicking outside
+                                    document.addEventListener('click', function(e) {
+                                        if (!profileBtn.contains(e.target) && !profileDropdown.contains(e.target)) {
+                                            profileDropdown.classList.add('hidden');
+                                        }
+                                    });
+                                }
+                            });
+                        </script>
                     @else
                         <a href="{{ route('login') }}" class="text-gray-600 hover:text-indigo-600 font-medium transition-colors">Sign In</a>
                         <a href="{{ route('register') }}" class="bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-6 py-2.5 rounded-full font-medium hover:shadow-lg hover:scale-105 transition-all duration-300 shadow-indigo-200">

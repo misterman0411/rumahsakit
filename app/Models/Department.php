@@ -15,6 +15,12 @@ class Department extends Model
         'nama',
         'kode',
         'deskripsi',
+        'lokasi',
+        'telepon',
+        'email',
+        'kepala_departemen',
+        'status',
+        'foto',
     ];
 
     public function dokter()

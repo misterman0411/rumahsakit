@@ -31,6 +31,36 @@
                 </tr>
             </thead>
             <tbody class="bg-white divide-y divide-gray-200">
+                <?php $__empty_1 = true; $__currentLoopData = $departments; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $department): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
+                <tr>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm font-medium text-gray-900"><?php echo e($department->nama); ?></div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-indigo-100 text-indigo-800">
+                            <?php echo e($department->kode); ?>
+
+                        </span>
+                    </td>
+                    <td class="px-6 py-4">
+                        <div class="text-sm text-gray-500 line-clamp-2"><?php echo e($department->deskripsi ?? '-'); ?></div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full <?php echo e($department->status === 'active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'); ?>">
+                            <?php echo e(ucfirst($department->status ?? 'Active')); ?>
+
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                        <a href="<?php echo e(route('departments.edit', $department)); ?>" class="text-indigo-600 hover:text-indigo-900 mr-3">Edit</a>
+                        <form action="<?php echo e(route('departments.destroy', $department)); ?>" method="POST" class="inline-block" onsubmit="return confirm('Apakah Anda yakin ingin menghapus departemen ini?');">
+                            <?php echo csrf_field(); ?>
+                            <?php echo method_field('DELETE'); ?>
+                            <button type="submit" class="text-red-600 hover:text-red-900">Hapus</button>
+                        </form>
+                    </td>
+                </tr>
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
                 <tr>
                     <td colspan="5" class="px-6 py-12 text-center text-gray-500">
                         <svg class="w-12 h-12 mx-auto mb-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -39,6 +69,7 @@
                         <p class="text-lg font-semibold">Tidak ada data departemen</p>
                     </td>
                 </tr>
+                <?php endif; ?>
             </tbody>
         </table>
     </div>

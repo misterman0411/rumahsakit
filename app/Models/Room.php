@@ -16,8 +16,8 @@ class Room extends Model
         'nomor_ruangan',
         'departemen_id',
         'jenis',
-        'tarif_per_hari',
         'kapasitas',
+        'tarif_per_hari',
         'status',
     ];
 

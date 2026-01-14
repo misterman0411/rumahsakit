@@ -26,51 +26,70 @@
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <!-- Type -->
+                        <!-- Room Name -->
                         <div>
-                            <label for="room_type" class="block text-sm font-semibold text-gray-700 mb-2">
-                                Room Type <span class="text-red-500">*</span>
+                            <label for="name" class="block text-sm font-semibold text-gray-700 mb-2">
+                                Nama Ruangan <span class="text-red-500">*</span>
                             </label>
-                            <select name="tipe_ruangan" id="tipe_ruangan" required
-                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
-                                <option value="vip" {{ old('tipe_ruangan', $room->tipe_ruangan) == 'vip' ? 'selected' : '' }}>VIP</option>
-                                <option value="kelas_1" {{ old('tipe_ruangan', $room->tipe_ruangan) == 'kelas_1' ? 'selected' : '' }}>Kelas 1</option>
-                                <option value="kelas_2" {{ old('tipe_ruangan', $room->tipe_ruangan) == 'kelas_2' ? 'selected' : '' }}>Kelas 2</option>
-                                <option value="kelas_3" {{ old('tipe_ruangan', $room->tipe_ruangan) == 'kelas_3' ? 'selected' : '' }}>Kelas 3</option>
-                                <option value="icu" {{ old('tipe_ruangan', $room->tipe_ruangan) == 'icu' ? 'selected' : '' }}>ICU</option>
-                                <option value="darurat" {{ old('tipe_ruangan', $room->tipe_ruangan) == 'darurat' ? 'selected' : '' }}>Darurat</option>
-                            </select>
-                            @error('room_type')
+                            <input type="text" name="nama" id="name" required value="{{ old('nama', $room->nama) }}"
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                            @error('nama')
                                 <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                             @enderror
                         </div>
 
-                        <!-- Floor -->
+                        <!-- Department -->
                         <div>
-                            <label for="floor" class="block text-sm font-semibold text-gray-700 mb-2">
-                                Floor <span class="text-red-500">*</span>
+                            <label for="departemen_id" class="block text-sm font-semibold text-gray-700 mb-2">
+                                Departemen <span class="text-red-500">*</span>
                             </label>
-                            <input type="number" name="floor" id="floor" required value="{{ old('floor', $room->floor) }}"
+                            <select name="departemen_id" id="departemen_id" required
                                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
-                            @error('floor')
+                                <option value="">-- Pilih Departemen --</option>
+                                @foreach($departments as $department)
+                                    <option value="{{ $department->id }}" {{ old('departemen_id', $room->departemen_id) == $department->id ? 'selected' : '' }}>
+                                        {{ $department->nama }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            @error('departemen_id')
+                                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <!-- Type -->
+                        <div>
+                            <label for="jenis" class="block text-sm font-semibold text-gray-700 mb-2">
+                                Jenis Ruangan <span class="text-red-500">*</span>
+                            </label>
+                            <select name="jenis" id="jenis" required
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
+                                <option value="vip" {{ old('jenis', $room->jenis) == 'vip' ? 'selected' : '' }}>VIP</option>
+                                <option value="kelas_1" {{ old('jenis', $room->jenis) == 'kelas_1' ? 'selected' : '' }}>Kelas 1</option>
+                                <option value="kelas_2" {{ old('jenis', $room->jenis) == 'kelas_2' ? 'selected' : '' }}>Kelas 2</option>
+                                <option value="kelas_3" {{ old('jenis', $room->jenis) == 'kelas_3' ? 'selected' : '' }}>Kelas 3</option>
+                                <option value="icu" {{ old('jenis', $room->jenis) == 'icu' ? 'selected' : '' }}>ICU</option>
+                                <option value="isolasi" {{ old('jenis', $room->jenis) == 'isolasi' ? 'selected' : '' }}>Isolasi</option>
+                            </select>
+                            @error('jenis')
                                 <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                             @enderror
                         </div>
 
                         <!-- Daily Rate -->
                         <div>
-                            <label for="daily_rate" class="block text-sm font-semibold text-gray-700 mb-2">
-                                Daily Rate (Rp) <span class="text-red-500">*</span>
+                            <label for="tarif_per_hari" class="block text-sm font-semibold text-gray-700 mb-2">
+                                Tarif Per Hari (Rp) <span class="text-red-500">*</span>
                             </label>
-                            <input type="number" step="0.01" name="daily_rate" id="daily_rate" required value="{{ old('daily_rate', $room->daily_rate) }}"
+                            <input type="number" step="0.01" name="tarif_per_hari" id="tarif_per_hari" required value="{{ old('tarif_per_hari', $room->tarif_per_hari) }}"
                                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
-                            @error('daily_rate')
+                            @error('tarif_per_hari')
                                 <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                             @enderror
                         </div>
 
                         <!-- Status -->
-                        <div>
+                        <div class="md:col-span-2">
                             <label for="status" class="block text-sm font-semibold text-gray-700 mb-2">
                                 Status
                             </label>
@@ -78,7 +97,7 @@
                                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
                                 <option value="tersedia" {{ old('status', $room->status) == 'tersedia' ? 'selected' : '' }}>Tersedia</option>
                                 <option value="terisi" {{ old('status', $room->status) == 'terisi' ? 'selected' : '' }}>Terisi</option>
-                                <option value="perawatan" {{ old('status', $room->status) == 'perawatan' ? 'selected' : '' }}>Dalam Perawatan</option>
+                                <option value="maintenance" {{ old('status', $room->status) == 'maintenance' ? 'selected' : '' }}>Maintenance</option>
                             </select>
                             @error('status')
                                 <p class="text-red-500 text-sm mt-1">{{ $message }}</p>

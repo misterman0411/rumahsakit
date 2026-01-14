@@ -53,7 +53,7 @@ class PatientPortalController extends Controller
 
             $recentMedicalRecords = MedicalRecord::where('pasien_id', $patient->id)
                 ->with(['dokter.user'])
-                ->latest('tanggal_kunjungan')
+                ->latest()
                 ->limit(3)
                 ->get();
 
@@ -152,8 +152,9 @@ class PatientPortalController extends Controller
             'dokter_id' => $validated['dokter_id'],
             'departemen_id' => $validated['departemen_id'],
             'tanggal_janji' => $validated['tanggal_janji'] . ' ' . $validated['waktu_janji'],
-            'keluhan' => $validated['keluhan'],
-            'tipe_kunjungan' => 'baru',
+            'alasan' => $validated['keluhan'], // Map keluhan to alasan
+            'catatan' => $validated['keluhan'], // Also map to catatan for redundancy if needed, or remove
+            'jenis' => 'rawat_jalan', // Default to rawat_jalan (valid enum)
             'status' => 'terjadwal',
             'nomor_antrian' => ($lastQueue ?? 0) + 1,
         ]);
@@ -173,7 +174,7 @@ class PatientPortalController extends Controller
         if ($patient) {
             $medicalRecords = MedicalRecord::where('pasien_id', $patient->id)
                 ->with(['dokter.user'])
-                ->latest('tanggal_kunjungan')
+                ->latest()
                 ->paginate(10);
         }
 

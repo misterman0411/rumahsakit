@@ -33,9 +33,9 @@
                         <label for="code" class="block text-sm font-semibold text-gray-700 mb-2">
                             Department Code
                         </label>
-                        <input type="text" name="code" id="code" value="{{ old('code', $department->code) }}"
+                        <input type="text" name="kode" id="code" value="{{ old('kode', $department->kode) }}"
                             class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
-                        @error('code')
+                        @error('kode')
                             <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                         @enderror
                     </div>
@@ -46,9 +46,9 @@
                             <label for="head_of_department" class="block text-sm font-semibold text-gray-700 mb-2">
                                 Head of Department
                             </label>
-                            <input type="text" name="head_of_department" id="head_of_department" value="{{ old('head_of_department', $department->head_of_department) }}"
+                            <input type="text" name="kepala_departemen" id="head_of_department" value="{{ old('kepala_departemen', $department->kepala_departemen) }}"
                                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
-                            @error('head_of_department')
+                            @error('kepala_departemen')
                                 <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                             @enderror
                         </div>
@@ -82,9 +82,9 @@
                             <label for="location" class="block text-sm font-semibold text-gray-700 mb-2">
                                 Location
                             </label>
-                            <input type="text" name="location" id="location" value="{{ old('location', $department->location) }}"
+                            <input type="text" name="lokasi" id="location" value="{{ old('lokasi', $department->lokasi) }}"
                                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
-                            @error('location')
+                            @error('lokasi')
                                 <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                             @enderror
                         </div>
@@ -95,24 +95,14 @@
                         <label for="description" class="block text-sm font-semibold text-gray-700 mb-2">
                             Description
                         </label>
-                        <textarea name="description" id="description" rows="4"
-                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500">{{ old('description', $department->description) }}</textarea>
-                        @error('description')
+                        <textarea name="deskripsi" id="description" rows="4"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500">{{ old('deskripsi', $department->deskripsi) }}</textarea>
+                        @error('deskripsi')
                             <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                         @enderror
                     </div>
 
-                    <!-- Operating Hours -->
-                    <div>
-                        <label for="operating_hours" class="block text-sm font-semibold text-gray-700 mb-2">
-                            Operating Hours
-                        </label>
-                        <textarea name="operating_hours" id="operating_hours" rows="2"
-                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500">{{ old('operating_hours', $department->operating_hours) }}</textarea>
-                        @error('operating_hours')
-                            <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-                        @enderror
-                    </div>
+
 
                     <!-- Status -->
                     <div>

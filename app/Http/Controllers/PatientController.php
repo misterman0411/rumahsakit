@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Patient;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class PatientController extends Controller
@@ -61,6 +62,14 @@ class PatientController extends Controller
         $validated['status'] = $validated['status'] ?? 'aktif';
         $validated['jenis_asuransi'] = $validated['jenis_asuransi'] ?? 'tidak_ada';
 
+        // Link to user if email exists
+        if (!empty($validated['email'])) {
+            $user = User::where('email', $validated['email'])->first();
+            if ($user) {
+                $validated['user_id'] = $user->id;
+            }
+        }
+
         $patient = Patient::create($validated);
 
         return redirect()->route('patients.show', $patient)
@@ -108,6 +117,13 @@ class PatientController extends Controller
             'nomor_asuransi' => 'nullable|string|max:100',
             'status' => 'nullable|in:aktif,tidak_aktif,meninggal',
         ]);
+
+        if (!empty($validated['email'])) {
+            $user = User::where('email', $validated['email'])->first();
+            if ($user) {
+                $validated['user_id'] = $user->id;
+            }
+        }
 
         $patient->update($validated);
 

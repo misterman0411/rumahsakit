@@ -17,8 +17,8 @@ class RoomController extends Controller
             $query->where('status', $request->status);
         }
 
-        if ($request->filled('tipe_ruangan')) {
-            $query->where('tipe_ruangan', $request->tipe_ruangan);
+        if ($request->filled('jenis')) {
+            $query->where('jenis', $request->jenis);
         }
 
         $rooms = $query->orderBy('nomor_ruangan')->paginate(20);
@@ -35,12 +35,13 @@ class RoomController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
+            'nama' => 'required|string|max:255',
             'nomor_ruangan' => 'required|string|unique:ruangan,nomor_ruangan',
-            'tipe_ruangan' => 'required|in:vip,kelas_1,kelas_2,kelas_3,icu,darurat',
-            'lantai' => 'required|integer',
+            'jenis' => 'required|in:vip,kelas_1,kelas_2,kelas_3,icu,isolasi',
             'kapasitas' => 'required|integer|min:1',
             'tarif_per_hari' => 'required|numeric|min:0',
-            'status' => 'required|in:tersedia,terisi,perawatan',
+            'status' => 'required|in:tersedia,terisi,maintenance',
+            'departemen_id' => 'required|exists:departemen,id',
         ]);
 
         $room = Room::create($validated);
@@ -73,10 +74,11 @@ class RoomController extends Controller
     public function update(Request $request, Room $room)
     {
         $validated = $request->validate([
-            'tipe_ruangan' => 'required|in:vip,kelas_1,kelas_2,kelas_3,icu,darurat',
-            'lantai' => 'required|integer',
+            'nama' => 'required|string|max:255',
+            'jenis' => 'required|in:vip,kelas_1,kelas_2,kelas_3,icu,isolasi',
             'tarif_per_hari' => 'required|numeric|min:0',
-            'status' => 'required|in:tersedia,terisi,perawatan',
+            'status' => 'required|in:tersedia,terisi,maintenance',
+            'departemen_id' => 'required|exists:departemen,id',
         ]);
 
         $room->update($validated);

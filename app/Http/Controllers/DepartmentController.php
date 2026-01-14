@@ -24,6 +24,11 @@ class DepartmentController extends Controller
             'nama' => 'required|string|max:255',
             'kode' => 'required|string|unique:departemen,kode',
             'deskripsi' => 'nullable|string',
+            'lokasi' => 'nullable|string|max:255',
+            'telepon' => 'nullable|string|max:20',
+            'email' => 'nullable|email|max:255',
+            'kepala_departemen' => 'nullable|string|max:255',
+            'status' => 'nullable|in:active,inactive',
         ]);
 
         $department = Department::create($validated);
@@ -48,6 +53,11 @@ class DepartmentController extends Controller
         $validated = $request->validate([
             'nama' => 'required|string|max:255',
             'deskripsi' => 'nullable|string',
+            'lokasi' => 'nullable|string|max:255',
+            'telepon' => 'nullable|string|max:20',
+            'email' => 'nullable|email|max:255',
+            'kepala_departemen' => 'nullable|string|max:255',
+            'status' => 'nullable|in:active,inactive',
         ]);
 
         $department->update($validated);
