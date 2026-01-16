@@ -84,13 +84,6 @@
                     <span class="font-medium">Janji Temu</span>
                 </a>
 
-                <a href="{{ route('patient.appointments.book') }}" class="patient-nav-item {{ request()->routeIs('patient.appointments.book') ? 'active' : '' }}">
-                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-                    </svg>
-                    <span class="font-medium">Booking Konsultasi</span>
-                </a>
-
                 <div class="px-4 mt-6 mb-3">
                     <p class="text-xs font-semibold text-indigo-300 uppercase tracking-wider">Riwayat Kesehatan</p>
                 </div>

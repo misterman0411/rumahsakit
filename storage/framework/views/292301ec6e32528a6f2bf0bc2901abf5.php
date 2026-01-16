@@ -1,9 +1,58 @@
+<!DOCTYPE html>
+<html lang="<?php echo e(str_replace('_', '-', app()->getLocale())); ?>">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="csrf-token" content="<?php echo e(csrf_token()); ?>">
+    <title><?php echo e(config('app.name', 'MedCare')); ?> - Booking Konsultasi</title>
+    <?php echo app('Illuminate\Foundation\Vite')(['resources/css/app.css', 'resources/js/app.js']); ?>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Poppins', sans-serif; }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <?php if (isset($component)) { $__componentOriginala591787d01fe92c5706972626cdf7231 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginala591787d01fe92c5706972626cdf7231 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.navbar','data' => []] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('navbar'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes([]); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginala591787d01fe92c5706972626cdf7231)): ?>
+<?php $attributes = $__attributesOriginala591787d01fe92c5706972626cdf7231; ?>
+<?php unset($__attributesOriginala591787d01fe92c5706972626cdf7231); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginala591787d01fe92c5706972626cdf7231)): ?>
+<?php $component = $__componentOriginala591787d01fe92c5706972626cdf7231; ?>
+<?php unset($__componentOriginala591787d01fe92c5706972626cdf7231); ?>
+<?php endif; ?>
+    
+    <div class="min-h-screen pt-20">
+        <!-- Header -->
+        <div class="bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-8">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex items-center space-x-4">
+                    <a href="<?php echo e(route('patient.dashboard')); ?>" class="text-white/80 hover:text-white transition-colors">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                        </svg>
+                    </a>
+                    <div>
+                        <h1 class="text-3xl font-bold">Booking Konsultasi</h1>
+                        <p class="text-indigo-100 mt-1">Buat janji temu dengan dokter</p>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-
-<?php $__env->startSection('title', 'Booking Konsultasi'); ?>
-<?php $__env->startSection('subtitle', 'Buat janji temu dengan dokter'); ?>
-
-<?php $__env->startSection('content'); ?>
+        <!-- Content -->
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
 <?php if(!$patient): ?>
     <div class="bg-yellow-50 border border-yellow-200 rounded-2xl p-6 text-center">
         <svg class="w-16 h-16 text-yellow-500 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -144,6 +193,26 @@ endif;
 unset($__errorArgs, $__bag); ?>
                 </div>
 
+                <!-- Price Information -->
+                <div class="bg-blue-50 border border-blue-200 rounded-xl p-6">
+                    <div class="flex items-start space-x-3">
+                        <svg class="w-6 h-6 text-blue-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <div>
+                            <h4 class="font-semibold text-gray-900 mb-2">Informasi Biaya</h4>
+                            <ul class="space-y-1 text-sm text-gray-700">
+                                <li class="flex justify-between">
+                                    <span>• Biaya Konsultasi Dokter:</span>
+                                    <span class="font-semibold ml-2">Rp 150.000</span>
+                                </li>
+                                <li class="text-gray-600 text-xs mt-2">* Biaya tindakan medis dan obat (jika ada) akan ditagihkan terpisah</li>
+                                <li class="text-gray-600 text-xs">* Pembayaran dapat dilakukan setelah konsultasi di kasir</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Submit -->
                 <div class="flex items-center justify-between pt-4 border-t border-gray-100">
                     <a href="<?php echo e(route('patient.appointments')); ?>" class="text-gray-600 hover:text-gray-800 font-medium">
@@ -157,6 +226,11 @@ unset($__errorArgs, $__bag); ?>
         </div>
     </div>
 <?php endif; ?>
+
+        </div>
+    </div>
+</body>
+</html>
 
 <script>
     // Filter doctors by department
@@ -178,6 +252,4 @@ unset($__errorArgs, $__bag); ?>
         doctorSelect.value = '';
     });
 </script>
-<?php $__env->stopSection(); ?>
-
-<?php echo $__env->make('layouts.patient', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH E:\laragon\www\rumahsakit\resources\views/patient/book-appointment.blade.php ENDPATH**/ ?>
+<?php /**PATH E:\laragon\www\rumahsakit\resources\views/patient/book-appointment.blade.php ENDPATH**/ ?>

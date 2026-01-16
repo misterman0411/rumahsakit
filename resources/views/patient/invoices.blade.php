@@ -31,14 +31,16 @@
                     <div class="text-right">
                         <p class="text-xl font-bold text-gray-900">Rp {{ number_format($invoice->total ?? 0, 0, ',', '.') }}</p>
                         <span class="px-3 py-1 text-xs font-semibold rounded-full 
-                            @if($invoice->status === 'paid') bg-green-100 text-green-700
-                            @elseif($invoice->status === 'partial') bg-blue-100 text-blue-700
-                            @elseif($invoice->status === 'unpaid') bg-red-100 text-red-700
+                            @if($invoice->status === 'lunas') bg-green-100 text-green-700
+                            @elseif($invoice->status === 'dibayar_sebagian') bg-blue-100 text-blue-700
+                            @elseif($invoice->status === 'belum_dibayar') bg-red-100 text-red-700
+                            @elseif($invoice->status === 'dibatalkan') bg-gray-100 text-gray-700
                             @else bg-gray-100 text-gray-700
                             @endif">
-                            @if($invoice->status === 'paid') Lunas
-                            @elseif($invoice->status === 'partial') Sebagian
-                            @elseif($invoice->status === 'unpaid') Belum Bayar
+                            @if($invoice->status === 'lunas') Lunas
+                            @elseif($invoice->status === 'dibayar_sebagian') Dibayar Sebagian
+                            @elseif($invoice->status === 'belum_dibayar') Belum Dibayar
+                            @elseif($invoice->status === 'dibatalkan') Dibatalkan
                             @else {{ ucfirst($invoice->status) }}
                             @endif
                         </span>
@@ -46,22 +48,22 @@
                 </div>
                 
                 <div class="p-6">
-                    @if($invoice->items && $invoice->items->count() > 0)
+                    @if($invoice->itemTagihan && $invoice->itemTagihan->count() > 0)
                         <h5 class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">Rincian</h5>
                         <div class="space-y-2 mb-4">
-                            @foreach($invoice->items as $item)
+                            @foreach($invoice->itemTagihan as $item)
                                 <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                                     <span class="text-gray-700">{{ $item->deskripsi ?? 'Item' }}</span>
-                                    <span class="font-medium text-gray-900">Rp {{ number_format($item->jumlah ?? 0, 0, ',', '.') }}</span>
+                                    <span class="font-medium text-gray-900">Rp {{ number_format($item->total ?? 0, 0, ',', '.') }}</span>
                                 </div>
                             @endforeach
                         </div>
                     @endif
                     
-                    @if($invoice->payments && $invoice->payments->count() > 0)
+                    @if($invoice->pembayaran && $invoice->pembayaran->count() > 0)
                         <h5 class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3 mt-4">Riwayat Pembayaran</h5>
                         <div class="space-y-2">
-                            @foreach($invoice->payments as $payment)
+                            @foreach($invoice->pembayaran as $payment)
                                 <div class="flex items-center justify-between p-3 bg-green-50 rounded-lg">
                                     <div>
                                         <span class="text-green-700 font-medium">Pembayaran {{ $payment->created_at->format('d M Y') }}</span>
@@ -70,6 +72,20 @@
                                     <span class="font-semibold text-green-700">Rp {{ number_format($payment->jumlah ?? 0, 0, ',', '.') }}</span>
                                 </div>
                             @endforeach
+                        </div>
+                    @endif
+
+                    @if($invoice->status === 'belum_dibayar')
+                        <div class="mt-4 pt-4 border-t border-gray-200">
+                            <form action="{{ route('patient.invoices.pay', $invoice->id) }}" method="POST">
+                                @csrf
+                                <button type="submit" class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold py-3 px-6 rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl flex items-center justify-center gap-2">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                                    </svg>
+                                    Bayar Sekarang
+                                </button>
+                            </form>
                         </div>
                     @endif
                 </div>

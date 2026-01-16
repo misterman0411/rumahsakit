@@ -28,12 +28,25 @@
 
             <!-- Doctor -->
             <div class="md:col-span-2">
+                <label for="departemen_id" class="block text-sm font-medium text-gray-700">Department *</label>
+                <select name="departemen_id" id="departemen_id" required
+                    class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                    <option value="">Select Department</option>
+                    @foreach($departments as $department)
+                        <option value="{{ $department->id }}" {{ old('departemen_id') == $department->id ? 'selected' : '' }}>
+                            {{ $department->nama }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+
+            <div class="md:col-span-2">
                 <label for="dokter_id" class="block text-sm font-medium text-gray-700">Doctor *</label>
                 <select name="dokter_id" id="dokter_id" required
                     class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
                     <option value="">Select Doctor</option>
                     @foreach($doctors as $doctor)
-                        <option value="{{ $doctor->id }}" {{ old('dokter_id') == $doctor->id ? 'selected' : '' }}>
+                        <option value="{{ $doctor->id }}" data-department="{{ $doctor->departemen_id }}" {{ old('dokter_id') == $doctor->id ? 'selected' : '' }}>
                             {{ $doctor->user->nama }} - {{ $doctor->departemen->nama }}
                         </option>
                     @endforeach
@@ -91,4 +104,43 @@
         </div>
     </form>
 </div>
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const departmentSelect = document.getElementById('departemen_id');
+    const doctorSelect = document.getElementById('dokter_id');
+    const allDoctors = Array.from(doctorSelect.querySelectorAll('option[data-department]'));
+    
+    departmentSelect.addEventListener('change', function() {
+        const selectedDepartment = this.value;
+        
+        // Reset doctor select
+        doctorSelect.innerHTML = '<option value="">Select Doctor</option>';
+        
+        if (selectedDepartment) {
+            // Filter and show only doctors from selected department
+            allDoctors.forEach(option => {
+                if (option.dataset.department === selectedDepartment) {
+                    doctorSelect.appendChild(option.cloneNode(true));
+                }
+            });
+        } else {
+            // Show all doctors if no department selected
+            allDoctors.forEach(option => {
+                doctorSelect.appendChild(option.cloneNode(true));
+            });
+        }
+    });
+    
+    // Auto-select department when doctor is selected
+    doctorSelect.addEventListener('change', function() {
+        const selectedOption = this.options[this.selectedIndex];
+        if (selectedOption.dataset.department) {
+            departmentSelect.value = selectedOption.dataset.department;
+        }
+    });
+});
+</script>
+@endpush
 @endsection

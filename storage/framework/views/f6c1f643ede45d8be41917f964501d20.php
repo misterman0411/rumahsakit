@@ -27,12 +27,26 @@
 
             <!-- Doctor -->
             <div class="md:col-span-2">
+                <label for="departemen_id" class="block text-sm font-medium text-gray-700">Department *</label>
+                <select name="departemen_id" id="departemen_id" required
+                    class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                    <option value="">Select Department</option>
+                    <?php $__currentLoopData = $departments; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $department): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                        <option value="<?php echo e($department->id); ?>" <?php echo e(old('departemen_id') == $department->id ? 'selected' : ''); ?>>
+                            <?php echo e($department->nama); ?>
+
+                        </option>
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                </select>
+            </div>
+
+            <div class="md:col-span-2">
                 <label for="dokter_id" class="block text-sm font-medium text-gray-700">Doctor *</label>
                 <select name="dokter_id" id="dokter_id" required
                     class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
                     <option value="">Select Doctor</option>
                     <?php $__currentLoopData = $doctors; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $doctor): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                        <option value="<?php echo e($doctor->id); ?>" <?php echo e(old('dokter_id') == $doctor->id ? 'selected' : ''); ?>>
+                        <option value="<?php echo e($doctor->id); ?>" data-department="<?php echo e($doctor->departemen_id); ?>" <?php echo e(old('dokter_id') == $doctor->id ? 'selected' : ''); ?>>
                             <?php echo e($doctor->user->nama); ?> - <?php echo e($doctor->departemen->nama); ?>
 
                         </option>
@@ -91,6 +105,45 @@
         </div>
     </form>
 </div>
+
+<?php $__env->startPush('scripts'); ?>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const departmentSelect = document.getElementById('departemen_id');
+    const doctorSelect = document.getElementById('dokter_id');
+    const allDoctors = Array.from(doctorSelect.querySelectorAll('option[data-department]'));
+    
+    departmentSelect.addEventListener('change', function() {
+        const selectedDepartment = this.value;
+        
+        // Reset doctor select
+        doctorSelect.innerHTML = '<option value="">Select Doctor</option>';
+        
+        if (selectedDepartment) {
+            // Filter and show only doctors from selected department
+            allDoctors.forEach(option => {
+                if (option.dataset.department === selectedDepartment) {
+                    doctorSelect.appendChild(option.cloneNode(true));
+                }
+            });
+        } else {
+            // Show all doctors if no department selected
+            allDoctors.forEach(option => {
+                doctorSelect.appendChild(option.cloneNode(true));
+            });
+        }
+    });
+    
+    // Auto-select department when doctor is selected
+    doctorSelect.addEventListener('change', function() {
+        const selectedOption = this.options[this.selectedIndex];
+        if (selectedOption.dataset.department) {
+            departmentSelect.value = selectedOption.dataset.department;
+        }
+    });
+});
+</script>
+<?php $__env->stopPush(); ?>
 <?php $__env->stopSection(); ?>
 
 <?php echo $__env->make('layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH E:\laragon\www\rumahsakit\resources\views/appointments/create.blade.php ENDPATH**/ ?>

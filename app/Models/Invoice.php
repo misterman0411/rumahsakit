@@ -15,6 +15,7 @@ class Invoice extends Model
         'nomor_tagihan',
         'pasien_id',
         'kunjungan_id',
+        'janji_temu_id',
         'tagihan_untuk_id',
         'tagihan_untuk_tipe',
         'subtotal',

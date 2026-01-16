@@ -77,7 +77,12 @@ class Appointment extends Model
 
     public function tagihan()
     {
-        return $this->morphOne(Invoice::class, 'tagihan_untuk', 'tagihan_untuk_tipe', 'tagihan_untuk_id');
+        return $this->hasOne(Invoice::class, 'janji_temu_id');
+    }
+
+    public function invoice()
+    {
+        return $this->hasOne(Invoice::class, 'janji_temu_id');
     }
 
     // Accessor untuk kompatibilitas dengan nama Inggris

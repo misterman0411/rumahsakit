@@ -101,7 +101,7 @@ class ManagementReportController extends Controller
             ->get();
 
         // Recent Payments (Detailed List)
-        $recentPayments = Payment::with(['tagihan.pasien', 'kasir'])
+        $recentPayments = Payment::with(['tagihan.pasien', 'diterimaOleh'])
             ->whereBetween('tanggal_pembayaran', [$startDate, $endDate])
             ->orderBy('tanggal_pembayaran', 'desc')
             ->limit(50)

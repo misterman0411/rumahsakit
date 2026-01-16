@@ -60,7 +60,7 @@
                 <div class="hidden md:block">
                     <div class="ml-10 flex items-baseline space-x-8">
                         <a href="<?php echo e(route('home')); ?>" class="text-gray-600 hover:text-indigo-600 font-medium px-3 py-2 rounded-md text-base transition-colors">Home</a>
-                        <a href="<?php echo e(route('shop.index')); ?>" class="text-gray-600 hover:text-indigo-600 font-medium px-3 py-2 rounded-md text-base transition-colors">Beli Obat</a>
+                        
                         <a href="#" class="text-gray-600 hover:text-indigo-600 font-medium px-3 py-2 rounded-md text-base transition-colors">Konsultasi</a>
                     </div>
                 </div>

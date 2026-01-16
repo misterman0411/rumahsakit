@@ -42,7 +42,7 @@ class MidtransService
             ],
             'item_details' => $this->getItemDetails($invoice),
             'callbacks' => [
-                'finish' => route('billing.payment-success') . '?order_id=' . $orderId,
+                'finish' => route('patient.payment.success') . '?order_id=' . $orderId,
             ],
         ];
 
@@ -249,16 +249,41 @@ class MidtransService
                 ->get($this->baseUrl . '/' . $orderId . '/status');
 
             if ($response->successful()) {
-                return $response->json();
+                $result = $response->json();
+                
+                Log::info('Midtrans Transaction Status Retrieved', [
+                    'order_id' => $orderId,
+                    'status' => $result['transaction_status'] ?? null,
+                ]);
+
+                return [
+                    'success' => true,
+                    'transaction_status' => $result['transaction_status'] ?? null,
+                    'payment_type' => $result['payment_type'] ?? null,
+                    'gross_amount' => $result['gross_amount'] ?? null,
+                    'fraud_status' => $result['fraud_status'] ?? 'accept',
+                ];
             }
 
-            return null;
+            Log::error('Midtrans Status Check Failed', [
+                'order_id' => $orderId,
+                'status' => $response->status(),
+            ]);
+
+            return [
+                'success' => false,
+                'message' => 'Failed to get transaction status',
+            ];
         } catch (\Exception $e) {
             Log::error('Midtrans Get Status Failed', [
                 'order_id' => $orderId,
                 'error' => $e->getMessage(),
             ]);
-            return null;
+            
+            return [
+                'success' => false,
+                'message' => 'Error checking transaction status: ' . $e->getMessage(),
+            ];
         }
     }
 

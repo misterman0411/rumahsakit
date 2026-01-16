@@ -70,6 +70,10 @@ Route::middleware(['auth'])->prefix('patient')->name('patient.')->group(function
     Route::get('/lab-results', [PatientPortalController::class, 'labResults'])->name('lab-results');
     Route::get('/radiology-results', [PatientPortalController::class, 'radiologyResults'])->name('radiology-results');
     Route::get('/invoices', [PatientPortalController::class, 'invoices'])->name('invoices');
+    Route::post('/invoices/{invoice}/pay', [PatientPortalController::class, 'payInvoice'])->name('invoices.pay');
+    Route::get('/payment/success', [PatientPortalController::class, 'paymentSuccess'])->name('payment.success');
+    Route::get('/payment/pending', [PatientPortalController::class, 'paymentPending'])->name('payment.pending');
+    Route::get('/payment/failed', [PatientPortalController::class, 'paymentFailed'])->name('payment.failed');
 });
 
 Route::middleware(['auth'])->group(function () {
@@ -410,6 +414,11 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/staff-performance', [App\Http\Controllers\ManagementReportController::class, 'staffPerformance'])->name('staff-performance');
     });
 });
+
+// ============================================
+// MIDTRANS WEBHOOK (No Auth Required)
+// ============================================
+Route::post('/midtrans/notification', [PatientPortalController::class, 'midtransNotification'])->name('midtrans.notification');
 
 // ============================================
 // PROFILE MANAGEMENT
