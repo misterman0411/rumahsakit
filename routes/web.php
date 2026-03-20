@@ -418,7 +418,7 @@ Route::middleware(['auth'])->group(function () {
 // ============================================
 // MIDTRANS WEBHOOK (No Auth Required)
 // ============================================
-Route::post('/midtrans/notification', [PatientPortalController::class, 'midtransNotification'])->name('midtrans.notification');
+Route::post('/midtrans/notification', [PatientPortalController::class, 'midtransNotification'])->name('patient.midtrans.notification');
 
 // ============================================
 // PROFILE MANAGEMENT
