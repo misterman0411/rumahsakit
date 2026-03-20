@@ -1,1 +1,1 @@
-web: mkdir -p storage/framework/sessions storage/framework/views storage/framework/cache && chmod -R 777 storage bootstrap/cache && php artisan migrate --force && php -d variables_order=EGPCS -S 0.0.0.0:$PORT server.php
+web: mkdir -p storage/framework/sessions storage/framework/views storage/framework/cache && chmod -R 777 storage bootstrap/cache && php artisan migrate --force && php -d variables_order=EGPCS -S 0.0.0.0:$PORT -t public server.php
