@@ -33,9 +33,9 @@ Di Railway dashboard → pilih service app kamu → tab **Variables** → klik *
 ```env
 APP_NAME=Rumah Sakit
 APP_ENV=production
-APP_KEY=                        ← Isi hasil: php artisan key:generate --show
+APP_KEY= base64:KjHp9N/T+hsITWMa825nS3RlosWnb2UoN8OPfLo9UvU=
 APP_DEBUG=false
-APP_URL=                        ← Isi setelah dapat URL dari Railway (langkah 5)
+APP_URL= web-production-2c14a.up.railway.appRailway
 
 APP_LOCALE=id
 APP_FALLBACK_LOCALE=id
