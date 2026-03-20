@@ -25,9 +25,10 @@ cmds = [
 
 [phases.build]
 cmds = [
-  "php artisan config:cache"
+  "mkdir -p storage/framework/sessions storage/framework/views storage/framework/cache",
+  "chmod -R 775 storage bootstrap/cache",
+  "php artisan optimize:clear"
 ]
-
 
 [start]
 cmd = "php artisan migrate --force && php -S 0.0.0.0:$PORT -t public"
