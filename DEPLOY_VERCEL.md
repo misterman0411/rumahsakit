@@ -8,9 +8,9 @@ Panduan ini menggantikan `DEPLOY_RAILWAY.md` (arsip — Railway setup tidak dipa
 |----------|----------|--------|
 | Hosting | Vercel Serverless | Auto-scaling, CDN global, free tier generous |
 | PHP runtime | `vercel-php@0.9.0` (community) | Satu-satunya runtime PHP mature di Vercel |
-| Database | PlanetScale MySQL | Free 5GB, MySQL-compatible, branch-based workflow |
+| Database | TiDB Cloud Serverless (MySQL 8.0 compatible) | Free tier tanpa kartu kredit, MySQL-compatible, serverless auto-scale |
 | File storage | Vercel Blob | Native integration, ideal untuk upload radiologi |
-| Cache/Session/Queue | `database` driver | Konsisten dengan PlanetScale, tidak butuh Redis |
+| Cache/Session/Queue | `database` driver | Konsisten dengan TiDB, tidak butuh Redis |
 | Cron | Vercel Cron | Replace `schedule:run` di Railway |
 | Logging | stderr (auto-captured Vercel) | Tidak ada persistent log file di filesystem |
 
@@ -19,29 +19,46 @@ Panduan ini menggantikan `DEPLOY_RAILWAY.md` (arsip — Railway setup tidak dipa
 ## Prasyarat
 
 - [Akun Vercel](https://vercel.com/signup) (gratis)
-- [Akun PlanetScale](https://planetscale.com/signup) (gratis)
+- [Akun TiDB Cloud](https://tidbcloud.com/free-tier) (gratis, **tidak butuh kartu kredit**)
 - Repo ini sudah ter-connect ke GitHub/GitLab/Bitbucket
 - Local punya `php`, `composer`, `node`, `npm` (untuk build assets)
 
 ---
 
-## 1. Buat Database di PlanetScale
+## 1. Buat Database di TiDB Cloud Serverless
 
-1. Login ke [planetscale.com](https://planetscale.com) → New database
-2. Pilih region terdekat (Singapore `ap-southeast` recommended untuk Indonesia)
-3. Nama DB: `hospital-db`
-4. Klik **Create database**
-5. Setelah DB ready, ke tab **Branches** → klik branch `main` → **Connect** → pilih **PHP** → copy connection string:
-   ```
-   mysql://USERNAME:PASSWORD@HOST/DBNAME?ssl={"ssl":{"ca":"/etc/ssl/cert.pem"}}
-   ```
-6. Catat credentials berikut (akan dipakai di langkah 4):
-   - `DB_HOST` (hostname tanpa port)
-   - `DB_PORT` (default `3306`)
-   - `DB_DATABASE` (nama database)
-   - `DB_USERNAME` dan `DB_PASSWORD`
+TiDB Cloud Serverless adalah **MySQL 8.0 compatible** dengan free tier yang generous (5GB storage, 50M Request Units/bulan) — **tidak butuh kartu kredit**, jadi lebih mudah dibanding PlanetScale yang sudah discontinue free tier.
 
-> ⚠️ PlanetScale **disable foreign keys** di production branch. Beberapa migration Laravel akan emit warning, bukan error — ini normal.
+1. Login ke [tidbcloud.com](https://tidbcloud.com) (sign up dengan Google/GitHub)
+2. **Create Cluster** → pilih **Serverless** (bukan Dedicated)
+3. Setting:
+   - **Cluster Name**: `rumahsakit-prod`
+   - **Region**: `Singapore (ap-southeast-1)` recommended untuk latency Indonesia
+   - **Tier**: `Free` (default untuk Serverless)
+4. Klik **Create Cluster** (provisining ~30 detik)
+5. Setelah cluster ready, klik **Connect** di kanan atas:
+   - **Connection Type**: `General` (standard MySQL driver)
+   - **Operating System**: `Linux`
+   - Copy **Connect with...** string untuk **MySQL CLI** — bentuknya:
+     ```
+     mysql --connect-timeout 15 -u USERNAME -h HOST.tidbcloud.com -P 4000 -p DATABASE
+     ```
+   - Catat:
+     - `HOST` (contoh: `gateway.tidbcloud.com`)
+     - `PORT` = `4000` (default TiDB Cloud, **bukan 3306**)
+     - `USERNAME` (format: `<username>.root`)
+     - `PASSWORD` (generate baru atau pakai default)
+     - `DATABASE` (default `test`, rename ke `hospital_db`)
+
+6. (Opsional tapi recommended) Rename database default ke nama yang lebih deskriptif:
+   ```sql
+   CREATE DATABASE hospital_db;
+   -- Opsional: drop database 'test' setelah migrate
+   ```
+
+> ⚠️ **SSL Wajib**: TiDB Cloud Serverless **wajib** pakai TLS. Sertifikat CA Let's Encrypt (`isrgrootx1.pem`) sudah tersedia di `/etc/ssl/cert.pem` di Vercel. Set env var `MYSQL_ATTR_SSL_CA=/etc/ssl/cert.pem` di langkah 4.
+
+> ✅ **Foreign keys tetap aktif** di TiDB Cloud Serverless — beda dari PlanetScale yang disable FK. Migration Laravel akan jalan normal tanpa warning.
 
 ---
 
@@ -82,12 +99,13 @@ Di Vercel dashboard → Project → **Settings** → **Environment Variables**, 
 | `APP_DEBUG` | `false` | |
 | `APP_KEY` | `base64:...` | Generate: `php artisan key:generate --show` |
 | `APP_URL` | `https://rumahsakit.vercel.app` | Sesuaikan dengan project URL |
-| `DB_CONNECTION` | `mysql` | |
-| `DB_HOST` | `...psdb.cloud` | Dari PlanetScale |
-| `DB_PORT` | `3306` | |
-| `DB_DATABASE` | `hospital-db` | |
-| `DB_USERNAME` | `...` | Dari PlanetScale |
-| `DB_PASSWORD` | `...` | Dari PlanetScale |
+| `DB_CONNECTION` | `mysql` | TiDB Cloud pakai MySQL protocol |
+| `DB_HOST` | `gateway.tidbcloud.com` | Dari TiDB Cloud Connect dialog |
+| `DB_PORT` | `4000` | **Bukan 3306** — TiDB Cloud Serverless default port |
+| `DB_DATABASE` | `hospital_db` | Atau nama lain yang dibuat di langkah 1 |
+| `DB_USERNAME` | `<user>.root` | Dari TiDB Cloud (ada suffix `.root`) |
+| `DB_PASSWORD` | `...` | Dari TiDB Cloud |
+| `MYSQL_ATTR_SSL_CA` | `/etc/ssl/cert.pem` | **Wajib** untuk TLS ke TiDB Cloud. Path default CA bundle di Linux/Vercel |
 | `SESSION_DRIVER` | `cookie` | Stateless, tidak butuh server storage |
 | `CACHE_STORE` | `database` | Tabel `cache` sudah ada di migration |
 | `QUEUE_CONNECTION` | `database` | Tabel `jobs` sudah ada (migration baru) |
@@ -111,13 +129,14 @@ Di Vercel dashboard → Project → **Settings** → **Environment Variables**, 
 Vercel tidak punya shell persistent, jadi migration dijalankan dari **local** dengan mengarahkan ke database production.
 
 ```bash
-# Export credentials PlanetScale ke environment lokal
-export DB_HOST="..."
-export DB_PORT="3306"
-export DB_DATABASE="hospital-db"
+# Export credentials TiDB Cloud ke environment lokal
+export DB_HOST="gateway.tidbcloud.com"
+export DB_PORT="4000"
+export DB_DATABASE="hospital_db"
 export DB_USERNAME="..."
 export DB_PASSWORD="..."
 export DB_CONNECTION="mysql"
+export MYSQL_ATTR_SSL_CA="/etc/ssl/cert.pem"
 
 # Jalankan migration
 php artisan migrate --force
@@ -157,7 +176,7 @@ git add vercel.json api/ .vercelignore config/vercel_blob.php config/filesystems
         app/Models/RadiologyOrder.php resources/views/radiology/ \
         database/migrations/2026_01_15_030000_create_jobs_table.php \
         routes/web.php routes/console.php .env.example DEPLOY_VERCEL.md
-git commit -m "feat: Vercel deployment setup with PlanetScale and Vercel Blob"
+git commit -m "feat: Vercel deployment setup with TiDB Cloud and Vercel Blob"
 git push origin main
 ```
 
@@ -206,9 +225,12 @@ Pastikan `BLOB_READ_WRITE_TOKEN` ter-inject. Cek di tab Storage → klik Blob st
 
 Cek tab **Crons** di project settings — jadwal `1 0 * * *` di vercel.json berarti jalan tiap hari jam 00:01 UTC. Test manual via curl seperti di langkah 8.5.
 
-### Migration error di PlanetScale
+### Migration error di TiDB Cloud
 
-PlanetScale disable FK di production branch. Cek error message — kalau soal FK, abaikan saja (Laravel emit warning, bukan error fatal).
+TiDB Cloud Serverless pakai MySQL 8.0 syntax — semua migration Laravel seharusnya jalan normal. Kalau ada error:
+- **SSL error** → pastikan `MYSQL_ATTR_SSL_CA=/etc/ssl/cert.pem` ter-set
+- **Connection timeout** → cek `DB_PORT=4000` (bukan 3306)
+- **Unknown database** → cek `DB_DATABASE` sesuai nama yang dibuat di langkah 1
 
 ---
 
@@ -236,11 +258,13 @@ Atau di dashboard → Project → Logs.
 
 ### Backup database
 
-PlanetScale otomatis daily backup di paid tier. Di free tier, export manual via:
+TiDB Cloud Serverless free tier tidak include automatic backup. Export manual via mysqldump:
 
 ```bash
-mysqldump -h $DB_HOST -u $DB_USERNAME -p $DB_DATABASE > backup.sql
+mysqldump --ssl-mode=REQUIRED -h $DB_HOST -P 4000 -u $DB_USERNAME -p $DB_DATABASE > backup-$(date +%Y%m%d).sql
 ```
+
+Atau pakai TiDB Cloud UI → cluster → **Backup** tab (untuk paid tier).
 
 ---
 
