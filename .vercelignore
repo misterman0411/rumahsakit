@@ -4,7 +4,6 @@
 
 # Dependencies
 node_modules
-/vendor
 
 # Local environment & secrets (NEVER upload .env)
 .env
