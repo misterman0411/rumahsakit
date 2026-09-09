@@ -15,7 +15,7 @@
             </div>
             <div class="flex space-x-2">
                 @if($radiology->report_status === 'final' && $radiology->image_path)
-                    <a href="{{ asset('storage/' . $radiology->image_path) }}" target="_blank"
+                    <a href="{{ $radiology->image_url }}" target="_blank"
                         class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-2">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
@@ -142,8 +142,8 @@
                 <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
                     <h2 class="text-xl font-bold text-gray-800 mb-4">Gambar Radiologi</h2>
                     <div class="bg-gray-100 p-4 rounded-lg">
-                        <img src="{{ asset('storage/' . $radiology->image_path) }}" 
-                             alt="Radiology Image" 
+                        <img src="{{ $radiology->image_url }}"
+                             alt="Radiology Image"
                              class="w-full h-auto rounded cursor-pointer hover:opacity-90"
                              onclick="document.getElementById('imageModal').classList.remove('hidden')">
                         <p class="text-sm text-gray-500 mt-2 text-center">Klik gambar untuk memperbesar</p>
@@ -502,7 +502,7 @@
 @if($radiology->image_path)
 <div id="imageModal" class="hidden fixed inset-0 bg-black bg-opacity-90 z-50 flex items-center justify-center p-4" onclick="this.classList.add('hidden')">
     <div class="max-w-6xl w-full">
-        <img src="{{ asset('storage/' . $radiology->image_path) }}" alt="Radiology Image" class="w-full h-auto">
+        <img src="{{ $radiology->image_url }}" alt="Radiology Image" class="w-full h-auto">
         <p class="text-white text-center mt-4">Klik di mana saja untuk menutup</p>
     </div>
 </div>

@@ -22,6 +22,7 @@ use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\VitalSignController;
 use App\Http\Controllers\QueueDisplayController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\CronController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -46,6 +47,10 @@ Route::middleware(['auth'])->group(function () {
 
 // Midtrans Webhook (must be outside auth middleware)
 Route::post('/api/midtrans/notification', [MidtransController::class, 'notification'])->name('midtrans.notification');
+
+// Vercel Cron endpoint (must be outside auth + CSRF middleware).
+// Replaces the in-process Schedule::command() at routes/console.php:12.
+Route::get('/api/cron/charge-rooms', [CronController::class, 'chargeRooms'])->name('cron.charge-rooms');
 
 // Midtrans callback routes (must be outside auth middleware for callback)
 Route::get('billing/payment-success', [MidtransController::class, 'paymentSuccess'])->name('billing.payment-success');

@@ -2,8 +2,11 @@
 
 namespace App\Providers;
 
+use App\Services\VercelBlobStorage;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Storage;
+use League\Flysystem\Filesystem;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -12,7 +15,16 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        // Register the custom 'vercel-blob' driver that talks to the
+        // Vercel Blob REST API. Used on Vercel where the filesystem is
+        // read-only and the existing 'local'/'public' drivers cannot
+        // persist user uploads (radiology images, etc.).
+        Storage::extend('vercel-blob', function ($app, array $config) {
+            return new Filesystem(new VercelBlobStorage(
+                token: $config['token'] ?? '',
+                baseUrl: $config['base_url'] ?? 'https://blob.vercel-storage.com',
+            ));
+        });
     }
 
     /**

@@ -60,6 +60,14 @@ return [
             'report' => false,
         ],
 
+        'vercel-blob' => [
+            'driver' => 'vercel-blob',
+            'token' => env('BLOB_READ_WRITE_TOKEN'),
+            'base_url' => env('VERCEL_BLOB_BASE_URL', 'https://blob.vercel-storage.com'),
+            'throw' => false,
+            'report' => false,
+        ],
+
     ],
 
     /*

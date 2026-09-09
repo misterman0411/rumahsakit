@@ -188,10 +188,15 @@ class RadiologyController extends Controller
             'image' => 'nullable|file|mimes:jpg,jpeg,png,dcm,dicom|max:10240', // 10MB max
         ]);
 
-        // Handle image upload
+        // Handle image upload.
+        // Disk is configurable via FILESYSTEM_DISK so Vercel deployments can
+        // route to Vercel Blob while local/XAMPP dev still uses 'public'.
         if ($request->hasFile('image')) {
-            $path = $request->file('image')->store('radiology_images', 'public');
-            $validated['image_path'] = $path;
+            $disk = config('filesystems.default') === 'local' ? 'public' : config('filesystems.default');
+            $validated['image_path'] = $request->file('image')->store(
+                'radiology_images',
+                $disk
+            );
         }
 
         // Save as draft by default

@@ -39,6 +39,44 @@ class RadiologyOrder extends Model
         'waktu_input_hasil' => 'datetime',
     ];
 
+    /**
+     * Resolved image URL for templates.
+     *
+     * - On Vercel, image_path stores the full Vercel Blob URL (returned by
+     *   the custom storage adapter after upload), so we use it verbatim.
+     * - On local/XAMPP, image_path is a relative path under
+     *   storage/app/public and we resolve it via the `public` disk.
+     */
+    public function getImageUrlAttribute(): ?string
+    {
+        if (! $this->image_path) {
+            return null;
+        }
+
+        if (preg_match('#^https?://#i', $this->image_path)) {
+            return $this->image_path;
+        }
+
+        try {
+            return \Illuminate\Support\Facades\Storage::disk('public')->url($this->image_path);
+        } catch (\Throwable) {
+            return asset('storage/'.$this->image_path);
+        }
+    }
+
+    /**
+     * Display label for the stored image path (used in the print view).
+     */
+    public function getImagePathLabelAttribute(): string
+    {
+        if (! $this->image_path) {
+            return '-';
+        }
+
+        // Strip the Vercel Blob host so the printed label shows just the key.
+        return preg_replace('#^https?://[^/]+/#', '', $this->image_path) ?? $this->image_path;
+    }
+
     protected static function boot()
     {
         parent::boot();

@@ -1,0 +1,50 @@
+# Vercel upload filter — keeps the deployment bundle small and free of
+# local-only artifacts. Order doesn't matter; patterns are evaluated against
+# every file in the project root during `vercel deploy`.
+
+# Dependencies
+node_modules
+/vendor
+
+# Local environment & secrets (NEVER upload .env)
+.env
+.env.*
+!.env.example
+
+# Laravel runtime artifacts that get rebuilt by deploy hooks
+storage/logs/*
+storage/framework/cache/data/*
+storage/framework/sessions/*
+storage/framework/views/*
+storage/app/private/*
+storage/app/public/*
+bootstrap/cache/*.php
+!bootstrap/cache/.gitignore
+
+# Tests & dev artifacts
+tests
+.phpunit.cache
+.phpunit.result.cache
+coverage
+
+# Editor / OS noise
+.git
+.github
+.gitattributes
+.gitignore
+.idea
+.vscode
+.DS_Store
+Thumbs.db
+
+# Documentation-only files (the deploy guide is published separately)
+README.md
+DEPLOY_*.md
+LOGIN_CREDENTIALS.md
+LICENSE
+docs
+*.log
+
+# Build outputs that are uploaded via outputDirectory instead
+public/build
+public/hot

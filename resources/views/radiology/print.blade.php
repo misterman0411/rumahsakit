@@ -290,7 +290,7 @@
     <div class="section">
         <div class="image-info">
             <p><strong>📸 Gambar Radiologi:</strong> Tersimpan dalam sistem</p>
-            <p><strong>Path:</strong> {{ $radiology->image_path }}</p>
+            <p><strong>Path:</strong> {{ $radiology->image_path_label }}</p>
             <p style="font-size: 11px; color: #64748b; margin-top: 10px;">
                 <em>* Gambar dapat diakses melalui sistem elektronik untuk analisis lebih lanjut</em>
             </p>
