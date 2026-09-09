@@ -11,12 +11,27 @@
     }
   },
   "routes": [
-    { "src": "/build/(.*)", "dest": "/public/build/$1" },
-    { "src": "/favicon.ico", "dest": "/public/favicon.ico" },
-    { "src": "/robots.txt", "dest": "/public/robots.txt" },
-    { "src": "/(.*)", "dest": "/api/index.php" }
+    {
+      "src": "/build/(.*)",
+      "dest": "/public/build/$1"
+    },
+    {
+      "src": "/favicon.ico",
+      "dest": "/public/favicon.ico"
+    },
+    {
+      "src": "/robots.txt",
+      "dest": "/public/robots.txt"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/api/index.php"
+    }
   ],
   "crons": [
-    { "path": "/api/cron/charge-rooms", "schedule": "1 0 * * *" }
+    {
+      "path": "/api/cron/charge-rooms",
+      "schedule": "1 0 * * *"
+    }
   ]
 }
