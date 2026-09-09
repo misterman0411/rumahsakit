@@ -56,7 +56,7 @@ TiDB Cloud Serverless adalah **MySQL 8.0 compatible** dengan free tier yang gene
    -- Opsional: drop database 'test' setelah migrate
    ```
 
-> ⚠️ **SSL Wajib**: TiDB Cloud Serverless **wajib** pakai TLS. Sertifikat CA Let's Encrypt (`isrgrootx1.pem`) sudah tersedia di `/etc/ssl/cert.pem` di Vercel. Set env var `MYSQL_ATTR_SSL_CA=/etc/ssl/cert.pem` di langkah 4.
+> ⚠️ **SSL Wajib**: TiDB Cloud Serverless **wajib** pakai TLS. Sertifikat CA Let's Encrypt (`isrgrootx1.pem`) sudah ada di `/etc/ssl/cert.pem` di Vercel. Config `database.php` otomatis mendeteksi path ini (Linux) atau fallback ke `storage/certs/isrgrootx1.pem` (bundled). Tidak perlu set env var `MYSQL_ATTR_SSL_CA` kecuali pakai custom CA.
 
 > ✅ **Foreign keys tetap aktif** di TiDB Cloud Serverless — beda dari PlanetScale yang disable FK. Migration Laravel akan jalan normal tanpa warning.
 
@@ -105,7 +105,6 @@ Di Vercel dashboard → Project → **Settings** → **Environment Variables**, 
 | `DB_DATABASE` | `hospital_db` | Atau nama lain yang dibuat di langkah 1 |
 | `DB_USERNAME` | `<user>.root` | Dari TiDB Cloud (ada suffix `.root`) |
 | `DB_PASSWORD` | `...` | Dari TiDB Cloud |
-| `MYSQL_ATTR_SSL_CA` | `/etc/ssl/cert.pem` | **Wajib** untuk TLS ke TiDB Cloud. Path default CA bundle di Linux/Vercel |
 | `SESSION_DRIVER` | `cookie` | Stateless, tidak butuh server storage |
 | `CACHE_STORE` | `database` | Tabel `cache` sudah ada di migration |
 | `QUEUE_CONNECTION` | `database` | Tabel `jobs` sudah ada (migration baru) |
@@ -136,7 +135,9 @@ export DB_DATABASE="hospital_db"
 export DB_USERNAME="..."
 export DB_PASSWORD="..."
 export DB_CONNECTION="mysql"
-export MYSQL_ATTR_SSL_CA="/etc/ssl/cert.pem"
+
+# MYSQL_ATTR_SSL_CA tidak perlu di-set — config otomatis detect path
+# yang sesuai (storage/certs/isrgrootx1.pem di Windows, /etc/ssl/cert.pem di Linux)
 
 # Jalankan migration
 php artisan migrate --force
