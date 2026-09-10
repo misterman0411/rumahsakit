@@ -107,4 +107,4 @@
         </div>
     </div>
 </nav>
-<?php /**PATH E:\laragon\www\rumahsakit\resources\views/components/navbar.blade.php ENDPATH**/ ?>
+<?php /**PATH E:\laragon\www\rumahsakit\resources\views\components\navbar.blade.php ENDPATH**/ ?>

@@ -7,7 +7,7 @@
   "env": {
     "APP_NAME": "Rumah Sakit",
     "APP_ENV": "production",
-    "APP_DEBUG": "false",
+    "APP_DEBUG": "true",
     "APP_URL": "https://rumahsakit-vert.vercel.app",
     "APP_LOCALE": "id",
     "APP_FALLBACK_LOCALE": "id",

@@ -1,0 +1,16 @@
+{
+  "projectId": "prj_cZSGaHbUONtXYIHj2vzovDCsL9pO",
+  "orgId": "team_fZ6eVXgPP4CWJhfiCjZl0oPA",
+  "projectName": "rumahsakit-vert",
+  "settings": {
+    "createdAt": 1789030814417,
+    "framework": null,
+    "devCommand": null,
+    "installCommand": null,
+    "buildCommand": null,
+    "outputDirectory": null,
+    "rootDirectory": null,
+    "directoryListing": false,
+    "nodeVersion": "24.x"
+  }
+}

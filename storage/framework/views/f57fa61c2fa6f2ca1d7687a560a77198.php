@@ -319,4 +319,4 @@
 
 </body>
 </html>
-<?php /**PATH E:\laragon\www\rumahsakit\resources\views/welcome.blade.php ENDPATH**/ ?>
+<?php /**PATH E:\laragon\www\rumahsakit\resources\views\welcome.blade.php ENDPATH**/ ?>
