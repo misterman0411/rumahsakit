@@ -29,6 +29,7 @@ storage/app/private/*
 storage/app/public/*
 !storage/app/public/.gitkeep
 !bootstrap/cache/.gitignore
+bootstrap/cache/*.php
 
 # Tests & dev artifacts
 tests
