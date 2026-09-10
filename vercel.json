@@ -36,13 +36,6 @@
     "MIDTRANS_IS_3DS": "true",
     "VITE_APP_NAME": "Rumah Sakit"
   },
-  "functions": {
-    "api/index.php": {
-      "runtime": "vercel-php@0.9.0",
-      "memory": 1024,
-      "maxDuration": 60
-    }
-  },
   "builds": [
     {
       "src": "api/index.php",
