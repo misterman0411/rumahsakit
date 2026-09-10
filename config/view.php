@@ -27,8 +27,11 @@ return [
     | stored for your application. Typically, this is within the storage
     | directory of your application. Tweak this directory as needed.
     |
+    | On Vercel, the project filesystem is read-only except for /tmp, so
+    | Blade's compiled view cache has to live there.
+    |
     */
 
-    'compiled' => realpath(storage_path('framework/views')),
+    'compiled' => env('VIEW_COMPILED_PATH', realpath(storage_path('framework/views')) ?: sys_get_temp_dir()),
 
 ];

@@ -34,7 +34,8 @@
     "MIDTRANS_IS_PRODUCTION": "false",
     "MIDTRANS_IS_SANITIZED": "true",
     "MIDTRANS_IS_3DS": "true",
-    "VITE_APP_NAME": "Rumah Sakit"
+    "VITE_APP_NAME": "Rumah Sakit",
+    "VIEW_COMPILED_PATH": "/tmp/storage/framework/views"
   },
   "builds": [
     {
