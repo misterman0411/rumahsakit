@@ -1,9 +1,9 @@
 {
   "version": 2,
   "framework": null,
-  "buildCommand": "rm -f bootstrap/cache/*.php && composer dump-autoload --no-dev && php artisan package:discover --ansi --no-interaction && npm run build",
+  "buildCommand": "npm run build",
   "outputDirectory": "public",
-  "installCommand": "composer install --no-dev --optimize-autoloader && npm install",
+  "installCommand": "rm -f bootstrap/cache/*.php && composer dump-autoload --no-dev && php artisan package:discover --ansi --no-interaction && npm install",
   "env": {
     "APP_NAME": "Rumah Sakit",
     "APP_ENV": "production",
