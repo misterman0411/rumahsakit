@@ -11,13 +11,15 @@ node_modules
 !.env.example
 
 # Laravel runtime artifacts that get rebuilt by deploy hooks
+# Keep the bootstrap/cache directory itself (composer install writes
+# services.php into it at build time), but exclude any cached files
+# that might leak from a local environment into production.
 storage/logs/*
 storage/framework/cache/data/*
 storage/framework/sessions/*
 storage/framework/views/*
 storage/app/private/*
 storage/app/public/*
-bootstrap/cache/*.php
 !bootstrap/cache/.gitignore
 
 # Tests & dev artifacts
